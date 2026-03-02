@@ -1,0 +1,80 @@
+export const Colors = {
+  light: {
+    text: '#0f172a',
+    textSecondary: '#64748b',
+    background: '#f8fafc',
+    surface: '#ffffff',
+    surfaceElevated: '#f1f5f9',
+    border: '#e2e8f0',
+    primary: '#3b82f6',
+    primaryDark: '#2563eb',
+    success: '#22c55e',
+    warning: '#f59e0b',
+    danger: '#ef4444',
+    info: '#06b6d4',
+    debit: '#ef4444',
+    credit: '#22c55e',
+    muted: '#94a3b8',
+    icon: '#475569',
+    tabActive: '#3b82f6',
+    tabInactive: '#94a3b8',
+    cardBg: '#ffffff',
+    inputBg: '#f1f5f9',
+    inputBorder: '#cbd5e1',
+    placeholder: '#94a3b8',
+  },
+  dark: {
+    text: '#f1f5f9',
+    textSecondary: '#94a3b8',
+    background: '#0f172a',
+    surface: '#1e293b',
+    surfaceElevated: '#334155',
+    border: '#334155',
+    primary: '#60a5fa',
+    primaryDark: '#3b82f6',
+    success: '#4ade80',
+    warning: '#fbbf24',
+    danger: '#f87171',
+    info: '#22d3ee',
+    debit: '#f87171',
+    credit: '#4ade80',
+    muted: '#64748b',
+    icon: '#cbd5e1',
+    tabActive: '#60a5fa',
+    tabInactive: '#64748b',
+    cardBg: '#1e293b',
+    inputBg: '#334155',
+    inputBorder: '#475569',
+    placeholder: '#64748b',
+  },
+} as const;
+
+export type ColorScheme = keyof typeof Colors;
+
+export const Spacing = {
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 48,
+} as const;
+
+export const FontSize = {
+  xs: 12,
+  sm: 14,
+  base: 16,
+  lg: 18,
+  xl: 20,
+  '2xl': 24,
+  '3xl': 30,
+  '4xl': 36,
+} as const;
+
+export const BorderRadius = {
+  sm: 6,
+  md: 8,
+  lg: 12,
+  xl: 16,
+  full: 9999,
+} as const;
