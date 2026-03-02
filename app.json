@@ -8,9 +8,11 @@
     "scheme": "financialite",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "bundleIdentifier": "com.danreby.financialite",
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "package": "com.danreby.financialite",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -35,11 +37,20 @@
             "imageWidth": 76
           }
         }
-      ]
+      ],
+      "expo-sqlite",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c9326856-db45-4f8d-a832-a8ac1430a23f"
+      }
+    },
+    "owner": "neydo"
   }
 }
