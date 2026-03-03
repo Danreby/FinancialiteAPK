@@ -7,11 +7,20 @@
       "android": {
         "buildType": "apk"
       },
-      "distribution": "internal"
+      "distribution": "internal",
+      "cache": {
+        "key": "v1"
+      },
+      "env": {
+        "EX_UPDATES_NATIVE_DEBUG": "0"
+      }
     },
     "production": {
       "android": {
         "buildType": "apk"
+      },
+      "cache": {
+        "key": "v1"
       }
     }
   }
