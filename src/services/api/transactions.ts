@@ -30,6 +30,7 @@ export const transacoesApi = {
     is_recurring?: boolean;
     bank_user_id?: number;
     category_id?: number;
+    debit_account_id?: number | null;
   }): Promise<Transacao> {
     return apiClient.post<Transacao>('/transacoes', data);
   },
@@ -77,7 +78,7 @@ export const transacoesApi = {
 
   payMonth(data: {
     month: string;
-    bank_user_id?: number;
+    bank_user_id?: number | null;
     bank_account_id: number;
   }): Promise<{ message: string; total_paid?: number }> {
     return apiClient.post('/transacoes/pay-month', data);

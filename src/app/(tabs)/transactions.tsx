@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, FlatList, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, RefreshControl, TouchableOpacity, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { transacoesApi } from '@/services/api/transactions';
 import { categoriesApi } from '@/services/api/categories';
+import { banksApi } from '@/services/api/banks';
 import { formatCurrency } from '@/utils/format';
 import { getCurrentMonthKey } from '@/utils/date';
 import { Header } from '@/components/ui/Header';
@@ -15,7 +16,7 @@ import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { MoneyInput } from '@/components/ui/MoneyInput';
 import { TransactionCard } from '@/components/cards/TransactionCard';
-import type { Transacao, Category, PaginatedResponse } from '@/types';
+import type { Transacao, Category, BankUser, PaginatedResponse } from '@/types';
 
 type FilterType = 'all' | 'credit' | 'debit';
 
@@ -24,6 +25,7 @@ export default function TransactionsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [transactions, setTransactions] = useState<Transacao[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [bankAccounts, setBankAccounts] = useState<BankUser[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -37,6 +39,8 @@ export default function TransactionsScreen() {
   const [formType, setFormType] = useState<string>('debit');
   const [formCategory, setFormCategory] = useState<string | number | undefined>();
   const [formSaving, setFormSaving] = useState(false);
+  const [deductFromBank, setDeductFromBank] = useState(false);
+  const [selectedDebitAccountId, setSelectedDebitAccountId] = useState<string | number | undefined>();
 
   const loadData = useCallback(async (pageNum = 1, filterType: FilterType = filter) => {
     try {
@@ -76,9 +80,17 @@ export default function TransactionsScreen() {
     } catch {}
   }, []);
 
+  const loadBankAccounts = useCallback(async () => {
+    try {
+      const accounts = await banksApi.listAccounts();
+      setBankAccounts(Array.isArray(accounts) ? accounts : []);
+    } catch {}
+  }, []);
+
   useEffect(() => {
     loadData(1);
     loadCategories();
+    loadBankAccounts();
   }, []);
 
   const onRefresh = useCallback(async () => {
@@ -108,6 +120,7 @@ export default function TransactionsScreen() {
         amount: numericValue,
         type: formType as 'credit' | 'debit',
         category_id: formCategory ? Number(formCategory) : undefined,
+        debit_account_id: deductFromBank && selectedDebitAccountId ? Number(selectedDebitAccountId) : null,
       });
       setShowCreate(false);
       resetForm();
@@ -121,6 +134,8 @@ export default function TransactionsScreen() {
     setFormAmount('');
     setFormType('debit');
     setFormCategory(undefined);
+    setDeductFromBank(false);
+    setSelectedDebitAccountId(undefined);
   };
 
   const categoryOptions = categories.map((c) => ({
@@ -252,6 +267,48 @@ export default function TransactionsScreen() {
           options={categoryOptions}
           placeholder="Selecione uma categoria"
         />
+
+        {/* Bank deduction toggle */}
+        {bankAccounts.length > 0 && (
+          <View className="mt-2 border border-dark-200 dark:border-dark-700 rounded-2xl p-4 bg-dark-50 dark:bg-dark-900/30">
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center gap-2 flex-1">
+                <Ionicons name="business-outline" size={16} color="#94a3b8" />
+                <Text className="text-sm font-medium text-dark-700 dark:text-dark-200">
+                  Subtrair de conta bancária
+                </Text>
+              </View>
+              <Switch
+                value={deductFromBank}
+                onValueChange={(val) => {
+                  setDeductFromBank(val);
+                  if (!val) setSelectedDebitAccountId(undefined);
+                }}
+                trackColor={{ false: '#d1d5db', true: '#6366f1' }}
+                thumbColor="#fff"
+              />
+            </View>
+
+            {deductFromBank && (
+              <View className="mt-3">
+                <Select
+                  label="Conta para débito"
+                  value={selectedDebitAccountId}
+                  onChange={setSelectedDebitAccountId}
+                  options={bankAccounts.map((acc) => ({
+                    label: `${acc.name || acc.bank?.name || 'Conta'} · ${formatCurrency(acc.balance || 0)}`,
+                    value: acc.id,
+                    icon: 'wallet-outline' as keyof typeof Ionicons.glyphMap,
+                  }))}
+                  placeholder="Selecione uma conta"
+                />
+                <Text className="text-xs text-dark-500 dark:text-dark-400 mt-1">
+                  O valor da despesa será debitado do saldo da conta selecionada.
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
       </Modal>
     </SafeAreaView>
   );
