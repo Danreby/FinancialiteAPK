@@ -10,11 +10,13 @@ interface SavingsCardProps {
 }
 
 export function SavingsCard({ goal, onPress }: SavingsCardProps) {
-  const progress = goal.target_amount > 0
-    ? (goal.current_amount / goal.target_amount) * 100
-    : 0;
+  const progressFromServer = goal.progress ?? null;
+  const progress = progressFromServer !== null
+    ? progressFromServer
+    : (goal.target_amount > 0 ? (goal.current_amount / goal.target_amount) * 100 : 0);
   const progressClamped = Math.min(progress, 100);
-  const isCompleted = progress >= 100;
+  // Use server-side is_completed when available, fall back to local computation
+  const isCompleted = goal.is_completed ?? (progressClamped >= 100);
 
   return (
     <TouchableOpacity

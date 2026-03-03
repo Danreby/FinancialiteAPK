@@ -79,7 +79,7 @@ export const transacoesApi = {
   payMonth(data: {
     month: string;
     bank_user_id?: number | null;
-    bank_account_id: number;
+    bank_account_id?: number | null;
   }): Promise<{ message: string; total_paid?: number }> {
     return apiClient.post('/transacoes/pay-month', data);
   },

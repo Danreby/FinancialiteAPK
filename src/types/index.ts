@@ -178,6 +178,9 @@ export interface SavingsGoal {
   color: string | null;
   is_active: boolean;
   completed_at: string | null;
+  is_completed: boolean;
+  progress: number;
+  remaining: number;
   user_id: number;
   created_at: string;
 }
