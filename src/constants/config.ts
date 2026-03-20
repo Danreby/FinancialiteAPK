@@ -1,9 +1,12 @@
 const API_BASE_URL = __DEV__
   ? 'http://10.0.2.2:8000/api/v1'
-  : 'https://financialite.app/api/v1';
+  : 'https://financialite.rolims.com/api/v1';
+
+const GOOGLE_WEB_CLIENT_ID = '105982257579-bj5rmr9qcuuggr3rmf081ib4ri4ckfvh.apps.googleusercontent.com';
 
 export const CONFIG = {
   API_BASE_URL,
+  GOOGLE_WEB_CLIENT_ID,
   REQUEST_TIMEOUT: 15000,
   SYNC_INTERVAL: 30000,
   MAX_SYNC_RETRIES: 5,

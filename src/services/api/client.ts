@@ -68,7 +68,7 @@ class ApiClient {
 
       if (!response.ok) {
         throw new ApiError(
-          data?.message || `Erro ${response.status}`,
+          data?.message || data?.error || `Erro ${response.status}`,
           response.status,
           data?.errors
         );

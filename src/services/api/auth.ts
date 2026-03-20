@@ -10,6 +10,10 @@ export const authApi = {
     return apiClient.post<AuthResponse>('/auth/login', data as unknown as Record<string, unknown>);
   },
 
+  googleLogin(idToken: string) {
+    return apiClient.post<AuthResponse>('/auth/google', { id_token: idToken });
+  },
+
   logout() {
     return apiClient.post('/auth/logout');
   },

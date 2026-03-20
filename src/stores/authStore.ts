@@ -14,6 +14,7 @@ interface AuthState {
   error: string | null;
   initialize: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  googleLogin: (idToken: string) => Promise<void>;
   register: (name: string, email: string, password: string, phone?: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -71,6 +72,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({
         isLoading: false,
         error: error instanceof Error ? error.message : 'Erro ao fazer login',
+      });
+      throw error;
+    }
+  },
+
+  googleLogin: async (idToken: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await authApi.googleLogin(idToken);
+      const { user, token } = response.data;
+      await setToken(token);
+      await setStoredUser(JSON.stringify(user));
+      await userRepo.upsert(user);
+      set({ user, isAuthenticated: true, isLoading: false });
+      syncEngine.start();
+      syncEngine.trySync();
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Erro ao fazer login com Google',
       });
       throw error;
     }

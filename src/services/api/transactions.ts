@@ -38,7 +38,7 @@ export const transactionsApi = {
     return apiClient.get<Record<string, unknown>>('/transacoes/top-spending', params as Record<string, string | number | undefined>);
   },
 
-  payMonth(data: { month_key: string; bank_user_id?: number; bank_account_id?: number }) {
+  payMonth(data: { month: string; bank_user_id?: number; bank_account_id?: number }) {
     return apiClient.post('/transacoes/pay-month', data as unknown as Record<string, unknown>);
   },
 
