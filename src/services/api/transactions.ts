@@ -1,86 +1,48 @@
 import { apiClient } from './client';
-import type { Transacao, PaginatedResponse, DashboardStats, FinancialInsights } from '@/types';
+import type { Transacao, TransactionFormData, TransactionFilters } from '@/types';
 
-export const transacoesApi = {
-  list(params?: {
-    bank_user_id?: number;
-    category_id?: number;
-    per_page?: number;
-    page?: number;
-    month?: string | number;
-    year?: string | number;
-    type?: 'credit' | 'debit';
-  }): Promise<PaginatedResponse<Transacao>> {
-    return apiClient.get<PaginatedResponse<Transacao>>('/transacoes', { params });
+export const transactionsApi = {
+  list(filters?: TransactionFilters) {
+    return apiClient.get<{ data: Transacao[] }>('/transacoes', filters as Record<string, string | number | undefined>);
   },
 
-  show(id: number): Promise<Transacao> {
+  get(id: number) {
     return apiClient.get<Transacao>(`/transacoes/${id}`);
   },
 
-  create(data: {
-    title: string;
-    amount: number;
-    type: 'credit' | 'debit';
-    description?: string;
-    status?: string;
-    paid_date?: string;
-    total_installments?: number;
-    current_installment?: number;
-    is_recurring?: boolean;
-    bank_user_id?: number;
-    category_id?: number;
-    debit_account_id?: number | null;
-  }): Promise<Transacao> {
-    return apiClient.post<Transacao>('/transacoes', data);
+  create(data: TransactionFormData) {
+    return apiClient.post<Transacao>('/transacoes', data as unknown as Record<string, unknown>);
   },
 
-  update(id: number, data: Partial<{
-    title: string;
-    amount: number;
-    type: 'credit' | 'debit';
-    description: string;
-    status: string;
-    paid_date: string;
-    total_installments: number;
-    current_installment: number;
-    is_recurring: boolean;
-    bank_user_id: number | null;
-    category_id: number | null;
-  }>): Promise<Transacao> {
-    return apiClient.put<Transacao>(`/transacoes/${id}`, data);
+  update(id: number, data: Partial<TransactionFormData>) {
+    return apiClient.put<Transacao>(`/transacoes/${id}`, data as unknown as Record<string, unknown>);
   },
 
-  delete(id: number): Promise<{ message: string }> {
-    return apiClient.delete<{ message: string }>(`/transacoes/${id}`);
+  delete(id: number) {
+    return apiClient.delete(`/transacoes/${id}`);
   },
 
-  restore(id: number): Promise<{ message: string; transacao: Transacao }> {
-    return apiClient.post<{ message: string; transacao: Transacao }>(`/transacoes/${id}/restore`);
+  restore(id: number) {
+    return apiClient.post(`/transacoes/${id}/restore`);
   },
 
-  stats(params?: { bank_user_id?: number; category_id?: number; month?: string | number; year?: string | number }): Promise<DashboardStats> {
-    return apiClient.get<DashboardStats>('/transacoes/stats', { params });
+  stats(params?: { bank_user_id?: number; month?: string }) {
+    return apiClient.get<Record<string, unknown>>('/transacoes/stats', params as Record<string, string | number | undefined>);
   },
 
-  insights(params?: { bank_user_id?: number }): Promise<FinancialInsights> {
-    return apiClient.get<FinancialInsights>('/transacoes/insights', { params });
+  insights(params?: { bank_user_id?: number }) {
+    return apiClient.get<Record<string, unknown>>('/transacoes/insights', params as Record<string, string | number | undefined>);
   },
 
-  topSpending(params: {
-    month_from: string;
-    month_to: string;
-    bank_user_id?: number;
-    category_id?: number;
-  }): Promise<unknown> {
-    return apiClient.get('/transacoes/top-spending', { params });
+  topSpending(params?: { month_from: string; month_to: string; bank_user_id?: number; category_id?: number }) {
+    return apiClient.get<Record<string, unknown>>('/transacoes/top-spending', params as Record<string, string | number | undefined>);
   },
 
-  payMonth(data: {
-    month: string;
-    bank_user_id?: number | null;
-    bank_account_id?: number | null;
-  }): Promise<{ message: string; total_paid?: number }> {
-    return apiClient.post('/transacoes/pay-month', data);
+  payMonth(data: { month_key: string; bank_user_id?: number; bank_account_id?: number }) {
+    return apiClient.post('/transacoes/pay-month', data as unknown as Record<string, unknown>);
+  },
+
+  export(params?: { bank_user_id?: number; category_id?: number }) {
+    return apiClient.get<Record<string, unknown>>('/transacoes/export', params as Record<string, string | number | undefined>);
   },
 };

@@ -1,100 +1,104 @@
 import { create } from 'zustand';
 import type { User } from '@/types';
 import { authApi } from '@/services/api/auth';
-import { SecureStorage } from '@/services/storage/secure';
-import { clearDatabase } from '@/services/database';
-import { ApiClientError } from '@/services/api/client';
+import { getToken, setToken, removeToken, setStoredUser, getStoredUser, removeStoredUser, clearAllStorage } from '@/services/storage/secure';
+import { UserRepository } from '@/services/database/repositories';
+import { clearDatabase } from '@/services/database/connection';
+import { syncEngine } from '@/services/sync/engine';
+import { sanitizeObject } from '@/utils/sanitize';
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  isInitialized: boolean;
   error: string | null;
-
   initialize: () => Promise<void>;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (data: { name: string; email: string; password: string; password_confirmation: string; phone?: string }) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, phone?: string) => Promise<void>;
   logout: () => Promise<void>;
-  updateUser: (user: Partial<User>) => void;
+  refreshUser: () => Promise<void>;
   clearError: () => void;
 }
+
+const userRepo = new UserRepository();
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isAuthenticated: false,
-  isLoading: false,
-  isInitialized: false,
+  isLoading: true,
   error: null,
 
   initialize: async () => {
     try {
-      const token = await SecureStorage.getToken();
+      const token = await getToken();
       if (!token) {
-        set({ isInitialized: true, isAuthenticated: false });
+        set({ isLoading: false, isAuthenticated: false });
         return;
       }
 
-      const userData = await SecureStorage.getUserData();
-      if (userData) {
-        const user = JSON.parse(userData) as User;
-        set({ user, isAuthenticated: true, isInitialized: true });
+      const storedUser = await getStoredUser();
+      if (storedUser) {
+        const user = JSON.parse(storedUser) as User;
+        set({ user, isAuthenticated: true, isLoading: false });
+        syncEngine.start();
+        return;
       }
 
-      // Validate token with server (non-blocking)
-      try {
-        const freshUser = await authApi.getUser();
-        await SecureStorage.setUserData(JSON.stringify(freshUser));
-        set({ user: freshUser, isAuthenticated: true, isInitialized: true });
-      } catch {
-        // Token invalid - keep offline data but mark as need re-auth on next sync
-        if (!userData) {
-          await SecureStorage.removeToken();
-          set({ isAuthenticated: false, isInitialized: true });
-        } else {
-          set({ isInitialized: true });
-        }
-      }
+      const response = await authApi.getUser();
+      const user = response.data;
+      await setStoredUser(JSON.stringify(user));
+      await userRepo.upsert(user);
+      set({ user, isAuthenticated: true, isLoading: false });
+      syncEngine.start();
     } catch {
-      set({ isInitialized: true, isAuthenticated: false });
+      await clearAllStorage();
+      set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },
 
-  login: async (email, password) => {
+  login: async (email: string, password: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await authApi.login(email, password);
-      await SecureStorage.setToken(response.token);
-      await SecureStorage.setUserData(JSON.stringify(response.user));
-      set({ user: response.user, isAuthenticated: true, isLoading: false });
-      return true;
+      const response = await authApi.login({ email, password });
+      const { user, token } = response.data;
+      await setToken(token);
+      await setStoredUser(JSON.stringify(user));
+      await userRepo.upsert(user);
+      set({ user, isAuthenticated: true, isLoading: false });
+      syncEngine.start();
+      syncEngine.trySync();
     } catch (error) {
-      const message = error instanceof ApiClientError
-        ? error.data && typeof error.data === 'object' && 'errors' in error.data
-          ? Object.values((error.data as { errors: Record<string, string[]> }).errors).flat().join('\n')
-          : error.message
-        : 'Erro ao fazer login. Tente novamente.';
-      set({ isLoading: false, error: message });
-      return false;
+      set({
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Erro ao fazer login',
+      });
+      throw error;
     }
   },
 
-  register: async (data) => {
+  register: async (name: string, email: string, password: string, phone?: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await authApi.register(data);
-      await SecureStorage.setToken(response.token);
-      await SecureStorage.setUserData(JSON.stringify(response.user));
-      set({ user: response.user, isAuthenticated: true, isLoading: false });
-      return true;
+      const sanitized = sanitizeObject({ name, email, phone: phone || '' });
+      const response = await authApi.register({
+        name: sanitized.name,
+        email: sanitized.email,
+        password,
+        password_confirmation: password,
+        phone: sanitized.phone || undefined,
+      });
+      const { user, token } = response.data;
+      await setToken(token);
+      await setStoredUser(JSON.stringify(user));
+      await userRepo.upsert(user);
+      set({ user, isAuthenticated: true, isLoading: false });
+      syncEngine.start();
     } catch (error) {
-      const message = error instanceof ApiClientError
-        ? error.data && typeof error.data === 'object' && 'errors' in error.data
-          ? Object.values((error.data as { errors: Record<string, string[]> }).errors).flat().join('\n')
-          : error.message
-        : 'Erro ao criar conta. Tente novamente.';
-      set({ isLoading: false, error: message });
-      return false;
+      set({
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Erro ao criar conta',
+      });
+      throw error;
     }
   },
 
@@ -102,19 +106,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await authApi.logout();
     } catch {
-      // Ignore server errors on logout
+      // Continue logout even if API fails
     }
-    await SecureStorage.clearAll();
+    syncEngine.stop();
+    await clearAllStorage();
     await clearDatabase();
-    set({ user: null, isAuthenticated: false, error: null });
+    set({ user: null, isAuthenticated: false, isLoading: false, error: null });
   },
 
-  updateUser: (updates) => {
-    const current = get().user;
-    if (current) {
-      const updated = { ...current, ...updates };
-      set({ user: updated });
-      SecureStorage.setUserData(JSON.stringify(updated));
+  refreshUser: async () => {
+    try {
+      const response = await authApi.getUser();
+      const user = response.data;
+      await setStoredUser(JSON.stringify(user));
+      await userRepo.upsert(user);
+      set({ user });
+    } catch {
+      // Silent fail - use cached user
     }
   },
 

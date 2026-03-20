@@ -1,50 +1,28 @@
 import { apiClient } from './client';
-import type { Income } from '@/types';
+import type { Income, IncomeFormData } from '@/types';
 
 export const incomesApi = {
-  list(): Promise<Income[]> {
+  list() {
     return apiClient.get<Income[]>('/incomes');
   },
 
-  create(data: {
-    title: string;
-    amount: number;
-    type: string;
-    description?: string;
-    is_recurring?: boolean;
-    payment_day_type?: string;
-    payment_day_value?: number;
-    received_at?: string;
-    bank_user_id?: number;
-    bank_account_id?: number;
-  }): Promise<Income> {
-    return apiClient.post<Income>('/incomes', data);
+  create(data: IncomeFormData) {
+    return apiClient.post<Income>('/incomes', data as unknown as Record<string, unknown>);
   },
 
-  update(id: number, data: Partial<{
-    title: string;
-    amount: number;
-    type: string;
-    description: string;
-    is_recurring: boolean;
-    payment_day_type: string;
-    payment_day_value: number;
-    received_at: string;
-    bank_user_id: number | null;
-    bank_account_id: number | null;
-  }>): Promise<Income> {
-    return apiClient.put<Income>(`/incomes/${id}`, data);
+  update(id: number, data: Partial<IncomeFormData>) {
+    return apiClient.put<Income>(`/incomes/${id}`, data as unknown as Record<string, unknown>);
   },
 
-  delete(id: number): Promise<{ message: string }> {
-    return apiClient.delete<{ message: string }>(`/incomes/${id}`);
+  delete(id: number) {
+    return apiClient.delete(`/incomes/${id}`);
   },
 
-  toggleActive(id: number): Promise<Income> {
-    return apiClient.patch<Income>(`/incomes/${id}/toggle`);
+  toggleActive(id: number) {
+    return apiClient.patch(`/incomes/${id}/toggle`);
   },
 
-  summary(): Promise<{ total_monthly_income: number }> {
-    return apiClient.get<{ total_monthly_income: number }>('/incomes/summary');
+  summary() {
+    return apiClient.get<{ total_monthly: number }>('/incomes/summary');
   },
 };

@@ -1,36 +1,28 @@
 import { apiClient } from './client';
-import type { Budget, BudgetWithSpending } from '@/types';
+import type { Budget, BudgetFormData } from '@/types';
 
 export const budgetsApi = {
-  list(): Promise<BudgetWithSpending[]> {
-    return apiClient.get<BudgetWithSpending[]>('/budgets');
+  list() {
+    return apiClient.get<Budget[]>('/budgets');
   },
 
-  current(): Promise<BudgetWithSpending | null> {
-    return apiClient.get<BudgetWithSpending | null>('/budgets/current');
+  current() {
+    return apiClient.get<Budget>('/budgets/current');
   },
 
-  create(data: {
-    monthly_limit: number;
-    month_year: string;
-    category_limits?: { category_id: number; limit: number }[];
-  }): Promise<Budget> {
-    return apiClient.post<Budget>('/budgets', data);
-  },
-
-  update(id: number, data: Partial<{
-    monthly_limit: number;
-    month_year: string;
-    category_limits: { category_id: number; limit: number }[];
-  }>): Promise<Budget> {
-    return apiClient.put<Budget>(`/budgets/${id}`, data);
-  },
-
-  delete(id: number): Promise<{ message: string }> {
-    return apiClient.delete<{ message: string }>(`/budgets/${id}`);
-  },
-
-  getOrCreateCurrent(): Promise<Budget> {
+  getOrCreateCurrent() {
     return apiClient.post<Budget>('/budgets/get-or-create-current');
+  },
+
+  create(data: BudgetFormData) {
+    return apiClient.post<Budget>('/budgets', data as unknown as Record<string, unknown>);
+  },
+
+  update(id: number, data: Partial<BudgetFormData>) {
+    return apiClient.put<Budget>(`/budgets/${id}`, data as unknown as Record<string, unknown>);
+  },
+
+  delete(id: number) {
+    return apiClient.delete(`/budgets/${id}`);
   },
 };

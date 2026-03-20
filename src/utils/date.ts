@@ -1,4 +1,14 @@
-import { format, parseISO, isToday, isYesterday, differenceInDays, startOfMonth, endOfMonth } from 'date-fns';
+import {
+  format,
+  parseISO,
+  startOfMonth,
+  endOfMonth,
+  addMonths,
+  subMonths,
+  isAfter,
+  isBefore,
+  differenceInDays,
+} from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export function formatDate(date: string | Date, pattern = 'dd/MM/yyyy'): string {
@@ -6,47 +16,54 @@ export function formatDate(date: string | Date, pattern = 'dd/MM/yyyy'): string 
   return format(d, pattern, { locale: ptBR });
 }
 
-export function formatDateTime(date: string | Date): string {
+export function formatMonthYear(date: string | Date): string {
   const d = typeof date === 'string' ? parseISO(date) : date;
-  return format(d, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+  return format(d, 'MMMM yyyy', { locale: ptBR });
 }
 
-export function formatRelativeDate(date: string | Date): string {
+export function formatShortMonth(date: string | Date): string {
   const d = typeof date === 'string' ? parseISO(date) : date;
-  if (isToday(d)) return 'Hoje';
-  if (isYesterday(d)) return 'Ontem';
-  const days = differenceInDays(new Date(), d);
-  if (days < 7) return `${days} dias atrás`;
-  return formatDate(d);
+  return format(d, 'MMM', { locale: ptBR });
 }
 
-export function formatMonthYear(monthKey: string | Date): string {
-  if (monthKey instanceof Date) {
-    return format(monthKey, 'MMMM yyyy', { locale: ptBR });
-  }
-  const [year, month] = monthKey.split('-');
-  const date = new Date(parseInt(year), parseInt(month) - 1, 1);
-  return format(date, 'MMMM yyyy', { locale: ptBR });
+export function getMonthKey(date: Date = new Date()): string {
+  return format(date, 'yyyy-MM');
 }
 
-export function getCurrentMonthKey(): string {
-  return format(new Date(), 'yyyy-MM');
-}
-
-export function getMonthRange(monthKey: string): { start: Date; end: Date } {
-  const [year, month] = monthKey.split('-');
-  const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+export function getMonthRange(monthKey: string) {
+  const date = parseISO(`${monthKey}-01`);
   return {
     start: startOfMonth(date),
     end: endOfMonth(date),
   };
 }
 
-export function getDaysUntil(day: number): number {
-  const today = new Date();
-  const targetDate = new Date(today.getFullYear(), today.getMonth(), day);
-  if (targetDate < today) {
-    targetDate.setMonth(targetDate.getMonth() + 1);
-  }
-  return differenceInDays(targetDate, today);
+export function getNextMonth(monthKey: string): string {
+  const date = parseISO(`${monthKey}-01`);
+  return format(addMonths(date, 1), 'yyyy-MM');
 }
+
+export function getPrevMonth(monthKey: string): string {
+  const date = parseISO(`${monthKey}-01`);
+  return format(subMonths(date, 1), 'yyyy-MM');
+}
+
+export function isOverdue(dateStr: string): boolean {
+  return isBefore(parseISO(dateStr), new Date());
+}
+
+export function isUpcoming(dateStr: string, days = 7): boolean {
+  const target = parseISO(dateStr);
+  const now = new Date();
+  return isAfter(target, now) && differenceInDays(target, now) <= days;
+}
+
+export function daysUntil(dateStr: string): number {
+  return differenceInDays(parseISO(dateStr), new Date());
+}
+
+export function toISODate(date: Date): string {
+  return format(date, 'yyyy-MM-dd');
+}
+
+export { parseISO, addMonths, subMonths, startOfMonth, endOfMonth };

@@ -1,26 +1,24 @@
 import { apiClient } from './client';
-import type { AppNotification, PaginatedResponse } from '@/types';
+import type { Notification } from '@/types';
 
 export const notificationsApi = {
-  list(page = 1, perPage = 20): Promise<PaginatedResponse<AppNotification>> {
-    return apiClient.get<PaginatedResponse<AppNotification>>('/notifications', {
-      params: { page, per_page: perPage },
-    });
+  list() {
+    return apiClient.get<Notification[]>('/notifications');
   },
 
-  unreadCount(): Promise<{ count: number }> {
+  unreadCount() {
     return apiClient.get<{ count: number }>('/notifications/unread-count');
   },
 
-  markAsRead(id: number): Promise<AppNotification> {
-    return apiClient.patch<AppNotification>(`/notifications/${id}/read`);
+  markAsRead(id: number) {
+    return apiClient.patch(`/notifications/${id}/read`);
   },
 
-  markAllAsRead(): Promise<{ message: string }> {
-    return apiClient.post<{ message: string }>('/notifications/mark-all-read');
+  markAllAsRead() {
+    return apiClient.post('/notifications/mark-all-read');
   },
 
-  clearAll(): Promise<{ message: string }> {
-    return apiClient.delete<{ message: string }>('/notifications/clear-all');
+  clearAll() {
+    return apiClient.delete('/notifications/clear-all');
   },
 };

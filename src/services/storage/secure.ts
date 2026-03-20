@@ -1,53 +1,40 @@
 import * as SecureStore from 'expo-secure-store';
 import { CONFIG } from '@/constants/config';
 
-export const SecureStorage = {
-  async getToken(): Promise<string | null> {
-    try {
-      return await SecureStore.getItemAsync(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
-    } catch {
-      return null;
-    }
-  },
+export async function getToken(): Promise<string | null> {
+  return SecureStore.getItemAsync(CONFIG.TOKEN_KEY);
+}
 
-  async setToken(token: string): Promise<void> {
-    await SecureStore.setItemAsync(CONFIG.STORAGE_KEYS.AUTH_TOKEN, token);
-  },
+export async function setToken(token: string): Promise<void> {
+  await SecureStore.setItemAsync(CONFIG.TOKEN_KEY, token);
+}
 
-  async removeToken(): Promise<void> {
-    await SecureStore.deleteItemAsync(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
-  },
+export async function removeToken(): Promise<void> {
+  await SecureStore.deleteItemAsync(CONFIG.TOKEN_KEY);
+}
 
-  async getUserData(): Promise<string | null> {
-    try {
-      return await SecureStore.getItemAsync(CONFIG.STORAGE_KEYS.USER_DATA);
-    } catch {
-      return null;
-    }
-  },
+export async function getStoredUser(): Promise<string | null> {
+  return SecureStore.getItemAsync(CONFIG.USER_KEY);
+}
 
-  async setUserData(data: string): Promise<void> {
-    await SecureStore.setItemAsync(CONFIG.STORAGE_KEYS.USER_DATA, data);
-  },
+export async function setStoredUser(userJson: string): Promise<void> {
+  await SecureStore.setItemAsync(CONFIG.USER_KEY, userJson);
+}
 
-  async removeUserData(): Promise<void> {
-    await SecureStore.deleteItemAsync(CONFIG.STORAGE_KEYS.USER_DATA);
-  },
+export async function removeStoredUser(): Promise<void> {
+  await SecureStore.deleteItemAsync(CONFIG.USER_KEY);
+}
 
-  async getLastSync(): Promise<string | null> {
-    try {
-      return await SecureStore.getItemAsync(CONFIG.STORAGE_KEYS.LAST_SYNC);
-    } catch {
-      return null;
-    }
-  },
+export async function getStoredTheme(): Promise<string | null> {
+  return SecureStore.getItemAsync(CONFIG.THEME_KEY);
+}
 
-  async setLastSync(timestamp: string): Promise<void> {
-    await SecureStore.setItemAsync(CONFIG.STORAGE_KEYS.LAST_SYNC, timestamp);
-  },
+export async function setStoredTheme(theme: string): Promise<void> {
+  await SecureStore.setItemAsync(CONFIG.THEME_KEY, theme);
+}
 
-  async clearAll(): Promise<void> {
-    const keys = Object.values(CONFIG.STORAGE_KEYS);
-    await Promise.all(keys.map((key) => SecureStore.deleteItemAsync(key)));
-  },
-};
+export async function clearAllStorage(): Promise<void> {
+  await removeToken();
+  await removeStoredUser();
+  await SecureStore.deleteItemAsync(CONFIG.THEME_KEY);
+}

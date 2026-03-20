@@ -1,51 +1,57 @@
-import { Platform } from 'react-native';
-
-const DEV_API_URL = Platform.select({
-  android: 'http://10.0.2.2:8000',
-  ios: 'http://localhost:8000',
-  default: 'http://localhost:8000',
-});
+const API_BASE_URL = __DEV__
+  ? 'http://10.0.2.2:8000/api/v1'
+  : 'https://financialite.app/api/v1';
 
 export const CONFIG = {
-  API_BASE_URL: __DEV__ ? DEV_API_URL : 'https://financialite.rolims.com',
-  API_VERSION: 'v1',
-  APP_NAME: 'Financialite',
-
-  // Storage keys
-  STORAGE_KEYS: {
-    AUTH_TOKEN: 'auth_token',
-    USER_DATA: 'user_data',
-    LAST_SYNC: 'last_sync_timestamp',
-    THEME: 'app_theme',
-  },
-
-  // Sync
-  SYNC_INTERVAL_MS: 5 * 60 * 1000, // 5 minutes
-  MAX_SYNC_RETRIES: 3,
-  SYNC_BATCH_SIZE: 50,
-
-  // Pagination
-  DEFAULT_PAGE_SIZE: 15,
-
-  // Cache TTL (ms)
-  CACHE_TTL: {
-    DASHBOARD: 2 * 60 * 1000,
-    CATEGORIES: 10 * 60 * 1000,
-    BANKS: 10 * 60 * 1000,
-  },
-
-  // Validation
-  VALIDATION: {
-    MAX_AMOUNT: 999999999.99,
-    MIN_AMOUNT: 0.01,
-    MAX_TITLE_LENGTH: 255,
-    MIN_TITLE_LENGTH: 2,
-    MAX_DESCRIPTION_LENGTH: 1000,
-    MAX_INSTALLMENTS: 360,
-    ALLOWED_THEMES: ['rose', 'black', 'forest', 'gold', 'lavender', 'midnight'] as const,
-    INCOME_TYPES: ['salary', 'freelance', 'investment', 'rental', 'benefit', 'other', 'pix'] as const,
-    CARD_BRANDS: ['visa', 'mastercard', 'elo', 'hipercard', 'american_express', 'diners_club'] as const,
-  },
+  API_BASE_URL,
+  REQUEST_TIMEOUT: 15000,
+  SYNC_INTERVAL: 30000,
+  MAX_SYNC_RETRIES: 5,
+  DB_NAME: 'financialite.db',
+  DB_VERSION: 1,
+  TOKEN_KEY: 'auth_token',
+  USER_KEY: 'auth_user',
+  THEME_KEY: 'app_theme',
+  PAGINATION_LIMIT: 20,
+  MAX_FILE_SIZE: 10 * 1024 * 1024,
 } as const;
 
-export const API_URL = `${CONFIG.API_BASE_URL}/api/${CONFIG.API_VERSION}`;
+export const INCOME_TYPE_LABELS: Record<string, string> = {
+  salary: 'Salário',
+  freelance: 'Freelance',
+  investment: 'Investimento',
+  rental: 'Aluguel',
+  benefit: 'Benefício',
+  other: 'Outro',
+  pix: 'Pix',
+};
+
+export const CATEGORY_TYPE_LABELS: Record<string, string> = {
+  income: 'Receita',
+  expense: 'Despesa',
+};
+
+export const BILL_RECURRENCE_LABELS: Record<string, string> = {
+  none: 'Única',
+  monthly: 'Mensal',
+  yearly: 'Anual',
+};
+
+export const TRANSACTION_STATUS_LABELS: Record<string, string> = {
+  paid: 'Pago',
+  unpaid: 'Pendente',
+  overdue: 'Atrasado',
+};
+
+export const CARD_BRANDS = [
+  'visa',
+  'mastercard',
+  'elo',
+  'hipercard',
+  'american_express',
+  'diners_club',
+] as const;
+
+export const NOTIFICATION_TYPES = ['info', 'warning', 'error', 'success'] as const;
+
+export const VALID_THEMES = ['rose', 'black', 'forest', 'gold', 'lavender', 'midnight'] as const;

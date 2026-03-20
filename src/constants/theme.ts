@@ -1,65 +1,140 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+import type { ThemeName } from '@/types';
 
-import '@/global.css';
+export interface ThemeColors {
+  primary: string;
+  primaryLight: string;
+  primaryDark: string;
+  background: string;
+  surface: string;
+  surfaceElevated: string;
+  text: string;
+  textSecondary: string;
+  textMuted: string;
+  border: string;
+  success: string;
+  warning: string;
+  danger: string;
+  info: string;
+  cardBg: string;
+  income: string;
+  expense: string;
+  tabBar: string;
+  tabBarBorder: string;
+  statusBar: 'light' | 'dark';
+}
 
-import { Platform } from 'react-native';
+const baseColors = {
+  success: '#22c55e',
+  warning: '#f59e0b',
+  danger: '#ef4444',
+  info: '#3b82f6',
+  income: '#22c55e',
+  expense: '#ef4444',
+};
 
-export const Colors = {
-  light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+export const themes: Record<ThemeName, ThemeColors> = {
+  rose: {
+    primary: '#e11d48',
+    primaryLight: '#fda4af',
+    primaryDark: '#9f1239',
+    background: '#0f172a',
+    surface: '#1e293b',
+    surfaceElevated: '#334155',
+    text: '#f8fafc',
+    textSecondary: '#94a3b8',
+    textMuted: '#64748b',
+    border: '#334155',
+    cardBg: '#1e293b',
+    tabBar: '#0f172a',
+    tabBarBorder: '#1e293b',
+    statusBar: 'light',
+    ...baseColors,
   },
-  dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+  black: {
+    primary: '#a855f7',
+    primaryLight: '#c4b5fd',
+    primaryDark: '#7c3aed',
+    background: '#09090b',
+    surface: '#18181b',
+    surfaceElevated: '#27272a',
+    text: '#fafafa',
+    textSecondary: '#a1a1aa',
+    textMuted: '#71717a',
+    border: '#27272a',
+    cardBg: '#18181b',
+    tabBar: '#09090b',
+    tabBarBorder: '#18181b',
+    statusBar: 'light',
+    ...baseColors,
   },
-} as const;
-
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
-
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
+  forest: {
+    primary: '#22c55e',
+    primaryLight: '#86efac',
+    primaryDark: '#15803d',
+    background: '#0c1a14',
+    surface: '#14291f',
+    surfaceElevated: '#1c3829',
+    text: '#f0fdf4',
+    textSecondary: '#86efac',
+    textMuted: '#4ade80',
+    border: '#1c3829',
+    cardBg: '#14291f',
+    tabBar: '#0c1a14',
+    tabBarBorder: '#14291f',
+    statusBar: 'light',
+    ...baseColors,
   },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
+  gold: {
+    primary: '#eab308',
+    primaryLight: '#fde047',
+    primaryDark: '#a16207',
+    background: '#1a1608',
+    surface: '#292211',
+    surfaceElevated: '#3d331a',
+    text: '#fefce8',
+    textSecondary: '#fde047',
+    textMuted: '#ca8a04',
+    border: '#3d331a',
+    cardBg: '#292211',
+    tabBar: '#1a1608',
+    tabBarBorder: '#292211',
+    statusBar: 'light',
+    ...baseColors,
   },
-  web: {
-    sans: 'var(--font-display)',
-    serif: 'var(--font-serif)',
-    rounded: 'var(--font-rounded)',
-    mono: 'var(--font-mono)',
+  lavender: {
+    primary: '#8b5cf6',
+    primaryLight: '#c4b5fd',
+    primaryDark: '#6d28d9',
+    background: '#0f0a1e',
+    surface: '#1a1330',
+    surfaceElevated: '#261d42',
+    text: '#f5f3ff',
+    textSecondary: '#c4b5fd',
+    textMuted: '#8b5cf6',
+    border: '#261d42',
+    cardBg: '#1a1330',
+    tabBar: '#0f0a1e',
+    tabBarBorder: '#1a1330',
+    statusBar: 'light',
+    ...baseColors,
   },
-});
+  midnight: {
+    primary: '#3b82f6',
+    primaryLight: '#93c5fd',
+    primaryDark: '#1d4ed8',
+    background: '#0f172a',
+    surface: '#1e293b',
+    surfaceElevated: '#334155',
+    text: '#f8fafc',
+    textSecondary: '#94a3b8',
+    textMuted: '#64748b',
+    border: '#334155',
+    cardBg: '#1e293b',
+    tabBar: '#0f172a',
+    tabBarBorder: '#1e293b',
+    statusBar: 'light',
+    ...baseColors,
+  },
+};
 
-export const Spacing = {
-  half: 2,
-  one: 4,
-  two: 8,
-  three: 16,
-  four: 24,
-  five: 32,
-  six: 64,
-} as const;
-
-export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
-export const MaxContentWidth = 800;
+export const defaultTheme: ThemeName = 'midnight';

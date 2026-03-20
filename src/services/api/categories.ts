@@ -1,30 +1,20 @@
 import { apiClient } from './client';
-import type { Category } from '@/types';
+import type { Category, CategoryFormData } from '@/types';
 
 export const categoriesApi = {
-  list(): Promise<Category[]> {
-    return apiClient.get<Category[]>('/categories');
+  list(type?: string) {
+    return apiClient.get<Category[]>('/categories', type ? { type } : undefined);
   },
 
-  create(data: {
-    name: string;
-    color?: string;
-    icon?: string;
-    type?: 'income' | 'expense';
-  }): Promise<Category> {
-    return apiClient.post<Category>('/categories', data);
+  create(data: CategoryFormData) {
+    return apiClient.post<Category>('/categories', data as unknown as Record<string, unknown>);
   },
 
-  update(id: number, data: Partial<{
-    name: string;
-    color: string;
-    icon: string;
-    type: 'income' | 'expense';
-  }>): Promise<Category> {
-    return apiClient.put<Category>(`/categories/${id}`, data);
+  update(id: number, data: Partial<CategoryFormData>) {
+    return apiClient.put<Category>(`/categories/${id}`, data as unknown as Record<string, unknown>);
   },
 
-  delete(id: number): Promise<{ message: string }> {
-    return apiClient.delete<{ message: string }>(`/categories/${id}`);
+  delete(id: number) {
+    return apiClient.delete(`/categories/${id}`);
   },
 };

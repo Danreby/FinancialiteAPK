@@ -1,49 +1,32 @@
 import { apiClient } from './client';
-import type { SavingsGoal } from '@/types';
+import type { SavingsGoal, SavingsFormData } from '@/types';
 
 export const savingsApi = {
-  list(): Promise<SavingsGoal[]> {
+  list() {
     return apiClient.get<SavingsGoal[]>('/savings');
   },
 
-  create(data: {
-    title: string;
-    target_amount: number;
-    description?: string;
-    icon?: string;
-    color?: string;
-  }): Promise<SavingsGoal> {
-    return apiClient.post<SavingsGoal>('/savings', data);
+  create(data: SavingsFormData) {
+    return apiClient.post<SavingsGoal>('/savings', data as unknown as Record<string, unknown>);
   },
 
-  update(id: number, data: Partial<{
-    title: string;
-    target_amount: number;
-    description: string;
-    icon: string;
-    color: string;
-  }>): Promise<SavingsGoal> {
-    return apiClient.put<SavingsGoal>(`/savings/${id}`, data);
+  update(id: number, data: Partial<SavingsFormData>) {
+    return apiClient.put<SavingsGoal>(`/savings/${id}`, data as unknown as Record<string, unknown>);
   },
 
-  delete(id: number): Promise<{ message: string }> {
-    return apiClient.delete<{ message: string }>(`/savings/${id}`);
+  delete(id: number) {
+    return apiClient.delete(`/savings/${id}`);
   },
 
-  deposit(id: number, amount: number): Promise<SavingsGoal> {
-    return apiClient.post<SavingsGoal>(`/savings/${id}/deposit`, { amount });
+  deposit(id: number, amount: number) {
+    return apiClient.post(`/savings/${id}/deposit`, { amount });
   },
 
-  withdraw(id: number, amount: number): Promise<SavingsGoal> {
-    return apiClient.post<SavingsGoal>(`/savings/${id}/withdraw`, { amount });
+  withdraw(id: number, amount: number) {
+    return apiClient.post(`/savings/${id}/withdraw`, { amount });
   },
 
-  summary(): Promise<{
-    total_saved: number;
-    total_target: number;
-    goals_count: number;
-    completed_count: number;
-  }> {
-    return apiClient.get('/savings/summary');
+  summary() {
+    return apiClient.get<{ total_target: number; total_saved: number; count: number }>('/savings/summary');
   },
 };

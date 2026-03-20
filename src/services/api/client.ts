@@ -1,127 +1,128 @@
-import { API_URL } from '@/constants/config';
-import { SecureStorage } from '@/services/storage/secure';
+import { CONFIG } from '@/constants/config';
+import { getToken, removeToken } from '@/services/storage/secure';
 
-interface RequestConfig extends RequestInit {
-  params?: Record<string, string | number | boolean | undefined | null>;
+interface RequestOptions {
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  body?: Record<string, unknown>;
+  params?: Record<string, string | number | undefined>;
+  timeout?: number;
 }
 
-class ApiClientError extends Error {
+interface ApiResponse<T = unknown> {
+  data: T;
   status: number;
-  data: unknown;
-
-  constructor(message: string, status: number, data?: unknown) {
-    super(message);
-    this.name = 'ApiClientError';
-    this.status = status;
-    this.data = data;
-  }
+  ok: boolean;
 }
 
-async function getHeaders(contentType = 'application/json'): Promise<HeadersInit> {
-  const token = await SecureStorage.getToken();
-  const headers: HeadersInit = {
-    Accept: 'application/json',
-  };
+class ApiClient {
+  private baseUrl: string;
+  private defaultTimeout: number;
 
-  if (contentType) {
-    headers['Content-Type'] = contentType;
+  constructor() {
+    this.baseUrl = CONFIG.API_BASE_URL;
+    this.defaultTimeout = CONFIG.REQUEST_TIMEOUT;
   }
 
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  return headers;
-}
-
-function buildUrl(endpoint: string, params?: Record<string, string | number | boolean | undefined | null>): string {
-  const url = `${API_URL}${endpoint}`;
-
-  if (!params) return url;
-
-  const searchParams = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
-      searchParams.append(key, String(value));
+  private buildUrl(path: string, params?: Record<string, string | number | undefined>): string {
+    const url = new URL(`${this.baseUrl}${path}`);
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) url.searchParams.append(key, String(value));
+      });
     }
-  });
-
-  const queryString = searchParams.toString();
-  return queryString ? `${url}?${queryString}` : url;
-}
-
-async function handleResponse<T>(response: Response): Promise<T> {
-  if (response.status === 401) {
-    await SecureStorage.removeToken();
-    await SecureStorage.removeUserData();
-    throw new ApiClientError('Sessão expirada. Faça login novamente.', 401);
+    return url.toString();
   }
 
-  const data = await response.json().catch(() => null);
+  async request<T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+    const { method = 'GET', body, params, timeout = this.defaultTimeout } = options;
+    const token = await getToken();
 
-  if (!response.ok) {
-    const message = data?.error || data?.message || `Erro ${response.status}`;
-    throw new ApiClientError(message, response.status, data);
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(this.buildUrl(path, params), {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.status === 401) {
+        await removeToken();
+        throw new ApiError('Sessão expirada', 401);
+      }
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new ApiError(
+          data?.message || `Erro ${response.status}`,
+          response.status,
+          data?.errors
+        );
+      }
+
+      return { data: data as T, status: response.status, ok: true };
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof ApiError) throw error;
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new ApiError('Tempo de requisição esgotado', 408);
+      }
+      throw new ApiError('Sem conexão com o servidor', 0);
+    }
   }
 
-  return data as T;
+  get<T>(path: string, params?: Record<string, string | number | undefined>): Promise<ApiResponse<T>> {
+    return this.request<T>(path, { method: 'GET', params });
+  }
+
+  post<T>(path: string, body?: Record<string, unknown>): Promise<ApiResponse<T>> {
+    return this.request<T>(path, { method: 'POST', body });
+  }
+
+  put<T>(path: string, body?: Record<string, unknown>): Promise<ApiResponse<T>> {
+    return this.request<T>(path, { method: 'PUT', body });
+  }
+
+  patch<T>(path: string, body?: Record<string, unknown>): Promise<ApiResponse<T>> {
+    return this.request<T>(path, { method: 'PATCH', body });
+  }
+
+  delete<T>(path: string): Promise<ApiResponse<T>> {
+    return this.request<T>(path, { method: 'DELETE' });
+  }
 }
 
-export const apiClient = {
-  async get<T>(endpoint: string, config?: RequestConfig): Promise<T> {
-    const url = buildUrl(endpoint, config?.params);
-    const headers = await getHeaders();
-    const response = await fetch(url, { method: 'GET', headers, ...config });
-    return handleResponse<T>(response);
-  },
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+    public errors?: Record<string, string[]>
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
 
-  async post<T>(endpoint: string, body?: unknown, config?: RequestConfig): Promise<T> {
-    const url = buildUrl(endpoint, config?.params);
-    const headers = await getHeaders();
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-      ...config,
-    });
-    return handleResponse<T>(response);
-  },
+  get isNetworkError(): boolean {
+    return this.status === 0;
+  }
 
-  async put<T>(endpoint: string, body?: unknown, config?: RequestConfig): Promise<T> {
-    const url = buildUrl(endpoint, config?.params);
-    const headers = await getHeaders();
-    const response = await fetch(url, {
-      method: 'PUT',
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-      ...config,
-    });
-    return handleResponse<T>(response);
-  },
+  get isAuthError(): boolean {
+    return this.status === 401;
+  }
+}
 
-  async patch<T>(endpoint: string, body?: unknown, config?: RequestConfig): Promise<T> {
-    const url = buildUrl(endpoint, config?.params);
-    const headers = await getHeaders();
-    const response = await fetch(url, {
-      method: 'PATCH',
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-      ...config,
-    });
-    return handleResponse<T>(response);
-  },
-
-  async delete<T>(endpoint: string, body?: unknown, config?: RequestConfig): Promise<T> {
-    const url = buildUrl(endpoint, config?.params);
-    const headers = await getHeaders();
-    const response = await fetch(url, {
-      method: 'DELETE',
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-      ...config,
-    });
-    return handleResponse<T>(response);
-  },
-};
-
-export { ApiClientError };
+export const apiClient = new ApiClient();

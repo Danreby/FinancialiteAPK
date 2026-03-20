@@ -1,47 +1,40 @@
 import { apiClient } from './client';
-import type { BankUser, Bank, BankTransfer } from '@/types';
+import type { BankUser, BankTransfer, BankFormData, Bank } from '@/types';
 
 export const banksApi = {
-  listAccounts(): Promise<BankUser[]> {
+  list() {
     return apiClient.get<BankUser[]>('/bank-accounts');
   },
 
-  availableBanks(): Promise<Bank[]> {
+  get(id: number) {
+    return apiClient.get<BankUser>(`/bank-accounts/${id}`);
+  },
+
+  create(data: BankFormData) {
+    return apiClient.post<BankUser>('/bank-accounts', data as unknown as Record<string, unknown>);
+  },
+
+  update(id: number, data: Partial<BankFormData>) {
+    return apiClient.put<BankUser>(`/bank-accounts/${id}`, data as unknown as Record<string, unknown>);
+  },
+
+  delete(id: number) {
+    return apiClient.delete(`/bank-accounts/${id}`);
+  },
+
+  availableBanks() {
     return apiClient.get<Bank[]>('/bank-accounts/banks');
   },
 
-  stats(): Promise<unknown> {
-    return apiClient.get('/bank-accounts/stats');
+  stats() {
+    return apiClient.get<{ total_balance: number; account_count: number }>('/bank-accounts/stats');
   },
 
-  show(id: number): Promise<unknown> {
-    return apiClient.get(`/bank-accounts/${id}`);
+  transfers(params?: { bank_user_id?: number }) {
+    return apiClient.get<BankTransfer[]>('/bank-transfers', params as Record<string, string | number | undefined>);
   },
 
-  create(data: { bank_id: number; balance?: number }): Promise<BankUser> {
-    return apiClient.post<BankUser>('/bank-accounts', data);
-  },
-
-  update(id: number, balance: number): Promise<BankUser> {
-    return apiClient.put<BankUser>(`/bank-accounts/${id}`, { balance });
-  },
-
-  delete(id: number): Promise<{ message: string }> {
-    return apiClient.delete<{ message: string }>(`/bank-accounts/${id}`);
-  },
-
-  transfer(data: {
-    from_bank_user_id: number;
-    to_bank_user_id: number;
-    amount: number;
-    description?: string;
-  }): Promise<BankTransfer> {
-    return apiClient.post<BankTransfer>('/bank-transfers', data);
-  },
-
-  listTransfers(bankUserId?: number): Promise<BankTransfer[]> {
-    return apiClient.get<BankTransfer[]>('/bank-transfers', {
-      params: bankUserId ? { bank_user_id: bankUserId } : undefined,
-    });
+  transfer(data: { from_bank_user_id: number; to_bank_user_id: number; amount: number; description?: string }) {
+    return apiClient.post<BankTransfer>('/bank-transfers', data as unknown as Record<string, unknown>);
   },
 };
