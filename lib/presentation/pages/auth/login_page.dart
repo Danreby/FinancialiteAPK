@@ -21,7 +21,8 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
   bool _googleLoading = false;
 
-  static const _googleClientId = '105982257579-bj5rmr9qcuuggr3rmf081ib4ri4ckfvh.apps.googleusercontent.com';
+  static const _googleClientId =
+      '105982257579-bj5rmr9qcuuggr3rmf081ib4ri4ckfvh.apps.googleusercontent.com';
 
   Future<void> _googleSignIn() async {
     if (_googleLoading) return;
@@ -43,13 +44,17 @@ class _LoginPageState extends State<LoginPage> {
         setState(() => _googleLoading = false);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Não foi possível obter o token do Google. Verifique a configuração do app.')),
+            const SnackBar(
+                content: Text(
+                    'Não foi possível obter o token do Google. Verifique a configuração do app.')),
           );
         }
         return;
       }
       if (mounted) {
-        context.read<AuthBloc>().add(AuthGoogleLoginRequested(idToken: idToken));
+        context
+            .read<AuthBloc>()
+            .add(AuthGoogleLoginRequested(idToken: idToken));
       }
     } catch (e) {
       if (mounted) {
@@ -58,12 +63,16 @@ class _LoginPageState extends State<LoginPage> {
           return;
         } else if (errorMsg.contains('network_error')) {
           errorMsg = 'Sem conexão com a internet';
-        } else if (errorMsg.contains('sign_in_failed') || errorMsg.contains('ApiException: 10')) {
-          errorMsg = 'Falha na configuração do Google Sign-In. Verifique se o app está registrado no Google Cloud Console.';
+        } else if (errorMsg.contains('sign_in_failed') ||
+            errorMsg.contains('ApiException: 10')) {
+          errorMsg =
+              'Falha na configuração do Google Sign-In. Verifique se o app está registrado no Google Cloud Console.';
         } else if (errorMsg.contains('ApiException: 12500')) {
-          errorMsg = 'Google Play Services desatualizado. Atualize pelo Play Store.';
+          errorMsg =
+              'Google Play Services desatualizado. Atualize pelo Play Store.';
         } else {
-          errorMsg = 'Erro ao autenticar com Google: ${errorMsg.replaceAll(RegExp(r'Exception:\s*|PlatformException\(|\)$'), '')}';
+          errorMsg =
+              'Erro ao autenticar com Google: ${errorMsg.replaceAll(RegExp(r'Exception:\s*|PlatformException\(|\)$'), '')}';
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorMsg)),
@@ -202,8 +211,8 @@ class _LoginPageState extends State<LoginPage> {
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
                           ),
-                          onPressed: () =>
-                              setState(() => _obscurePassword = !_obscurePassword),
+                          onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword),
                         ),
                       ),
                       const SizedBox(height: 28),
@@ -245,7 +254,8 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 24),
                       Row(
                         children: [
-                          Expanded(child: Divider(color: theme.colorScheme.outline)),
+                          Expanded(
+                              child: Divider(color: theme.colorScheme.outline)),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Text(
@@ -255,7 +265,8 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           ),
-                          Expanded(child: Divider(color: theme.colorScheme.outline)),
+                          Expanded(
+                              child: Divider(color: theme.colorScheme.outline)),
                         ],
                       ),
                       const SizedBox(height: 24),
@@ -265,10 +276,13 @@ class _LoginPageState extends State<LoginPage> {
                             ? const SizedBox(
                                 height: 20,
                                 width: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Icon(Icons.g_mobiledata_rounded, size: 28),
-                        label: Text(_googleLoading ? 'Conectando...' : 'Entrar com Google'),
+                        label: Text(_googleLoading
+                            ? 'Conectando...'
+                            : 'Entrar com Google'),
                       ),
                       const SizedBox(height: 32),
                       Row(
