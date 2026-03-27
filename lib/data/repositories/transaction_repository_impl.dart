@@ -1,4 +1,4 @@
-import 'package:sqflite/sqflite.dart';
+import 'package:sqflite/sqflite.dart' hide Transaction;
 import '../../core/constants/api_constants.dart';
 import '../../core/error/exceptions.dart';
 import '../../core/network/api_client.dart';

@@ -13,9 +13,9 @@ class IncomeCubit extends Cubit<IncomeState> {
   Future<void> loadIncomes({String? month}) async {
     emit(const IncomeLoading());
     try {
-      final result = await _repository.getIncomes(month: month);
-      final incomes = result['data'] as List<Income>;
-      final summary = result['summary'] as IncomeSummary?;
+      final incomes = await _repository.getIncomes(filters: month != null ? {'month': month} : null);
+      IncomeSummary? summary;
+      try { summary = await _repository.getSummary(); } catch (_) {}
       emit(IncomeLoaded(incomes: incomes, summary: summary));
     } catch (e) {
       emit(IncomeError(e.toString()));
@@ -57,7 +57,7 @@ class IncomeCubit extends Cubit<IncomeState> {
 
   Future<void> markAsReceived(int id) async {
     try {
-      await _repository.markAsReceived(id);
+      await _repository.toggleActive(id);
       loadIncomes();
     } catch (e) {
       emit(IncomeError(e.toString()));

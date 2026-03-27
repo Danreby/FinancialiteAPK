@@ -13,8 +13,7 @@ class BudgetCubit extends Cubit<BudgetState> {
   Future<void> loadBudgets({String? month}) async {
     emit(const BudgetLoading());
     try {
-      final result = await _repository.getBudgets(month: month);
-      final budgets = result['data'] as List<Budget>;
+      final budgets = await _repository.getBudgets();
       emit(BudgetLoaded(budgets: budgets));
     } catch (e) {
       emit(BudgetError(e.toString()));

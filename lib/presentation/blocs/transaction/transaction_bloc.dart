@@ -32,12 +32,11 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     }
 
     try {
-      final result = await _repository.getTransactions(
+      final transactions = await _repository.getTransactions(
         page: _currentPage,
         filters: _filters,
       );
-      final transactions = result['data'] as List<Transaction>;
-      _hasMore = result['has_more'] as bool? ?? false;
+      _hasMore = transactions.length >= 20;
 
       if (_currentPage == 1) {
         emit(TransactionLoaded(

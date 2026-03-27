@@ -62,4 +62,13 @@ class NotificationRepositoryImpl extends BaseOfflineRepository implements Notifi
     final database = await db;
     await database.delete('notifications');
   }
+
+  @override
+  Future<void> deleteNotification(int id) async {
+    if (await isOnline) {
+      await api.delete('${ApiConstants.notifications}/$id');
+    }
+    final database = await db;
+    await database.delete('notifications', where: 'id = ?', whereArgs: [id]);
+  }
 }

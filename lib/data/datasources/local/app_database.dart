@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../../core/constants/storage_constants.dart';
+import '../../../core/constants/storage_constants.dart';
 
 class AppDatabase {
   static Database? _database;

@@ -46,7 +46,7 @@ class AppTheme {
         ),
         iconTheme: IconThemeData(color: colors.onSurface, size: 22),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         color: colors.surface,
@@ -215,7 +215,7 @@ class AppTheme {
         showDragHandle: true,
         dragHandleColor: colors.divider,
       ),
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: colors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         elevation: 8,
@@ -243,7 +243,7 @@ class AppTheme {
         ),
       ),
       textTheme: _buildTextTheme(colors.onSurface, colors.onSurfaceVariant),
-      tabBarTheme: TabBarTheme(
+      tabBarTheme: TabBarThemeData(
         labelColor: colors.primary,
         unselectedLabelColor: colors.hint,
         indicatorSize: TabBarIndicatorSize.label,
@@ -307,7 +307,7 @@ class AppTheme {
         ),
         iconTheme: IconThemeData(color: colors.onSurface, size: 22),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         color: colors.surface,
@@ -425,7 +425,7 @@ class AppTheme {
         showDragHandle: true,
         dragHandleColor: colors.divider,
       ),
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: colors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         elevation: 8,

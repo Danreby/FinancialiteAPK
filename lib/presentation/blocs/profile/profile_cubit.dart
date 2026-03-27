@@ -38,7 +38,7 @@ class ProfileCubit extends Cubit<ProfileState> {
       await _repository.updatePassword(
         currentPassword: currentPassword,
         newPassword: newPassword,
-        confirmation: confirmation,
+        newPasswordConfirmation: confirmation,
       );
       if (state is ProfileLoaded) {
         emit(ProfilePasswordChanged((state as ProfileLoaded).user));
@@ -50,7 +50,7 @@ class ProfileCubit extends Cubit<ProfileState> {
 
   Future<void> deleteAccount(String password) async {
     try {
-      await _repository.deleteAccount(password);
+      await _repository.deleteAccount();
       emit(const ProfileDeleted());
     } catch (e) {
       emit(ProfileError(e.toString()));

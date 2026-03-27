@@ -13,8 +13,10 @@ class BillCubit extends Cubit<BillState> {
   Future<void> loadBills({String? month, String? status}) async {
     emit(const BillLoading());
     try {
-      final result = await _repository.getBills(month: month, status: status);
-      final bills = result['data'] as List<Bill>;
+      final filters = <String, dynamic>{};
+      if (month != null) filters['month'] = month;
+      if (status != null) filters['status'] = status;
+      final bills = await _repository.getBills(filters: filters.isNotEmpty ? filters : null);
       emit(BillLoaded(bills: bills));
     } catch (e) {
       emit(BillError(e.toString()));
@@ -55,7 +57,7 @@ class BillCubit extends Cubit<BillState> {
 
   Future<void> payBill(int id, Map<String, dynamic> data) async {
     try {
-      await _repository.payBill(id, data);
+      await _repository.markAsPaid(id);
       loadBills();
     } catch (e) {
       emit(BillError(e.toString()));

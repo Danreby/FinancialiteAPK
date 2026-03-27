@@ -6,4 +6,6 @@ abstract class CardRepository {
   Future<CardUser> updateCard(int id, Map<String, dynamic> data);
   Future<void> deleteCard(int id);
   Future<List<CardEntity>> getAvailableCards();
+  Future<Map<String, dynamic>?> getInvoice(int cardId, {String? month});
+  Future<void> payInvoice(int cardId, Map<String, dynamic> data);
 }

@@ -13,9 +13,9 @@ class BankCubit extends Cubit<BankState> {
   Future<void> loadAccounts() async {
     emit(const BankLoading());
     try {
-      final result = await _repository.getAccounts();
-      final accounts = result['data'] as List<BankAccount>;
-      final stats = result['stats'] as BankStats?;
+      final accounts = await _repository.getAccounts();
+      BankStats? stats;
+      try { stats = await _repository.getStats(); } catch (_) {}
       emit(BankLoaded(accounts: accounts, stats: stats));
     } catch (e) {
       emit(BankError(e.toString()));
@@ -24,7 +24,7 @@ class BankCubit extends Cubit<BankState> {
 
   Future<void> loadBanks() async {
     try {
-      final banks = await _repository.getBanksList();
+      final banks = await _repository.getAvailableBanks();
       if (state is BankLoaded) {
         final current = state as BankLoaded;
         emit(BankLoaded(
@@ -72,7 +72,7 @@ class BankCubit extends Cubit<BankState> {
 
   Future<void> transfer(Map<String, dynamic> data) async {
     try {
-      await _repository.transfer(data);
+      await _repository.createTransfer(data);
       loadAccounts();
     } catch (e) {
       emit(BankError(e.toString()));

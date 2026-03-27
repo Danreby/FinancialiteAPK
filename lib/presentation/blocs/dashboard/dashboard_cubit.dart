@@ -13,7 +13,7 @@ class DashboardCubit extends Cubit<DashboardState> {
   Future<void> load({String? month}) async {
     emit(const DashboardLoading());
     try {
-      final data = await _repository.getDashboard(month: month);
+      final data = await _repository.getDashboardData(filters: month != null ? {'month': month} : null);
       emit(DashboardLoaded(data));
     } catch (e) {
       emit(DashboardError(e.toString()));
@@ -22,7 +22,7 @@ class DashboardCubit extends Cubit<DashboardState> {
 
   Future<void> refresh({String? month}) async {
     try {
-      final data = await _repository.getDashboard(month: month);
+      final data = await _repository.getDashboardData(filters: month != null ? {'month': month} : null);
       emit(DashboardLoaded(data));
     } catch (e) {
       if (state is! DashboardLoaded) {

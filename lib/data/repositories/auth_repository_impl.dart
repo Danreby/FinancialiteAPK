@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/error/exceptions.dart';

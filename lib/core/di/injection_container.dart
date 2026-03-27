@@ -86,9 +86,9 @@ Future<void> init() async {
   sl.registerLazySingleton<NotificationRepository>(
       () => NotificationRepositoryImpl(sl(), sl()));
   sl.registerLazySingleton<ProfileRepository>(
-      () => ProfileRepositoryImpl(sl(), sl()));
+      () => ProfileRepositoryImpl(sl()));
   sl.registerLazySingleton<DashboardRepository>(
-      () => DashboardRepositoryImpl(sl(), sl()));
+      () => DashboardRepositoryImpl(sl()));
 
   // Services
   sl.registerLazySingleton(() => SyncService(sl(), sl()));

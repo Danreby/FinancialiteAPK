@@ -13,9 +13,9 @@ class SavingsCubit extends Cubit<SavingsState> {
   Future<void> loadGoals() async {
     emit(const SavingsLoading());
     try {
-      final result = await _repository.getGoals();
-      final goals = result['data'] as List<SavingsGoal>;
-      final summary = result['summary'] as SavingsSummary?;
+      final goals = await _repository.getGoals();
+      SavingsSummary? summary;
+      try { summary = await _repository.getSummary(); } catch (_) {}
       emit(SavingsLoaded(goals: goals, summary: summary));
     } catch (e) {
       emit(SavingsError(e.toString()));
@@ -57,7 +57,7 @@ class SavingsCubit extends Cubit<SavingsState> {
 
   Future<void> addDeposit(int id, Map<String, dynamic> data) async {
     try {
-      await _repository.addDeposit(id, data);
+      await _repository.deposit(id, (data['amount'] as num).toDouble());
       loadGoals();
     } catch (e) {
       emit(SavingsError(e.toString()));
@@ -66,7 +66,7 @@ class SavingsCubit extends Cubit<SavingsState> {
 
   Future<void> withdraw(int id, Map<String, dynamic> data) async {
     try {
-      await _repository.withdraw(id, data);
+      await _repository.withdraw(id, (data['amount'] as num).toDouble());
       loadGoals();
     } catch (e) {
       emit(SavingsError(e.toString()));

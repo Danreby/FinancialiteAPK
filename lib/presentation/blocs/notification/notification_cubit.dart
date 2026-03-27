@@ -13,16 +13,16 @@ class NotificationCubit extends Cubit<NotificationState> {
   Future<void> loadNotifications() async {
     emit(const NotificationLoading());
     try {
-      final result = await _repository.getNotifications();
-      final notifications = result['data'] as List<AppNotification>;
-      final unreadCount = result['unread_count'] as int? ?? 0;
+      final notifications = await _repository.getNotifications();
+      int unreadCount = 0;
+      try { unreadCount = await _repository.getUnreadCount(); } catch (_) {}
       emit(NotificationLoaded(notifications: notifications, unreadCount: unreadCount));
     } catch (e) {
       emit(NotificationError(e.toString()));
     }
   }
 
-  Future<void> markAsRead(String id) async {
+  Future<void> markAsRead(int id) async {
     try {
       await _repository.markAsRead(id);
       if (state is NotificationLoaded) {
@@ -34,8 +34,8 @@ class NotificationCubit extends Cubit<NotificationState> {
               type: n.type,
               title: n.title,
               message: n.message,
-              data: n.data,
-              readAt: DateTime.now(),
+              isRead: true,
+              userId: n.userId,
               createdAt: n.createdAt,
             );
           }
@@ -62,8 +62,8 @@ class NotificationCubit extends Cubit<NotificationState> {
             type: n.type,
             title: n.title,
             message: n.message,
-            data: n.data,
-            readAt: n.readAt ?? DateTime.now(),
+            isRead: true,
+            userId: n.userId,
             createdAt: n.createdAt,
           );
         }).toList();
@@ -74,7 +74,7 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
-  Future<void> deleteNotification(String id) async {
+  Future<void> deleteNotification(int id) async {
     try {
       await _repository.deleteNotification(id);
       if (state is NotificationLoaded) {
@@ -82,7 +82,7 @@ class NotificationCubit extends Cubit<NotificationState> {
         final removed = current.notifications.firstWhere((n) => n.id == id);
         emit(NotificationLoaded(
           notifications: current.notifications.where((n) => n.id != id).toList(),
-          unreadCount: removed.readAt == null ? current.unreadCount - 1 : current.unreadCount,
+          unreadCount: !removed.isRead ? current.unreadCount - 1 : current.unreadCount,
         ));
       }
     } catch (e) {

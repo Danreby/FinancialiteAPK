@@ -56,4 +56,17 @@ class CardRepositoryImpl extends BaseOfflineRepository implements CardRepository
     return (response.data['data'] as List? ?? response.data as List)
         .map((j) => CardEntityModel.fromJson(j)).toList();
   }
+
+  @override
+  Future<Map<String, dynamic>?> getInvoice(int cardId, {String? month}) async {
+    final params = <String, dynamic>{};
+    if (month != null) params['month'] = month;
+    final response = await api.get('${ApiConstants.cards}/$cardId/invoice', queryParameters: params);
+    return response.data is Map ? Map<String, dynamic>.from(response.data) : null;
+  }
+
+  @override
+  Future<void> payInvoice(int cardId, Map<String, dynamic> data) async {
+    await api.post('${ApiConstants.cards}/$cardId/pay-invoice', data: data);
+  }
 }
