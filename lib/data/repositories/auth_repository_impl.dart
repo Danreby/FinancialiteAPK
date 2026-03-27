@@ -35,7 +35,9 @@ class AuthRepositoryImpl implements AuthRepository {
 
       return user;
     } on DioException catch (e) {
-      throw e.error ?? ServerException(message: 'Erro ao fazer login');
+      throw e.error ?? ServerException(message: _extractDioMessage(e));
+    } catch (e) {
+      throw ServerException(message: 'Erro ao fazer login: ${e.toString().replaceAll(RegExp(r'^\w+Exception:\s*'), '')}');
     }
   }
 
@@ -67,7 +69,9 @@ class AuthRepositoryImpl implements AuthRepository {
 
       return user;
     } on DioException catch (e) {
-      throw e.error ?? ServerException(message: 'Erro ao registrar');
+      throw e.error ?? ServerException(message: _extractDioMessage(e));
+    } catch (e) {
+      throw ServerException(message: 'Erro ao registrar: ${e.toString().replaceAll(RegExp(r'^\w+Exception:\s*'), '')}');
     }
   }
 
@@ -86,7 +90,9 @@ class AuthRepositoryImpl implements AuthRepository {
 
       return user;
     } on DioException catch (e) {
-      throw e.error ?? ServerException(message: 'Erro ao autenticar com Google');
+      throw e.error ?? ServerException(message: _extractDioMessage(e));
+    } catch (e) {
+      throw ServerException(message: 'Erro ao autenticar com Google: ${e.toString().replaceAll(RegExp(r'^\w+Exception:\s*'), '')}');
     }
   }
 
@@ -137,5 +143,14 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<bool> isAuthenticated() async {
     return await _secureStorage.hasToken();
+  }
+
+  String _extractDioMessage(DioException e) {
+    final data = e.response?.data;
+    if (data is Map<String, dynamic>) {
+      if (data['message'] != null) return data['message'].toString();
+      if (data['error'] != null) return data['error'].toString();
+    }
+    return e.message ?? 'Erro de conexão com o servidor';
   }
 }

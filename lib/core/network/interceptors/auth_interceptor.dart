@@ -30,13 +30,13 @@ class AuthInterceptor extends Interceptor {
 
   Future<Response?> _tryRefreshToken(RequestOptions requestOptions) async {
     try {
-      final refreshToken = await _secureStorage.getRefreshToken();
-      if (refreshToken == null) return null;
+      final currentToken = await _secureStorage.getAccessToken();
+      if (currentToken == null) return null;
 
       final dio = Dio(BaseOptions(baseUrl: requestOptions.baseUrl));
       final response = await dio.post(
         '/auth/refresh-token',
-        options: Options(headers: {'Authorization': 'Bearer $refreshToken'}),
+        options: Options(headers: {'Authorization': 'Bearer $currentToken'}),
       );
 
       if (response.statusCode == 200) {

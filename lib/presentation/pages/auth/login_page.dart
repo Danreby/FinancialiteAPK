@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/app_text_field.dart';
 import '../../../core/utils/validators.dart';
@@ -17,6 +18,44 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _googleLoading = false;
+
+  static const _googleClientId = '105982257579-bj5rmr9qcuuggr3rmf081ib4ri4ckfvh.apps.googleusercontent.com';
+
+  Future<void> _googleSignIn() async {
+    if (_googleLoading) return;
+    setState(() => _googleLoading = true);
+    try {
+      final googleSignIn = GoogleSignIn(serverClientId: _googleClientId);
+      final account = await googleSignIn.signIn();
+      if (account == null) {
+        setState(() => _googleLoading = false);
+        return;
+      }
+      final auth = await account.authentication;
+      final idToken = auth.idToken;
+      if (idToken == null) {
+        setState(() => _googleLoading = false);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Não foi possível obter o token do Google')),
+          );
+        }
+        return;
+      }
+      if (mounted) {
+        context.read<AuthBloc>().add(AuthGoogleLoginRequested(idToken: idToken));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao autenticar com Google: ${e.toString().replaceAll('Exception: ', '')}')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _googleLoading = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -204,11 +243,15 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 24),
                       OutlinedButton.icon(
-                        onPressed: () {
-                          // TODO: Implement Google Sign-In flow
-                        },
-                        icon: const Icon(Icons.g_mobiledata_rounded, size: 28),
-                        label: const Text('Entrar com Google'),
+                        onPressed: _googleLoading ? null : _googleSignIn,
+                        icon: _googleLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.g_mobiledata_rounded, size: 28),
+                        label: Text(_googleLoading ? 'Conectando...' : 'Entrar com Google'),
                       ),
                       const SizedBox(height: 32),
                       Row(
