@@ -7,6 +7,7 @@ import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/month_selector.dart';
 import '../../widgets/confirm_dialog.dart';
+import '../../widgets/transaction_tile.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 
@@ -51,37 +52,59 @@ class _TransactionsPageState extends State<TransactionsPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Transações')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/transactions/new'),
-        child: const Icon(Icons.add),
-      ),
       body: Column(
         children: [
-          const SizedBox(height: 8),
-          MonthSelector(
-            selectedMonth: _selectedMonth,
-            onChanged: (date) {
-              setState(() => _selectedMonth = date);
-              _loadData();
-            },
+          // Custom Header
+          Container(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 16,
+              left: 20,
+              right: 20,
+              bottom: 8,
+            ),
+            child: Row(
+              children: [
+                Text(
+                  'Transações',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.only(top: 8, bottom: 4),
+            child: MonthSelector(
+              selectedMonth: _selectedMonth,
+              onChanged: (date) {
+                setState(() => _selectedMonth = date);
+                _loadData();
+              },
+            ),
+          ),
           Expanded(
             child: BlocBuilder<TransactionBloc, TransactionState>(
               builder: (context, state) {
                 if (state is TransactionLoading) {
-                  return const AppLoadingIndicator();
+                  return const AppLoadingIndicator(
+                    useShimmer: true,
+                    shimmerLines: 6,
+                  );
                 }
                 if (state is TransactionError) {
-                  return AppErrorWidget(message: state.message, onRetry: _loadData);
+                  return AppErrorWidget(
+                    message: state.message,
+                    onRetry: _loadData,
+                  );
                 }
                 if (state is TransactionLoaded) {
                   if (state.transactions.isEmpty) {
                     return EmptyStateWidget(
-                      icon: Icons.swap_horiz,
+                      icon: Icons.swap_horiz_rounded,
                       title: 'Nenhuma transação',
-                      subtitle: 'Adicione sua primeira transação',
+                      subtitle: 'Adicione sua primeira transação do mês',
                       actionLabel: 'Nova transação',
                       onAction: () => context.push('/transactions/new'),
                     );
@@ -90,12 +113,22 @@ class _TransactionsPageState extends State<TransactionsPage> {
                     onRefresh: () async => _loadData(),
                     child: ListView.builder(
                       controller: _scrollController,
+                      padding: const EdgeInsets.only(top: 8, bottom: 100),
                       itemCount: state.transactions.length + (state.hasMore ? 1 : 0),
                       itemBuilder: (context, index) {
                         if (index >= state.transactions.length) {
                           return const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Center(child: CircularProgressIndicator()),
+                            padding: EdgeInsets.all(20),
+                            child: Center(
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  strokeCap: StrokeCap.round,
+                                ),
+                              ),
+                            ),
                           );
                         }
                         final tx = state.transactions[index];
@@ -105,9 +138,19 @@ class _TransactionsPageState extends State<TransactionsPage> {
                           direction: DismissDirection.endToStart,
                           background: Container(
                             alignment: Alignment.centerRight,
-                            padding: const EdgeInsets.only(right: 20),
-                            color: theme.colorScheme.error,
-                            child: const Icon(Icons.delete, color: Colors.white),
+                            padding: const EdgeInsets.only(right: 24),
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.error,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: const Icon(
+                              Icons.delete_outline_rounded,
+                              color: Colors.white,
+                            ),
                           ),
                           confirmDismiss: (_) => ConfirmDialog.show(
                             context,
@@ -117,32 +160,21 @@ class _TransactionsPageState extends State<TransactionsPage> {
                             confirmColor: theme.colorScheme.error,
                           ),
                           onDismissed: (_) {
-                            context.read<TransactionBloc>().add(TransactionDeleted(tx.id!));
+                            context
+                                .read<TransactionBloc>()
+                                .add(TransactionDeleted(tx.id!));
                           },
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: isExpense
-                                  ? theme.colorScheme.errorContainer
-                                  : Colors.green.withValues(alpha: 0.15),
-                              child: Icon(
-                                isExpense ? Icons.arrow_downward : Icons.arrow_upward,
-                                color: isExpense ? theme.colorScheme.error : Colors.green,
-                                size: 20,
-                              ),
-                            ),
-                            title: Text(tx.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-                            subtitle: Text(
-                              '${tx.categoryName ?? 'Sem categoria'}${tx.date != null ? ' • ${DateFormatter.shortDate(tx.date!)}' : ''}',
-                              style: theme.textTheme.bodySmall,
-                            ),
-                            trailing: Text(
-                              '${isExpense ? '-' : '+'}${CurrencyFormatter.format(tx.amount)}',
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: isExpense ? theme.colorScheme.error : Colors.green,
-                              ),
-                            ),
-                            onTap: () => context.push('/transactions/${tx.id}'),
+                          child: TransactionTile(
+                            title: tx.title,
+                            subtitle:
+                                '${tx.categoryName ?? 'Sem categoria'}${tx.date != null ? ' • ${DateFormatter.shortDate(tx.date!)}' : ''}',
+                            amount: CurrencyFormatter.format(tx.amount),
+                            isExpense: isExpense,
+                            categoryIcon: isExpense
+                                ? Icons.arrow_downward_rounded
+                                : Icons.arrow_upward_rounded,
+                            onTap: () =>
+                                context.push('/transactions/${tx.id}'),
                           ),
                         );
                       },
@@ -154,6 +186,22 @@ class _TransactionsPageState extends State<TransactionsPage> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.primary.withValues(alpha: 0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          onPressed: () => context.push('/transactions/new'),
+          child: const Icon(Icons.add_rounded),
+        ),
       ),
     );
   }

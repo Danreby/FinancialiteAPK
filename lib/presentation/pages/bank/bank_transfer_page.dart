@@ -49,61 +49,205 @@ class _BankTransferPageState extends State<BankTransferPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
-      appBar: AppBar(title: const Text('Transferência')),
       body: BlocBuilder<BankCubit, BankState>(
         builder: (context, state) {
           final accounts = state is BankLoaded ? state.accounts : <BankAccount>[];
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  DropdownButtonFormField<int>(
-                    value: _fromAccountId,
-                    decoration: const InputDecoration(
-                      labelText: 'Conta de origem',
-                      prefixIcon: Icon(Icons.output),
+          return Column(
+            children: [
+              Container(
+                padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 16),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_back, size: 20, color: theme.colorScheme.onSurface),
+                        onPressed: () => context.pop(),
+                      ),
                     ),
-                    items: accounts.map((a) => DropdownMenuItem(
-                      value: a.id,
-                      child: Text(a.displayName),
-                    )).toList(),
-                    onChanged: (v) => setState(() => _fromAccountId = v),
-                    validator: (v) => v == null ? 'Selecione a conta de origem' : null,
-                  ),
-                  const SizedBox(height: 16),
-                  Center(child: Icon(Icons.arrow_downward, color: Theme.of(context).colorScheme.primary)),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<int>(
-                    value: _toAccountId,
-                    decoration: const InputDecoration(
-                      labelText: 'Conta de destino',
-                      prefixIcon: Icon(Icons.input),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        'Transferência',
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
                     ),
-                    items: accounts.map((a) => DropdownMenuItem(
-                      value: a.id,
-                      child: Text(a.displayName),
-                    )).toList(),
-                    onChanged: (v) => setState(() => _toAccountId = v),
-                    validator: (v) => v == null ? 'Selecione a conta de destino' : null,
-                  ),
-                  const SizedBox(height: 16),
-                  CurrencyTextField(
-                    controller: _amountCtrl,
-                    label: 'Valor da transferência',
-                    validator: Validators.currency,
-                  ),
-                  const SizedBox(height: 24),
-                  FilledButton(
-                    onPressed: _submit,
-                    child: const Text('Transferir'),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.error.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(Icons.output, color: theme.colorScheme.error, size: 20),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: DropdownButtonFormField<int>(
+                                  value: _fromAccountId,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Conta de origem',
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                  items: accounts.map((a) => DropdownMenuItem(
+                                    value: a.id,
+                                    child: Text(a.displayName),
+                                  )).toList(),
+                                  onChanged: (v) => setState(() => _fromAccountId = v),
+                                  validator: (v) => v == null ? 'Selecione a conta de origem' : null,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Center(
+                          child: Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(Icons.arrow_downward, color: theme.colorScheme.primary, size: 22),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(Icons.input, color: Colors.green, size: 20),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: DropdownButtonFormField<int>(
+                                  value: _toAccountId,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Conta de destino',
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                  items: accounts.map((a) => DropdownMenuItem(
+                                    value: a.id,
+                                    child: Text(a.displayName),
+                                  )).toList(),
+                                  onChanged: (v) => setState(() => _toAccountId = v),
+                                  validator: (v) => v == null ? 'Selecione a conta de destino' : null,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(Icons.attach_money, color: theme.colorScheme.primary, size: 22),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: CurrencyTextField(
+                                  controller: _amountCtrl,
+                                  label: 'Valor da transferência',
+                                  validator: Validators.currency,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        SizedBox(
+                          height: 56,
+                          child: FilledButton(
+                            style: FilledButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed: _submit,
+                            child: Text(
+                              'Transferir',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.onPrimary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),

@@ -6,18 +6,32 @@ class ConnectivityBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isOnline) return const SizedBox.shrink();
-    return MaterialBanner(
-      content: const Row(
-        children: [
-          Icon(Icons.wifi_off, size: 18),
-          SizedBox(width: 8),
-          Text('Sem conexão. Dados podem estar desatualizados.'),
-        ],
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      height: isOnline ? 0 : 36,
+      curve: Curves.easeInOut,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.error,
       ),
-      backgroundColor: Theme.of(context).colorScheme.errorContainer,
-      actions: const [SizedBox.shrink()],
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.wifi_off_rounded, size: 14, color: Colors.white.withValues(alpha: 0.9)),
+            const SizedBox(width: 8),
+            Text(
+              'Sem conexão com a internet',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.95),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

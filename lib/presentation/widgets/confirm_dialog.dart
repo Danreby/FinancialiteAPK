@@ -38,20 +38,41 @@ class ConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return AlertDialog(
       title: Text(title),
-      content: Text(message),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: Text(cancelText),
+      content: Text(
+        message,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+          height: 1.5,
         ),
-        FilledButton(
-          style: confirmColor != null
-              ? FilledButton.styleFrom(backgroundColor: confirmColor)
-              : null,
-          onPressed: () => Navigator.pop(context, true),
-          child: Text(confirmText),
+      ),
+      actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      actions: [
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => Navigator.pop(context, false),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(0, 48),
+                ),
+                child: Text(cancelText),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: confirmColor,
+                  minimumSize: const Size(0, 48),
+                ),
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(confirmText),
+              ),
+            ),
+          ],
         ),
       ],
     );

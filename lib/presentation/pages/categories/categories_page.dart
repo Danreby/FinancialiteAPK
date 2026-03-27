@@ -22,6 +22,7 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() => setState(() {}));
     _loadData();
   }
 
@@ -43,8 +44,11 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+        padding: EdgeInsets.fromLTRB(24, 16, 24, MediaQuery.of(ctx).viewInsets.bottom + 24),
         child: Form(
           key: formKey,
           child: StatefulBuilder(
@@ -52,8 +56,24 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Nova Categoria', style: Theme.of(ctx).textTheme.titleLarge),
-                const SizedBox(height: 16),
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                Text(
+                  'Nova Categoria',
+                  style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 AppTextField(
                   controller: nameCtrl,
                   label: 'Nome',
@@ -74,19 +94,25 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                   ],
                   onChanged: (v) => setLocalState(() => type = v ?? 'despesa'),
                 ),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: () {
-                    if (!formKey.currentState!.validate()) return;
-                    context.read<CategoryCubit>().createCategory({
-                      'nome': nameCtrl.text.trim(),
-                      'tipo': type,
-                      if (icon != null) 'icone': icon,
-                      if (color != null) 'cor': color,
-                    });
-                    Navigator.pop(ctx);
-                  },
-                  child: const Text('Salvar'),
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: 56,
+                  child: FilledButton(
+                    onPressed: () {
+                      if (!formKey.currentState!.validate()) return;
+                      context.read<CategoryCubit>().createCategory({
+                        'nome': nameCtrl.text.trim(),
+                        'tipo': type,
+                        if (icon != null) 'icone': icon,
+                        if (color != null) 'cor': color,
+                      });
+                      Navigator.pop(ctx);
+                    },
+                    style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                    child: const Text('Salvar', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                  ),
                 ),
               ],
             ),
@@ -100,43 +126,108 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Categorias'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Todas'),
-            Tab(text: 'Despesas'),
-            Tab(text: 'Receitas'),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.primary.withValues(alpha: 0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
           ],
         ),
+        child: FloatingActionButton(
+          onPressed: _showCreateDialog,
+          child: const Icon(Icons.add),
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showCreateDialog,
-        child: const Icon(Icons.add),
-      ),
-      body: BlocBuilder<CategoryCubit, CategoryState>(
-        builder: (context, state) {
-          if (state is CategoryLoading) return const AppLoadingIndicator();
-          if (state is CategoryError) return AppErrorWidget(message: state.message, onRetry: _loadData);
-          if (state is CategoryLoaded) {
-            return TabBarView(
-              controller: _tabController,
-              children: [
-                _buildCategoryList(state.categories, theme),
-                _buildCategoryList(
-                  state.categories.where((c) => c.type == 'despesa' || c.type == 'ambos').toList(),
-                  theme,
+      body: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 16,
+              left: 20,
+              right: 20,
+              bottom: 16,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Categorias',
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
                 ),
-                _buildCategoryList(
-                  state.categories.where((c) => c.type == 'receita' || c.type == 'ambos').toList(),
-                  theme,
-                ),
-              ],
-            );
-          }
-          return const SizedBox.shrink();
-        },
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: List.generate(3, (index) {
+                final labels = ['Todas', 'Despesas', 'Receitas'];
+                final isSelected = _tabController.index == index;
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => _tabController.animateTo(index),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: isSelected ? theme.colorScheme.primary : Colors.transparent,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        labels[index],
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: isSelected ? Colors.white : theme.colorScheme.onSurfaceVariant,
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: BlocBuilder<CategoryCubit, CategoryState>(
+              builder: (context, state) {
+                if (state is CategoryLoading) {
+                  return const AppLoadingIndicator(useShimmer: true, shimmerLines: 5);
+                }
+                if (state is CategoryError) {
+                  return AppErrorWidget(message: state.message, onRetry: _loadData);
+                }
+                if (state is CategoryLoaded) {
+                  return TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildCategoryList(state.categories, theme),
+                      _buildCategoryList(
+                        state.categories.where((c) => c.type == 'despesa' || c.type == 'ambos').toList(),
+                        theme,
+                      ),
+                      _buildCategoryList(
+                        state.categories.where((c) => c.type == 'receita' || c.type == 'ambos').toList(),
+                        theme,
+                      ),
+                    ],
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -152,38 +243,87 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
     return RefreshIndicator(
       onRefresh: () async => _loadData(),
       child: ListView.builder(
+        padding: const EdgeInsets.only(top: 8),
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final cat = categories[index];
-          return Dismissible(
-            key: Key('cat_${cat.id}'),
-            direction: DismissDirection.endToStart,
-            background: Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: 20),
-              color: theme.colorScheme.error,
-              child: const Icon(Icons.delete, color: Colors.white),
-            ),
-            confirmDismiss: (_) => ConfirmDialog.show(
-              context,
-              title: 'Excluir categoria',
-              message: 'Deseja excluir "${cat.name}"?',
-              confirmText: 'Excluir',
-              confirmColor: theme.colorScheme.error,
-            ),
-            onDismissed: (_) => context.read<CategoryCubit>().deleteCategory(cat.id),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: theme.colorScheme.primaryContainer,
-                child: Icon(
-                  cat.icon != null ? IconData(int.tryParse(cat.icon!) ?? 0xe14f, fontFamily: 'MaterialIcons') : Icons.category,
-                  color: theme.colorScheme.primary,
-                  size: 20,
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Dismissible(
+                key: Key('cat_${cat.id}'),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  color: theme.colorScheme.error,
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                confirmDismiss: (_) => ConfirmDialog.show(
+                  context,
+                  title: 'Excluir categoria',
+                  message: 'Deseja excluir "${cat.name}"?',
+                  confirmText: 'Excluir',
+                  confirmColor: theme.colorScheme.error,
+                ),
+                onDismissed: (_) => context.read<CategoryCubit>().deleteCategory(cat.id),
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(
+                          cat.icon != null
+                              ? IconData(int.tryParse(cat.icon!) ?? 0xe14f, fontFamily: 'MaterialIcons')
+                              : Icons.category,
+                          color: theme.colorScheme.primary,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              cat.name,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _typeLabel(cat.type),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right,
+                        color: theme.colorScheme.onSurfaceVariant,
+                        size: 20,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              title: Text(cat.name),
-              subtitle: Text(_typeLabel(cat.type)),
-              trailing: const Icon(Icons.chevron_right, size: 20),
             ),
           );
         },

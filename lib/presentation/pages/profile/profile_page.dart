@@ -27,7 +27,6 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Perfil')),
       body: BlocConsumer<ProfileCubit, ProfileState>(
         listener: (context, state) {
           if (state is ProfilePasswordChanged) {
@@ -46,7 +45,9 @@ class _ProfilePageState extends State<ProfilePage> {
           }
         },
         builder: (context, state) {
-          if (state is ProfileLoading) return const AppLoadingIndicator();
+          if (state is ProfileLoading) {
+            return const AppLoadingIndicator(useShimmer: true, shimmerLines: 6);
+          }
           if (state is ProfileError && state is! ProfileLoaded) {
             return AppErrorWidget(
               message: state.message,
@@ -58,74 +59,194 @@ class _ProfilePageState extends State<ProfilePage> {
                 ? state.user
                 : (state as ProfilePasswordChanged).user;
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.zero,
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 48,
-                    backgroundColor: theme.colorScheme.primaryContainer,
-                    child: Text(
-                      user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
-                      style: theme.textTheme.headlineLarge?.copyWith(
-                        color: theme.colorScheme.onPrimaryContainer,
+                  // Custom header
+                  Container(
+                    padding: EdgeInsets.fromLTRB(
+                      20,
+                      MediaQuery.of(context).padding.top + 16,
+                      20,
+                      20,
+                    ),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => context.pop(),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.arrow_back_ios_new,
+                              size: 18,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Text(
+                          'Perfil',
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Instagram-style profile header with gradient ring
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          theme.colorScheme.primary,
+                          theme.colorScheme.tertiary,
+                          theme.colorScheme.secondary,
+                        ],
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(3),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: theme.colorScheme.surface,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(3),
+                          child: CircleAvatar(
+                            radius: 56,
+                            backgroundColor: theme.colorScheme.primaryContainer,
+                            child: Text(
+                              user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
+                              style: theme.textTheme.headlineLarge?.copyWith(
+                                color: theme.colorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Text(user.name, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+                  Text(
+                    user.name,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(user.email, style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  )),
+                  Text(
+                    user.email,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+
                   const SizedBox(height: 32),
-                  Card(
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: const Icon(Icons.person_outline),
-                          title: const Text('Editar perfil'),
-                          trailing: const Icon(Icons.chevron_right, size: 20),
-                          onTap: () => _showEditProfileDialog(user.name, user.email),
+
+                  // Profile actions section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
                         ),
-                        const Divider(height: 1),
-                        ListTile(
-                          leading: const Icon(Icons.lock_outline),
-                          title: const Text('Alterar senha'),
-                          trailing: const Icon(Icons.chevron_right, size: 20),
-                          onTap: _showChangePasswordDialog,
-                        ),
-                      ],
+                      ),
+                      child: Column(
+                        children: [
+                          _buildMenuItem(
+                            context,
+                            icon: Icons.person_outline,
+                            title: 'Editar perfil',
+                            color: theme.colorScheme.primary,
+                            onTap: () => _showEditProfileDialog(user.name, user.email),
+                          ),
+                          Divider(
+                            height: 1,
+                            indent: 74,
+                            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                          ),
+                          _buildMenuItem(
+                            context,
+                            icon: Icons.lock_outline,
+                            title: 'Alterar senha',
+                            color: theme.colorScheme.primary,
+                            onTap: _showChangePasswordDialog,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+
                   const SizedBox(height: 16),
-                  Card(
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: const Icon(Icons.logout, color: Colors.orange),
-                          title: const Text('Sair'),
-                          onTap: () async {
-                            final confirmed = await ConfirmDialog.show(
-                              context,
-                              title: 'Sair',
-                              message: 'Deseja realmente sair da sua conta?',
-                              confirmText: 'Sair',
-                            );
-                            if (confirmed == true) {
-                              context.read<AuthBloc>().add(const AuthLogoutRequested());
-                              context.go('/login');
-                            }
-                          },
+
+                  // Danger zone section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
                         ),
-                        const Divider(height: 1),
-                        ListTile(
-                          leading: Icon(Icons.delete_forever, color: theme.colorScheme.error),
-                          title: Text('Excluir conta', style: TextStyle(color: theme.colorScheme.error)),
-                          onTap: _showDeleteAccountDialog,
-                        ),
-                      ],
+                      ),
+                      child: Column(
+                        children: [
+                          _buildMenuItem(
+                            context,
+                            icon: Icons.logout,
+                            title: 'Sair',
+                            color: Colors.orange,
+                            onTap: () async {
+                              final confirmed = await ConfirmDialog.show(
+                                context,
+                                title: 'Sair',
+                                message: 'Deseja realmente sair da sua conta?',
+                                confirmText: 'Sair',
+                              );
+                              if (confirmed == true) {
+                                context.read<AuthBloc>().add(const AuthLogoutRequested());
+                                context.go('/login');
+                              }
+                            },
+                          ),
+                          Divider(
+                            height: 1,
+                            indent: 74,
+                            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                          ),
+                          _buildMenuItem(
+                            context,
+                            icon: Icons.delete_forever,
+                            title: 'Excluir conta',
+                            color: theme.colorScheme.error,
+                            onTap: _showDeleteAccountDialog,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+
+                  const SizedBox(height: 32),
                 ],
               ),
             );
@@ -136,21 +257,90 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Widget _buildMenuItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: color, size: 22),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  title,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: color == theme.colorScheme.error ? color : null,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                size: 20,
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showEditProfileDialog(String currentName, String currentEmail) {
     final nameCtrl = TextEditingController(text: currentName);
     final formKey = GlobalKey<FormState>();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+        padding: EdgeInsets.fromLTRB(24, 12, 24, MediaQuery.of(ctx).viewInsets.bottom + 24),
         child: Form(
           key: formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Editar Perfil', style: Theme.of(ctx).textTheme.titleLarge),
+              // Drag handle
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade400,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Editar Perfil',
+                style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               const SizedBox(height: 16),
               AppTextField(
                 controller: nameCtrl,
@@ -182,15 +372,36 @@ class _ProfilePageState extends State<ProfilePage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+        padding: EdgeInsets.fromLTRB(24, 12, 24, MediaQuery.of(ctx).viewInsets.bottom + 24),
         child: Form(
           key: formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Alterar Senha', style: Theme.of(ctx).textTheme.titleLarge),
+              // Drag handle
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade400,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Alterar Senha',
+                style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               const SizedBox(height: 16),
               AppTextField(controller: currentCtrl, label: 'Senha atual', obscureText: true, validator: Validators.required),
               const SizedBox(height: 12),
@@ -228,7 +439,26 @@ class _ProfilePageState extends State<ProfilePage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Excluir Conta'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Column(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: Theme.of(ctx).colorScheme.error.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                Icons.warning_amber_rounded,
+                color: Theme.of(ctx).colorScheme.error,
+                size: 28,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text('Excluir Conta'),
+          ],
+        ),
         content: Form(
           key: formKey,
           child: Column(
@@ -237,6 +467,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Text(
                 'Esta ação é irreversível. Todos os seus dados serão excluídos permanentemente.',
                 style: Theme.of(ctx).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
               AppTextField(

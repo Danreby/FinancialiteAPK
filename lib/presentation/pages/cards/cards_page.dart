@@ -7,6 +7,7 @@ import '../../widgets/empty_state_widget.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/currency_text_field.dart';
+import '../../widgets/section_header.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
 
@@ -97,124 +98,284 @@ class _CardsPageState extends State<CardsPage> {
     );
   }
 
+  static const _cardGradients = [
+    [Color(0xFF1A1A2E), Color(0xFF16213E)],
+    [Color(0xFF0F3460), Color(0xFF533483)],
+    [Color(0xFF2C3E50), Color(0xFF3498DB)],
+    [Color(0xFF4A148C), Color(0xFF7B1FA2)],
+    [Color(0xFF1B5E20), Color(0xFF388E3C)],
+  ];
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
-      appBar: AppBar(title: const Text('Cartões')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showCreateDialog,
-        child: const Icon(Icons.add),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.primary.withValues(alpha: 0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: FloatingActionButton(
+          onPressed: _showCreateDialog,
+          child: const Icon(Icons.add),
+        ),
       ),
       body: BlocBuilder<CardCubit, CardState>(
         builder: (context, state) {
-          if (state is CardLoading) return const AppLoadingIndicator();
-          if (state is CardError) return AppErrorWidget(message: state.message, onRetry: _loadData);
-          if (state is CardLoaded) {
-            if (state.cards.isEmpty) {
-              return EmptyStateWidget(
-                icon: Icons.credit_card,
-                title: 'Nenhum cartão',
-                subtitle: 'Adicione seu primeiro cartão',
-                actionLabel: 'Novo cartão',
-                onAction: _showCreateDialog,
+          return Column(
+            children: [
+              Container(
+                padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Cartões',
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(child: _buildBody(context, state, theme)),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context, CardState state, ThemeData theme) {
+    if (state is CardLoading) {
+      return const AppLoadingIndicator(useShimmer: true, shimmerLines: 4);
+    }
+    if (state is CardError) {
+      return AppErrorWidget(message: state.message, onRetry: _loadData);
+    }
+    if (state is CardLoaded) {
+      if (state.cards.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Icon(Icons.credit_card, size: 40, color: theme.colorScheme.primary),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Nenhum cartão',
+                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Adicione seu primeiro cartão',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 20),
+              FilledButton.tonal(
+                onPressed: _showCreateDialog,
+                child: const Text('Novo cartão'),
+              ),
+            ],
+          ),
+        );
+      }
+      return RefreshIndicator(
+        onRefresh: () async => _loadData(),
+        child: ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          itemCount: state.cards.length + 1,
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return const Padding(
+                padding: EdgeInsets.only(bottom: 12),
+                child: SectionHeader(title: 'Seus Cartões'),
               );
             }
-            return RefreshIndicator(
-              onRefresh: () async => _loadData(),
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: state.cards.length,
-                itemBuilder: (context, index) {
-                  final card = state.cards[index];
-                  final spending = card.currentSpending ?? 0;
-                  final usedPercent = card.creditLimit > 0
-                      ? (spending / card.creditLimit * 100).clamp(0.0, 100.0)
-                      : 0.0;
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: Dismissible(
-                      key: Key('card_${card.id}'),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 20),
-                        color: theme.colorScheme.error,
-                        child: const Icon(Icons.delete, color: Colors.white),
+            final cardIndex = index - 1;
+            final card = state.cards[cardIndex];
+            final spending = card.currentSpending ?? 0;
+            final usedPercent = card.creditLimit > 0
+                ? (spending / card.creditLimit * 100).clamp(0.0, 100.0)
+                : 0.0;
+            final gradient = _cardGradients[cardIndex % _cardGradients.length];
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Dismissible(
+                key: Key('card_${card.id}'),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.error,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                confirmDismiss: (_) => ConfirmDialog.show(
+                  context,
+                  title: 'Excluir cartão',
+                  message: 'Deseja excluir "${card.displayName}"?',
+                  confirmText: 'Excluir',
+                  confirmColor: theme.colorScheme.error,
+                ),
+                onDismissed: (_) => context.read<CardCubit>().deleteCard(card.id!),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [gradient[0], gradient[1]],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: gradient[0].withValues(alpha: 0.4),
+                        blurRadius: 16,
+                        offset: const Offset(0, 8),
                       ),
-                      confirmDismiss: (_) => ConfirmDialog.show(
-                        context,
-                        title: 'Excluir cartão',
-                        message: 'Deseja excluir "${card.displayName}"?',
-                        confirmText: 'Excluir',
-                        confirmColor: theme.colorScheme.error,
-                      ),
-                      onDismissed: (_) => context.read<CardCubit>().deleteCard(card.id!),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            Row(
-                              children: [
-                                Icon(Icons.credit_card, color: theme.colorScheme.primary),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(card.displayName,
-                                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                                ),
-                              ],
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(Icons.credit_card, color: Colors.white, size: 22),
                             ),
-                            const SizedBox(height: 12),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Fatura atual', style: theme.textTheme.bodySmall),
-                                    Text(CurrencyFormatter.format(spending),
-                                        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
-                                  ],
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                card.displayName,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
                                 ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text('Limite', style: theme.textTheme.bodySmall),
-                                    Text(CurrencyFormatter.format(card.creditLimit),
-                                        style: theme.textTheme.titleSmall),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: usedPercent / 100,
-                                minHeight: 6,
-                                color: usedPercent > 80 ? theme.colorScheme.error : theme.colorScheme.primary,
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Fecha dia ${card.closingDay} • Vence dia ${card.dueDay}',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
+                            Container(
+                              width: 40,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                color: Colors.amber.withValues(alpha: 0.8),
+                                borderRadius: BorderRadius.circular(6),
                               ),
                             ),
                           ],
                         ),
-                      ),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Fatura atual',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  CurrencyFormatter.format(spending),
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'Limite',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  CurrencyFormatter.format(card.creditLimit),
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: LinearProgressIndicator(
+                            value: usedPercent / 100,
+                            minHeight: 8,
+                            backgroundColor: Colors.white.withValues(alpha: 0.2),
+                            color: usedPercent > 80
+                                ? Colors.redAccent.shade100
+                                : Colors.white.withValues(alpha: 0.9),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Fecha dia ${card.closingDay} • Vence dia ${card.dueDay}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.white.withValues(alpha: 0.6),
+                              ),
+                            ),
+                            Text(
+                              '${usedPercent.toStringAsFixed(0)}% usado',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white.withValues(alpha: 0.8),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
             );
-          }
-          return const SizedBox.shrink();
-        },
-      ),
-    );
+          },
+        ),
+      );
+    }
+    return const SizedBox.shrink();
   }
 }

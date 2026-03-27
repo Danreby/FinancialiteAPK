@@ -60,90 +60,253 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Editar Transação' : 'Nova Transação'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: 'despesa', label: Text('Despesa'), icon: Icon(Icons.arrow_downward)),
-                  ButtonSegment(value: 'receita', label: Text('Receita'), icon: Icon(Icons.arrow_upward)),
-                ],
-                selected: {_type},
-                onSelectionChanged: (v) => setState(() => _type = v.first),
-              ),
-              const SizedBox(height: 16),
-              AppTextField(
-                controller: _descriptionController,
-                label: 'Descrição',
-                prefixIcon: Icons.description,
-                validator: Validators.required,
-                textInputAction: TextInputAction.next,
-              ),
-              const SizedBox(height: 16),
-              CurrencyTextField(
-                controller: _amountController,
-                label: 'Valor',
-                validator: Validators.currency,
-              ),
-              const SizedBox(height: 16),
-              BlocBuilder<CategoryCubit, CategoryState>(
-                builder: (context, state) {
-                  final categories = state is CategoryLoaded ? state.categories : <Category>[];
-                  return DropdownButtonFormField<int>(
-                    value: _categoryId,
-                    decoration: const InputDecoration(
-                      labelText: 'Categoria',
-                      prefixIcon: Icon(Icons.category),
-                    ),
-                    items: categories.map((c) => DropdownMenuItem(
-                      value: c.id,
-                      child: Text(c.name),
-                    )).toList(),
-                    onChanged: (v) => setState(() => _categoryId = v),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-              AppTextField(
-                label: 'Data',
-                prefixIcon: Icons.calendar_today,
-                readOnly: true,
-                controller: TextEditingController(
-                  text: '${_date.day.toString().padLeft(2, '0')}/${_date.month.toString().padLeft(2, '0')}/${_date.year}',
+      body: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 16,
+              left: 20,
+              right: 20,
+              bottom: 16,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, size: 20),
+                    onPressed: () => context.pop(),
+                    padding: EdgeInsets.zero,
+                  ),
                 ),
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: _date,
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2030),
-                  );
-                  if (picked != null) setState(() => _date = picked);
-                },
-              ),
-              const SizedBox(height: 16),
-              AppTextField(
-                controller: _notesController,
-                label: 'Observações',
-                prefixIcon: Icons.notes,
-                maxLines: 3,
-              ),
-              const SizedBox(height: 24),
-              FilledButton(
-                onPressed: _submit,
-                child: Text(_isEditing ? 'Atualizar' : 'Salvar'),
-              ),
-            ],
+                const SizedBox(width: 16),
+                Text(
+                  _isEditing ? 'Editar Transação' : 'Nova Transação',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setState(() => _type = 'despesa'),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              height: 56,
+                              decoration: BoxDecoration(
+                                color: _type == 'despesa'
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.arrow_downward,
+                                    color: _type == 'despesa'
+                                        ? Colors.white
+                                        : theme.colorScheme.onSurfaceVariant,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Despesa',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: _type == 'despesa'
+                                          ? Colors.white
+                                          : theme.colorScheme.onSurfaceVariant,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setState(() => _type = 'receita'),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              height: 56,
+                              decoration: BoxDecoration(
+                                color: _type == 'receita'
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.arrow_upward,
+                                    color: _type == 'receita'
+                                        ? Colors.white
+                                        : theme.colorScheme.onSurfaceVariant,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Receita',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: _type == 'receita'
+                                          ? Colors.white
+                                          : theme.colorScheme.onSurfaceVariant,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          AppTextField(
+                            controller: _descriptionController,
+                            label: 'Descrição',
+                            prefixIcon: Icons.description,
+                            validator: Validators.required,
+                            textInputAction: TextInputAction.next,
+                          ),
+                          const SizedBox(height: 16),
+                          CurrencyTextField(
+                            controller: _amountController,
+                            label: 'Valor',
+                            validator: Validators.currency,
+                          ),
+                          const SizedBox(height: 16),
+                          BlocBuilder<CategoryCubit, CategoryState>(
+                            builder: (context, state) {
+                              final categories = state is CategoryLoaded ? state.categories : <Category>[];
+                              return DropdownButtonFormField<int>(
+                                value: _categoryId,
+                                decoration: const InputDecoration(
+                                  labelText: 'Categoria',
+                                  prefixIcon: Icon(Icons.category),
+                                ),
+                                items: categories.map((c) => DropdownMenuItem(
+                                  value: c.id,
+                                  child: Text(c.name),
+                                )).toList(),
+                                onChanged: (v) => setState(() => _categoryId = v),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          AppTextField(
+                            label: 'Data',
+                            prefixIcon: Icons.calendar_today,
+                            readOnly: true,
+                            controller: TextEditingController(
+                              text: '${_date.day.toString().padLeft(2, '0')}/${_date.month.toString().padLeft(2, '0')}/${_date.year}',
+                            ),
+                            suffix: Container(
+                              width: 40,
+                              height: 40,
+                              margin: const EdgeInsets.only(right: 4),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.calendar_month,
+                                color: theme.colorScheme.onSurfaceVariant,
+                                size: 20,
+                              ),
+                            ),
+                            onTap: () async {
+                              final picked = await showDatePicker(
+                                context: context,
+                                initialDate: _date,
+                                firstDate: DateTime(2020),
+                                lastDate: DateTime(2030),
+                              );
+                              if (picked != null) setState(() => _date = picked);
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          AppTextField(
+                            controller: _notesController,
+                            label: 'Observações',
+                            prefixIcon: Icons.notes,
+                            maxLines: 3,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: SizedBox(
+                        height: 56,
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: _submit,
+                          style: FilledButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            _isEditing ? 'Atualizar' : 'Salvar',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -6,6 +6,8 @@ import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/month_selector.dart';
+import '../../widgets/gradient_card.dart';
+import '../../widgets/section_header.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 
@@ -34,41 +36,86 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () => context.push('/notifications'),
-          ),
-        ],
-      ),
       body: RefreshIndicator(
         onRefresh: () async {
           final monthKey = DateFormatter.monthKey(_selectedMonth);
           await context.read<DashboardCubit>().refresh(month: monthKey);
         },
-        child: SingleChildScrollView(
+        child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 8),
-              MonthSelector(
-                selectedMonth: _selectedMonth,
-                onChanged: (date) {
-                  setState(() => _selectedMonth = date);
-                  _loadData();
-                },
+          slivers: [
+            // Custom Header
+            SliverToBoxAdapter(
+              child: Container(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top + 16,
+                  left: 20,
+                  right: 20,
+                  bottom: 4,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Visão Geral',
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    GestureDetector(
+                      onTap: () => context.push('/notifications'),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(
+                          Icons.notifications_outlined,
+                          color: theme.colorScheme.onSurface,
+                          size: 22,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              BlocBuilder<DashboardCubit, DashboardState>(
+            ),
+            // Month Selector
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 8),
+                child: MonthSelector(
+                  selectedMonth: _selectedMonth,
+                  onChanged: (date) {
+                    setState(() => _selectedMonth = date);
+                    _loadData();
+                  },
+                ),
+              ),
+            ),
+            // Content
+            SliverToBoxAdapter(
+              child: BlocBuilder<DashboardCubit, DashboardState>(
                 builder: (context, state) {
                   if (state is DashboardLoading) {
-                    return const SizedBox(height: 300, child: AppLoadingIndicator());
+                    return const SizedBox(
+                      height: 400,
+                      child: AppLoadingIndicator(useShimmer: true, shimmerLines: 5),
+                    );
                   }
                   if (state is DashboardError) {
-                    return AppErrorWidget(message: state.message, onRetry: _loadData);
+                    return AppErrorWidget(
+                      message: state.message,
+                      onRetry: _loadData,
+                    );
                   }
                   if (state is DashboardLoaded) {
                     return _buildContent(context, state);
@@ -76,8 +123,8 @@ class _DashboardPageState extends State<DashboardPage> {
                   return const SizedBox.shrink();
                 },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -86,139 +133,376 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildContent(BuildContext context, DashboardLoaded state) {
     final data = state.data;
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Balance card
-          Card(
-            color: theme.colorScheme.primaryContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Text('Saldo do Mês', style: theme.textTheme.titleSmall?.copyWith(
-                    color: theme.colorScheme.onPrimaryContainer,
-                  )),
-                  const SizedBox(height: 8),
-                  Text(
-                    CurrencyFormatter.format(data.balance),
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: data.balance >= 0
-                          ? theme.colorScheme.onPrimaryContainer
-                          : theme.colorScheme.error,
-                    ),
-                  ),
-                ],
-              ),
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        // Hero Balance Card with Gradient
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: GradientCard(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                theme.colorScheme.primary,
+                theme.colorScheme.primary.withValues(alpha: 0.85),
+                theme.colorScheme.primary.withValues(alpha: 0.7),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          // Stats grid
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 1.5,
-            children: [
-              StatCard(
-                title: 'Receitas',
-                value: CurrencyFormatter.format(data.totalIncome),
-                icon: Icons.trending_up,
-                iconColor: Colors.green,
-                onTap: () => context.push('/income'),
-              ),
-              StatCard(
-                title: 'Despesas',
-                value: CurrencyFormatter.format(data.totalExpense),
-                icon: Icons.trending_down,
-                iconColor: Colors.red,
-                onTap: () => context.push('/transactions'),
-              ),
-              StatCard(
-                title: 'Contas a pagar',
-                value: '${data.pendingBills}',
-                icon: Icons.receipt_long,
-                iconColor: Colors.orange,
-                onTap: () => context.push('/bills'),
-              ),
-              StatCard(
-                title: 'Economias',
-                value: CurrencyFormatter.format(data.savingsTotal),
-                icon: Icons.savings,
-                iconColor: Colors.blue,
-                onTap: () => context.push('/savings'),
+            boxShadow: [
+              BoxShadow(
+                color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
               ),
             ],
-          ),
-          const SizedBox(height: 24),
-          // Upcoming bills
-          if (data.upcomingBills.isNotEmpty) ...[
-            Text('Próximas Contas', style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            )),
-            const SizedBox(height: 12),
-            ...data.upcomingBills.take(5).map((bill) => Card(
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: theme.colorScheme.errorContainer,
-                      child: Icon(Icons.receipt, color: theme.colorScheme.error, size: 20),
-                    ),
-                    title: Text(bill.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-                    subtitle: Text('Dia ${bill.dueDay}'),
-                    trailing: Text(
-                      CurrencyFormatter.format(bill.amount),
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.error,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Saldo do Mês',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
-                  ),
-                )),
-          ],
-          // Category spending
-          if (data.topCategories.isNotEmpty) ...[
-            const SizedBox(height: 24),
-            Text('Gastos por Categoria', style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            )),
-            const SizedBox(height: 12),
-            ...data.topCategories.take(5).map((cat) {
-              final percent = data.totalExpense > 0
-                  ? (cat.amount / data.totalExpense * 100)
-                  : 0.0;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(cat.name, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        ),
-                        Text(CurrencyFormatter.format(cat.amount),
-                            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    LinearProgressIndicator(
-                      value: percent / 100,
-                      borderRadius: BorderRadius.circular(4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            data.balance >= 0
+                                ? Icons.trending_up_rounded
+                                : Icons.trending_down_rounded,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            data.balance >= 0 ? 'Positivo' : 'Negativo',
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              );
-            }),
-          ],
-          const SizedBox(height: 32),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    CurrencyFormatter.format(data.balance),
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: -1,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Income vs Expense row
+                Row(
+                  children: [
+                    Expanded(
+                      child: _BalanceRow(
+                        label: 'Receitas',
+                        value: CurrencyFormatter.format(data.totalIncome),
+                        icon: Icons.arrow_upward_rounded,
+                        color: const Color(0xFF34D399),
+                      ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 36,
+                      color: Colors.white.withValues(alpha: 0.2),
+                    ),
+                    Expanded(
+                      child: _BalanceRow(
+                        label: 'Despesas',
+                        value: CurrencyFormatter.format(data.totalExpense),
+                        icon: Icons.arrow_downward_rounded,
+                        color: const Color(0xFFFB7185),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        // Quick Stats
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              Expanded(
+                child: StatCard(
+                  title: 'Contas a pagar',
+                  value: '${data.pendingBills}',
+                  icon: Icons.receipt_long_rounded,
+                  iconColor: const Color(0xFFF59E0B),
+                  onTap: () => context.push('/bills'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: StatCard(
+                  title: 'Economias',
+                  value: CurrencyFormatter.format(data.savingsTotal),
+                  icon: Icons.savings_rounded,
+                  iconColor: const Color(0xFF3B82F6),
+                  onTap: () => context.push('/savings'),
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Upcoming Bills
+        if (data.upcomingBills.isNotEmpty) ...[
+          const SizedBox(height: 28),
+          SectionHeader(
+            title: 'Próximas Contas',
+            actionText: 'Ver todas',
+            onAction: () => context.push('/bills'),
+          ),
+          const SizedBox(height: 12),
+          ...data.upcomingBills.take(4).map((bill) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.error.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.receipt_long_rounded,
+                            color: theme.colorScheme.error,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                bill.title,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Vence dia ${bill.dueDay}',
+                                style: theme.textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          CurrencyFormatter.format(bill.amount),
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.error,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )),
         ],
-      ),
+        // Category Spending
+        if (data.topCategories.isNotEmpty) ...[
+          const SizedBox(height: 28),
+          SectionHeader(
+            title: 'Gastos por Categoria',
+            actionText: 'Ver relatório',
+            onAction: () => context.push('/reports'),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                ),
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: data.topCategories.take(5).map((cat) {
+                  final percent = data.totalExpense > 0
+                      ? (cat.amount / data.totalExpense * 100)
+                      : 0.0;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 14),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primary
+                                    .withValues(alpha: 1.0 - (data.topCategories.indexOf(cat) * 0.15)),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                cat.name,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Text(
+                              CurrencyFormatter.format(cat.amount),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primary
+                                    .withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                '${percent.toStringAsFixed(0)}%',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: percent / 100,
+                            minHeight: 4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(height: 32),
+      ],
+    );
+  }
+}
+
+class _BalanceRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  const _BalanceRow({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 14, color: color),
+        ),
+        const SizedBox(width: 10),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: Colors.white.withValues(alpha: 0.7),
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              value,
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
