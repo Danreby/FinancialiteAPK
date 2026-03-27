@@ -26,7 +26,10 @@ class _LoginPageState extends State<LoginPage> {
     if (_googleLoading) return;
     setState(() => _googleLoading = true);
     try {
-      final googleSignIn = GoogleSignIn(serverClientId: _googleClientId);
+      final googleSignIn = GoogleSignIn(
+        serverClientId: _googleClientId,
+        scopes: ['email', 'profile'],
+      );
       final account = await googleSignIn.signIn();
       if (account == null) {
         setState(() => _googleLoading = false);
@@ -38,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
         setState(() => _googleLoading = false);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Não foi possível obter o token do Google')),
+            const SnackBar(content: Text('Não foi possível obter o token do Google. Verifique a configuração do app.')),
           );
         }
         return;
@@ -48,8 +51,20 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       if (mounted) {
+        String errorMsg = e.toString();
+        if (errorMsg.contains('sign_in_canceled')) {
+          return;
+        } else if (errorMsg.contains('network_error')) {
+          errorMsg = 'Sem conexão com a internet';
+        } else if (errorMsg.contains('sign_in_failed') || errorMsg.contains('ApiException: 10')) {
+          errorMsg = 'Falha na configuração do Google Sign-In. Verifique se o app está registrado no Google Cloud Console.';
+        } else if (errorMsg.contains('ApiException: 12500')) {
+          errorMsg = 'Google Play Services desatualizado. Atualize pelo Play Store.';
+        } else {
+          errorMsg = 'Erro ao autenticar com Google: ${errorMsg.replaceAll(RegExp(r'Exception:\s*|PlatformException\(|\)$'), '')}';
+        }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao autenticar com Google: ${e.toString().replaceAll('Exception: ', '')}')),
+          SnackBar(content: Text(errorMsg)),
         );
       }
     } finally {

@@ -20,7 +20,25 @@ class ErrorInterceptor extends Interceptor {
         handler.reject(
           DioException(
             requestOptions: err.requestOptions,
-            error: const NetworkException(),
+            error: const NetworkException(message: 'Sem conexão com a internet. Verifique sua rede.'),
+            type: err.type,
+          ),
+        );
+        return;
+      case DioExceptionType.badCertificate:
+        handler.reject(
+          DioException(
+            requestOptions: err.requestOptions,
+            error: const NetworkException(message: 'Erro de certificado SSL. Verifique sua conexão.'),
+            type: err.type,
+          ),
+        );
+        return;
+      case DioExceptionType.cancel:
+        handler.reject(
+          DioException(
+            requestOptions: err.requestOptions,
+            error: const ServerException(message: 'Requisição cancelada'),
             type: err.type,
           ),
         );
@@ -63,13 +81,13 @@ class ErrorInterceptor extends Interceptor {
         }
 
         if (statusCode == 429) {
+          final msg = data is Map
+              ? (data['error']?.toString() ?? data['message']?.toString() ?? 'Muitas requisições. Tente novamente em instantes.')
+              : 'Muitas requisições. Tente novamente em instantes.';
           handler.reject(
             DioException(
               requestOptions: err.requestOptions,
-              error: const ServerException(
-                message: 'Muitas requisições. Tente novamente em instantes.',
-                statusCode: 429,
-              ),
+              error: ServerException(message: msg, statusCode: 429),
               response: err.response,
               type: err.type,
             ),
@@ -77,7 +95,14 @@ class ErrorInterceptor extends Interceptor {
           return;
         }
 
-        final message = data is Map ? (data['message']?.toString() ?? 'Erro no servidor') : 'Erro no servidor';
+        String message;
+        if (data is Map) {
+          message = data['error']?.toString() ?? data['message']?.toString() ?? 'Erro no servidor ($statusCode)';
+        } else if (data is String && data.isNotEmpty && !data.startsWith('<!')) {
+          message = data;
+        } else {
+          message = 'Erro no servidor ($statusCode)';
+        }
         handler.reject(
           DioException(
             requestOptions: err.requestOptions,
@@ -88,7 +113,15 @@ class ErrorInterceptor extends Interceptor {
         );
         return;
       default:
-        handler.next(err);
+        handler.reject(
+          DioException(
+            requestOptions: err.requestOptions,
+            error: ServerException(
+              message: err.message ?? 'Erro inesperado de conexão',
+            ),
+            type: err.type,
+          ),
+        );
     }
   }
 }
