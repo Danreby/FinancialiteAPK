@@ -24,15 +24,22 @@ class _LoginPageState extends State<LoginPage> {
   static const _googleClientId =
       '105982257579-bj5rmr9qcuuggr3rmf081ib4ri4ckfvh.apps.googleusercontent.com';
 
+  // Singleton instance: must not be recreated on every tap
+  late final GoogleSignIn _googleSignInInstance = GoogleSignIn(
+    // On Web: pass clientId; on Android/iOS: null (uses google-services / strings.xml)
+    clientId: kIsWeb ? _googleClientId : null,
+    // On Android: serverClientId requests an id_token for the backend
+    serverClientId: kIsWeb ? null : _googleClientId,
+    scopes: const ['email', 'profile', 'openid'],
+  );
+
   Future<void> _googleSignIn() async {
     if (_googleLoading) return;
     setState(() => _googleLoading = true);
     try {
-      final googleSignIn = GoogleSignIn(
-        clientId: kIsWeb ? _googleClientId : null,
-        serverClientId: kIsWeb ? null : _googleClientId,
-        scopes: ['email', 'profile'],
-      );
+      final googleSignIn = _googleSignInInstance;
+      // Sign out first to force account picker every time
+      await googleSignIn.signOut();
       final account = await googleSignIn.signIn();
       if (account == null) {
         setState(() => _googleLoading = false);
