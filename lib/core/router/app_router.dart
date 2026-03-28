@@ -41,7 +41,8 @@ class AppRouter {
     redirect: (context, state) {
       final authState = context.read<AuthBloc>().state;
       final isAuth = authState is AuthAuthenticated;
-      final isAuthRoute = state.matchedLocation == '/login' || state.matchedLocation == '/register';
+      final isAuthRoute = state.matchedLocation == '/login' ||
+          state.matchedLocation == '/register';
       final isSplash = state.matchedLocation == '/splash';
 
       if (isSplash) return null;
@@ -68,11 +69,13 @@ class AppRouter {
         routes: [
           GoRoute(
             path: '/dashboard',
-            pageBuilder: (context, state) => const NoTransitionPage(child: DashboardPage()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: DashboardPage()),
           ),
           GoRoute(
             path: '/transactions',
-            pageBuilder: (context, state) => const NoTransitionPage(child: TransactionsPage()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: TransactionsPage()),
           ),
           GoRoute(
             path: '/transactions/new',
@@ -86,23 +89,28 @@ class AppRouter {
           ),
           GoRoute(
             path: '/bills',
-            pageBuilder: (context, state) => const NoTransitionPage(child: BillsPage()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: BillsPage()),
           ),
           GoRoute(
             path: '/income',
-            pageBuilder: (context, state) => const NoTransitionPage(child: IncomePage()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: IncomePage()),
           ),
           GoRoute(
             path: '/budget',
-            pageBuilder: (context, state) => const NoTransitionPage(child: BudgetPage()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: BudgetPage()),
           ),
           GoRoute(
             path: '/savings',
-            pageBuilder: (context, state) => const NoTransitionPage(child: SavingsPage()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: SavingsPage()),
           ),
           GoRoute(
             path: '/bank-accounts',
-            pageBuilder: (context, state) => const NoTransitionPage(child: BankAccountsPage()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: BankAccountsPage()),
           ),
           GoRoute(
             path: '/bank-transfer',
@@ -110,15 +118,18 @@ class AppRouter {
           ),
           GoRoute(
             path: '/more',
-            pageBuilder: (context, state) => const NoTransitionPage(child: MorePage()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: MorePage()),
           ),
           GoRoute(
             path: '/cards',
-            pageBuilder: (context, state) => const NoTransitionPage(child: CardsPage()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: CardsPage()),
           ),
           GoRoute(
             path: '/categories',
-            pageBuilder: (context, state) => const NoTransitionPage(child: CategoriesPage()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: CategoriesPage()),
           ),
           GoRoute(
             path: '/notifications',
@@ -134,7 +145,8 @@ class AppRouter {
           ),
           GoRoute(
             path: '/reports',
-            pageBuilder: (context, state) => const NoTransitionPage(child: ReportsPage()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: ReportsPage()),
           ),
           GoRoute(
             path: '/reports/categories',

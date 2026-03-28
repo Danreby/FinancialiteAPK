@@ -109,7 +109,8 @@ class _DashboardPageState extends State<DashboardPage> {
                   if (state is DashboardLoading) {
                     return const SizedBox(
                       height: 400,
-                      child: AppLoadingIndicator(useShimmer: true, shimmerLines: 5),
+                      child: AppLoadingIndicator(
+                          useShimmer: true, shimmerLines: 5),
                     );
                   }
                   if (state is DashboardError) {
@@ -295,7 +296,8 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ],
         // Upcoming Bills
-        if (data.upcomingBills.isNotEmpty) ...[          const SizedBox(height: 28),
+        if (data.upcomingBills.isNotEmpty) ...[
+          const SizedBox(height: 28),
           SectionHeader(
             title: 'Próximas Contas',
             actionText: 'Ver todas',
@@ -303,13 +305,15 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           const SizedBox(height: 12),
           ...data.upcomingBills.take(4).map((bill) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                 child: Container(
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                      color: theme.colorScheme.outlineVariant
+                          .withValues(alpha: 0.5),
                     ),
                   ),
                   child: Padding(
@@ -320,7 +324,8 @@ class _DashboardPageState extends State<DashboardPage> {
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.error.withValues(alpha: 0.08),
+                            color:
+                                theme.colorScheme.error.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
@@ -379,7 +384,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                  color:
+                      theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
                 ),
               ),
               padding: const EdgeInsets.all(16),
@@ -398,8 +404,10 @@ class _DashboardPageState extends State<DashboardPage> {
                               width: 8,
                               height: 8,
                               decoration: BoxDecoration(
-                                color: theme.colorScheme.primary
-                                    .withValues(alpha: 1.0 - (data.topCategories.indexOf(cat) * 0.15)),
+                                color: theme.colorScheme.primary.withValues(
+                                    alpha: 1.0 -
+                                        (data.topCategories.indexOf(cat) *
+                                            0.15)),
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -557,13 +565,27 @@ class _MonthlyBarChart extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(width: 12, height: 12, decoration: BoxDecoration(color: incomeColor, borderRadius: BorderRadius.circular(3))),
+              Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                      color: incomeColor,
+                      borderRadius: BorderRadius.circular(3))),
               const SizedBox(width: 6),
-              Text('Receitas', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+              Text('Receitas',
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
               const SizedBox(width: 16),
-              Container(width: 12, height: 12, decoration: BoxDecoration(color: expenseColor, borderRadius: BorderRadius.circular(3))),
+              Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                      color: expenseColor,
+                      borderRadius: BorderRadius.circular(3))),
               const SizedBox(width: 6),
-              Text('Despesas', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+              Text('Despesas',
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
             ],
           ),
           const SizedBox(height: 12),
@@ -574,10 +596,13 @@ class _MonthlyBarChart extends StatelessWidget {
                 maxY: maxVal,
                 barTouchData: BarTouchData(
                   touchTooltipData: BarTouchTooltipData(
-                    getTooltipColor: (_) => theme.colorScheme.surfaceContainerHighest,
+                    getTooltipColor: (_) =>
+                        theme.colorScheme.surfaceContainerHighest,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       final m = chartData[groupIndex] as dynamic;
-                      final val = rodIndex == 0 ? m.income as double : m.expense as double;
+                      final val = rodIndex == 0
+                          ? m.income as double
+                          : m.expense as double;
                       return BarTooltipItem(
                         CurrencyFormatter.format(val),
                         theme.textTheme.labelSmall!.copyWith(
@@ -595,28 +620,48 @@ class _MonthlyBarChart extends StatelessWidget {
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
                         final i = value.toInt();
-                        if (i < 0 || i >= chartData.length) return const SizedBox.shrink();
+                        if (i < 0 || i >= chartData.length)
+                          return const SizedBox.shrink();
                         final m = (chartData[i] as dynamic).month as String;
                         final parts = m.split('-');
                         final label = parts.length == 2
-                            ? ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][(int.parse(parts[1]) - 1).clamp(0, 11)]
+                            ? [
+                                'Jan',
+                                'Fev',
+                                'Mar',
+                                'Abr',
+                                'Mai',
+                                'Jun',
+                                'Jul',
+                                'Ago',
+                                'Set',
+                                'Out',
+                                'Nov',
+                                'Dez'
+                              ][(int.parse(parts[1]) - 1).clamp(0, 11)]
                             : m;
                         return Padding(
                           padding: const EdgeInsets.only(top: 6),
-                          child: Text(label, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                          child: Text(label,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant)),
                         );
                       },
                     ),
                   ),
-                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
                 ),
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (_) => FlLine(
-                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    color:
+                        theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
                     strokeWidth: 1,
                     dashArray: [4, 4],
                   ),
@@ -631,13 +676,15 @@ class _MonthlyBarChart extends StatelessWidget {
                         toY: (m.income as double).clamp(0, maxVal),
                         color: incomeColor,
                         width: 10,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(4)),
                       ),
                       BarChartRodData(
                         toY: (m.expense as double).clamp(0, maxVal),
                         color: expenseColor,
                         width: 10,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(4)),
                       ),
                     ],
                     barsSpace: 4,

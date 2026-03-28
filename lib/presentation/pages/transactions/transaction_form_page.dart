@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../blocs/transaction/transaction_bloc.dart';
 import '../../blocs/category/category_cubit.dart';
 import '../../widgets/app_text_field.dart';
-import '../../widgets/currency_text_field.dart';import '../../../core/utils/validators.dart';
+import '../../widgets/currency_text_field.dart';
+import '../../../core/utils/validators.dart';
 import '../../../domain/entities/category.dart';
 
 class TransactionFormPage extends StatefulWidget {
@@ -47,10 +48,14 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
       'type': _type,
       'category_id': _categoryId,
       'date': _date.toIso8601String().substring(0, 10),
-      'description': _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+      'description': _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim(),
     };
     if (_isEditing) {
-      context.read<TransactionBloc>().add(TransactionUpdated(widget.transactionId!, data));
+      context
+          .read<TransactionBloc>()
+          .add(TransactionUpdated(widget.transactionId!, data));
     } else {
       context.read<TransactionBloc>().add(TransactionCreated(data));
     }
@@ -189,7 +194,8 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                         color: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                          color: theme.colorScheme.outlineVariant
+                              .withValues(alpha: 0.5),
                         ),
                       ),
                       child: Column(
@@ -211,18 +217,23 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                           const SizedBox(height: 16),
                           BlocBuilder<CategoryCubit, CategoryState>(
                             builder: (context, state) {
-                              final categories = state is CategoryLoaded ? state.categories : <Category>[];
+                              final categories = state is CategoryLoaded
+                                  ? state.categories
+                                  : <Category>[];
                               return DropdownButtonFormField<int>(
                                 value: _categoryId,
                                 decoration: const InputDecoration(
                                   labelText: 'Categoria',
                                   prefixIcon: Icon(Icons.category),
                                 ),
-                                items: categories.map((c) => DropdownMenuItem(
-                                  value: c.id,
-                                  child: Text(c.name),
-                                )).toList(),
-                                onChanged: (v) => setState(() => _categoryId = v),
+                                items: categories
+                                    .map((c) => DropdownMenuItem(
+                                          value: c.id,
+                                          child: Text(c.name),
+                                        ))
+                                    .toList(),
+                                onChanged: (v) =>
+                                    setState(() => _categoryId = v),
                               );
                             },
                           ),
@@ -232,14 +243,16 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                             prefixIcon: Icons.calendar_today,
                             readOnly: true,
                             controller: TextEditingController(
-                              text: '${_date.day.toString().padLeft(2, '0')}/${_date.month.toString().padLeft(2, '0')}/${_date.year}',
+                              text:
+                                  '${_date.day.toString().padLeft(2, '0')}/${_date.month.toString().padLeft(2, '0')}/${_date.year}',
                             ),
                             suffix: Container(
                               width: 40,
                               height: 40,
                               margin: const EdgeInsets.only(right: 4),
                               decoration: BoxDecoration(
-                                color: theme.colorScheme.surfaceContainerHighest,
+                                color:
+                                    theme.colorScheme.surfaceContainerHighest,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
@@ -255,7 +268,8 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                 firstDate: DateTime(2020),
                                 lastDate: DateTime(2030),
                               );
-                              if (picked != null) setState(() => _date = picked);
+                              if (picked != null)
+                                setState(() => _date = picked);
                             },
                           ),
                           const SizedBox(height: 16),
@@ -274,7 +288,8 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                            color: theme.colorScheme.primary
+                                .withValues(alpha: 0.3),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),

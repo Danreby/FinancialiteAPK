@@ -34,7 +34,8 @@ class SettingsPage extends StatelessWidget {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
@@ -68,24 +69,28 @@ class SettingsPage extends StatelessWidget {
                     color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                      color: theme.colorScheme.outlineVariant
+                          .withValues(alpha: 0.5),
                     ),
                   ),
                   child: Column(
                     children: [
                       // Dark mode toggle
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                         child: Row(
                           children: [
                             Container(
                               width: 44,
                               height: 44,
                               decoration: BoxDecoration(
-                                color: const Color(0xFF5C6BC0).withValues(alpha: 0.08),
+                                color: const Color(0xFF5C6BC0)
+                                    .withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(14),
                               ),
-                              child: const Icon(Icons.dark_mode, color: Color(0xFF5C6BC0), size: 22),
+                              child: const Icon(Icons.dark_mode,
+                                  color: Color(0xFF5C6BC0), size: 22),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -98,7 +103,8 @@ class SettingsPage extends StatelessWidget {
                             ),
                             Switch.adaptive(
                               value: themeState.isDark,
-                              onChanged: (_) => context.read<ThemeCubit>().toggleThemeMode(),
+                              onChanged: (_) =>
+                                  context.read<ThemeCubit>().toggleThemeMode(),
                             ),
                           ],
                         ),
@@ -106,35 +112,43 @@ class SettingsPage extends StatelessWidget {
                       Divider(
                         height: 1,
                         indent: 74,
-                        color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                        color: theme.colorScheme.outlineVariant
+                            .withValues(alpha: 0.3),
                       ),
                       // Color scheme selector
                       Material(
                         color: Colors.transparent,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
-                          onTap: () => _showColorSchemeSheet(context, themeState.colorSchemeName),
+                          onTap: () => _showColorSchemeSheet(
+                              context, themeState.colorSchemeName),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
                             child: Row(
                               children: [
                                 Container(
                                   width: 44,
                                   height: 44,
                                   decoration: BoxDecoration(
-                                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                                    color: theme.colorScheme.primary
+                                        .withValues(alpha: 0.08),
                                     borderRadius: BorderRadius.circular(14),
                                   ),
-                                  child: Icon(Icons.palette, color: theme.colorScheme.primary, size: 22),
+                                  child: Icon(Icons.palette,
+                                      color: theme.colorScheme.primary,
+                                      size: 22),
                                 ),
                                 const SizedBox(width: 14),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Tema de cores',
-                                        style: theme.textTheme.bodyLarge?.copyWith(
+                                        style:
+                                            theme.textTheme.bodyLarge?.copyWith(
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -151,9 +165,12 @@ class SettingsPage extends StatelessWidget {
                                           ),
                                           const SizedBox(width: 6),
                                           Text(
-                                            _themeLabel(themeState.colorSchemeName),
-                                            style: theme.textTheme.bodySmall?.copyWith(
-                                              color: theme.colorScheme.onSurfaceVariant,
+                                            _themeLabel(
+                                                themeState.colorSchemeName),
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                              color: theme
+                                                  .colorScheme.onSurfaceVariant,
                                             ),
                                           ),
                                         ],
@@ -164,7 +181,8 @@ class SettingsPage extends StatelessWidget {
                                 Icon(
                                   Icons.chevron_right,
                                   size: 20,
-                                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                                  color: theme.colorScheme.onSurfaceVariant
+                                      .withValues(alpha: 0.5),
                                 ),
                               ],
                             ),
@@ -188,7 +206,8 @@ class SettingsPage extends StatelessWidget {
                     color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                      color: theme.colorScheme.outlineVariant
+                          .withValues(alpha: 0.5),
                     ),
                   ),
                   child: Material(
@@ -197,21 +216,25 @@ class SettingsPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Sincronização iniciada...')),
+                          const SnackBar(
+                              content: Text('Sincronização iniciada...')),
                         );
                       },
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                         child: Row(
                           children: [
                             Container(
                               width: 44,
                               height: 44,
                               decoration: BoxDecoration(
-                                color: const Color(0xFF26A69A).withValues(alpha: 0.08),
+                                color: const Color(0xFF26A69A)
+                                    .withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(14),
                               ),
-                              child: const Icon(Icons.sync, color: Color(0xFF26A69A), size: 22),
+                              child: const Icon(Icons.sync,
+                                  color: Color(0xFF26A69A), size: 22),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -237,7 +260,8 @@ class SettingsPage extends StatelessWidget {
                             Icon(
                               Icons.chevron_right,
                               size: 20,
-                              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                              color: theme.colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.5),
                             ),
                           ],
                         ),
@@ -259,7 +283,8 @@ class SettingsPage extends StatelessWidget {
                     color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                      color: theme.colorScheme.outlineVariant
+                          .withValues(alpha: 0.5),
                     ),
                   ),
                   child: Material(
@@ -274,12 +299,15 @@ class SettingsPage extends StatelessWidget {
                           confirmText: 'Sair',
                         );
                         if (confirmed == true) {
-                          context.read<AuthBloc>().add(const AuthLogoutRequested());
+                          context
+                              .read<AuthBloc>()
+                              .add(const AuthLogoutRequested());
                           context.go('/login');
                         }
                       },
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                         child: Row(
                           children: [
                             Container(
@@ -289,7 +317,8 @@ class SettingsPage extends StatelessWidget {
                                 color: Colors.orange.withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(14),
                               ),
-                              child: const Icon(Icons.logout, color: Colors.orange, size: 22),
+                              child: const Icon(Icons.logout,
+                                  color: Colors.orange, size: 22),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -373,8 +402,8 @@ class SettingsPage extends StatelessWidget {
             Text(
               'Tema de cores',
               style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+                    fontWeight: FontWeight.w700,
+                  ),
             ),
             const SizedBox(height: 16),
             ...schemes.asMap().entries.map((entry) {
@@ -383,7 +412,10 @@ class SettingsPage extends StatelessWidget {
               return Column(
                 children: [
                   if (i > 0)
-                    Divider(height: 1, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
+                    Divider(
+                        height: 1,
+                        color: theme.colorScheme.outlineVariant
+                            .withValues(alpha: 0.3)),
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
@@ -408,9 +440,10 @@ class SettingsPage extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 label,
-                                style: Theme.of(ctx).textTheme.bodyLarge?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                style:
+                                    Theme.of(ctx).textTheme.bodyLarge?.copyWith(
+                                          fontWeight: FontWeight.w500,
+                                        ),
                               ),
                             ),
                             Radio<String>(

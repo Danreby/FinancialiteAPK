@@ -21,7 +21,9 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
   int _touchedIndex = -1;
 
   void _loadData() {
-    context.read<DashboardCubit>().load(month: DateFormatter.monthKey(_selectedMonth));
+    context
+        .read<DashboardCubit>()
+        .load(month: DateFormatter.monthKey(_selectedMonth));
   }
 
   @override
@@ -51,16 +53,19 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.arrow_back_ios_new, size: 18, color: theme.colorScheme.onSurface),
+                    child: Icon(Icons.arrow_back_ios_new,
+                        size: 18, color: theme.colorScheme.onSurface),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Text(
                   'Gastos por Categoria',
-                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                  style: theme.textTheme.titleLarge
+                      ?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ],
             ),
@@ -77,10 +82,12 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
             child: BlocBuilder<DashboardCubit, DashboardState>(
               builder: (context, state) {
                 if (state is DashboardLoading) {
-                  return const AppLoadingIndicator(useShimmer: true, shimmerLines: 5);
+                  return const AppLoadingIndicator(
+                      useShimmer: true, shimmerLines: 5);
                 }
                 if (state is DashboardError) {
-                  return AppErrorWidget(message: state.message, onRetry: _loadData);
+                  return AppErrorWidget(
+                      message: state.message, onRetry: _loadData);
                 }
                 if (state is DashboardLoaded) {
                   final cats = state.data.topCategories;
@@ -89,9 +96,14 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.pie_chart_outline, size: 64, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
+                          Icon(Icons.pie_chart_outline,
+                              size: 64,
+                              color: theme.colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.3)),
                           const SizedBox(height: 12),
-                          Text('Sem dados para este mês', style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                          Text('Sem dados para este mês',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant)),
                         ],
                       ),
                     );
@@ -117,7 +129,9 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                            border: Border.all(
+                                color: theme.colorScheme.outlineVariant
+                                    .withValues(alpha: 0.5)),
                           ),
                           padding: const EdgeInsets.all(16),
                           child: PieChart(
@@ -125,7 +139,9 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                               pieTouchData: PieTouchData(
                                 touchCallback: (event, response) {
                                   setState(() {
-                                    _touchedIndex = response?.touchedSection?.touchedSectionIndex ?? -1;
+                                    _touchedIndex = response?.touchedSection
+                                            ?.touchedSectionIndex ??
+                                        -1;
                                   });
                                 },
                               ),
@@ -134,11 +150,15 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                               sections: List.generate(cats.length, (i) {
                                 final cat = cats[i];
                                 final isTouched = i == _touchedIndex;
-                                final pct = total > 0 ? (cat.amount / total * 100) : 0.0;
+                                final pct = total > 0
+                                    ? (cat.amount / total * 100)
+                                    : 0.0;
                                 return PieChartSectionData(
                                   color: colors[i % colors.length],
                                   value: cat.amount,
-                                  title: isTouched ? '${pct.toStringAsFixed(1)}%' : '',
+                                  title: isTouched
+                                      ? '${pct.toStringAsFixed(1)}%'
+                                      : '',
                                   radius: isTouched ? 60 : 50,
                                   titleStyle: const TextStyle(
                                     fontSize: 12,
@@ -156,17 +176,24 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                            border: Border.all(
+                                color: theme.colorScheme.outlineVariant
+                                    .withValues(alpha: 0.5)),
                           ),
                           child: Column(
                             children: cats.asMap().entries.map((entry) {
                               final i = entry.key;
                               final cat = entry.value;
-                              final pct = total > 0 ? (cat.amount / total * 100) : 0.0;
+                              final pct =
+                                  total > 0 ? (cat.amount / total * 100) : 0.0;
                               return Column(
                                 children: [
                                   if (i > 0)
-                                    Divider(height: 1, indent: 60, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
+                                    Divider(
+                                        height: 1,
+                                        indent: 60,
+                                        color: theme.colorScheme.outlineVariant
+                                            .withValues(alpha: 0.3)),
                                   Padding(
                                     padding: const EdgeInsets.all(14),
                                     child: Row(
@@ -175,15 +202,18 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                                           width: 40,
                                           height: 40,
                                           decoration: BoxDecoration(
-                                            color: colors[i % colors.length].withValues(alpha: 0.12),
-                                            borderRadius: BorderRadius.circular(12),
+                                            color: colors[i % colors.length]
+                                                .withValues(alpha: 0.12),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
                                           child: Center(
                                             child: Container(
                                               width: 12,
                                               height: 12,
                                               decoration: BoxDecoration(
-                                                color: colors[i % colors.length],
+                                                color:
+                                                    colors[i % colors.length],
                                                 shape: BoxShape.circle,
                                               ),
                                             ),
@@ -192,17 +222,28 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Text(cat.name, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                                              Text(cat.name,
+                                                  style: theme
+                                                      .textTheme.bodyMedium
+                                                      ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.w600)),
                                               const SizedBox(height: 4),
                                               ClipRRect(
-                                                borderRadius: BorderRadius.circular(4),
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
                                                 child: LinearProgressIndicator(
                                                   value: pct / 100,
                                                   minHeight: 4,
-                                                  color: colors[i % colors.length],
-                                                  backgroundColor: colors[i % colors.length].withValues(alpha: 0.1),
+                                                  color:
+                                                      colors[i % colors.length],
+                                                  backgroundColor:
+                                                      colors[i % colors.length]
+                                                          .withValues(
+                                                              alpha: 0.1),
                                                 ),
                                               ),
                                             ],
@@ -210,16 +251,23 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                                         ),
                                         const SizedBox(width: 12),
                                         Column(
-                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
                                           children: [
                                             Text(
-                                              CurrencyFormatter.format(cat.amount),
-                                              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                                              CurrencyFormatter.format(
+                                                  cat.amount),
+                                              style: theme.textTheme.bodyMedium
+                                                  ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w700),
                                             ),
                                             Text(
                                               '${pct.toStringAsFixed(1)}%',
-                                              style: theme.textTheme.bodySmall?.copyWith(
-                                                color: colors[i % colors.length],
+                                              style: theme.textTheme.bodySmall
+                                                  ?.copyWith(
+                                                color:
+                                                    colors[i % colors.length],
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),

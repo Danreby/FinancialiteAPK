@@ -44,10 +44,12 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.arrow_back_ios_new, size: 18, color: theme.colorScheme.onSurface),
+                    child: Icon(Icons.arrow_back_ios_new,
+                        size: 18, color: theme.colorScheme.onSurface),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -56,11 +58,13 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                   children: [
                     Text(
                       'Projeções',
-                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                      style: theme.textTheme.titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w700),
                     ),
                     Text(
                       'Baseado no histórico financeiro',
-                      style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -71,7 +75,8 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
             child: BlocBuilder<DashboardCubit, DashboardState>(
               builder: (context, state) {
                 if (state is DashboardLoading) {
-                  return const AppLoadingIndicator(useShimmer: true, shimmerLines: 5);
+                  return const AppLoadingIndicator(
+                      useShimmer: true, shimmerLines: 5);
                 }
                 if (state is DashboardError) {
                   return AppErrorWidget(
@@ -88,22 +93,34 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.show_chart, size: 64, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
+                          Icon(Icons.show_chart,
+                              size: 64,
+                              color: theme.colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.3)),
                           const SizedBox(height: 12),
-                          Text('Dados insuficientes para projeção', style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                          Text('Dados insuficientes para projeção',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant)),
                           const SizedBox(height: 6),
-                          Text('Registre transações por pelo menos 2 meses', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                          Text('Registre transações por pelo menos 2 meses',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant)),
                         ],
                       ),
                     );
                   }
 
                   // Calculate averages from last 3 months
-                  final recent = chart.length >= 3 ? chart.sublist(chart.length - 3) : chart;
-                  final avgIncome = recent.fold(0.0, (s, d) => s + d.income) / recent.length;
-                  final avgExpense = recent.fold(0.0, (s, d) => s + d.expense) / recent.length;
+                  final recent = chart.length >= 3
+                      ? chart.sublist(chart.length - 3)
+                      : chart;
+                  final avgIncome =
+                      recent.fold(0.0, (s, d) => s + d.income) / recent.length;
+                  final avgExpense =
+                      recent.fold(0.0, (s, d) => s + d.expense) / recent.length;
                   final avgSaving = avgIncome - avgExpense;
-                  final savingRate = avgIncome > 0 ? (avgSaving / avgIncome * 100) : 0.0;
+                  final savingRate =
+                      avgIncome > 0 ? (avgSaving / avgIncome * 100) : 0.0;
 
                   // Generate 6-month projections
                   final now = DateTime.now();
@@ -119,7 +136,8 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                   }).toList();
 
                   // Historical points for context
-                  double cumulative = data.totalBalance - chart.fold(0.0, (s, d) => s + (d.income - d.expense));
+                  double cumulative = data.totalBalance -
+                      chart.fold(0.0, (s, d) => s + (d.income - d.expense));
                   final histPoints = chart.map((d) {
                     cumulative += d.income - d.expense;
                     return cumulative;
@@ -176,7 +194,9 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                                 'Poupança Média',
                                 CurrencyFormatter.format(avgSaving.abs()),
                                 avgSaving >= 0 ? Icons.savings : Icons.warning,
-                                avgSaving >= 0 ? const Color(0xFF10B981) : theme.colorScheme.error,
+                                avgSaving >= 0
+                                    ? const Color(0xFF10B981)
+                                    : theme.colorScheme.error,
                                 avgSaving >= 0 ? 'por mês' : 'déficit',
                                 theme,
                               ),
@@ -192,7 +212,11 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                                     : savingRate >= 10
                                         ? Colors.amber
                                         : theme.colorScheme.error,
-                                savingRate >= 20 ? 'excelente' : savingRate >= 10 ? 'regular' : 'baixa',
+                                savingRate >= 20
+                                    ? 'excelente'
+                                    : savingRate >= 10
+                                        ? 'regular'
+                                        : 'baixa',
                                 theme,
                               ),
                             ),
@@ -204,7 +228,9 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                            border: Border.all(
+                                color: theme.colorScheme.outlineVariant
+                                    .withValues(alpha: 0.5)),
                           ),
                           padding: const EdgeInsets.all(16),
                           child: Column(
@@ -212,12 +238,14 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                             children: [
                               Text(
                                 'Projeção de Patrimônio — 6 meses',
-                                style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                                style: theme.textTheme.titleSmall
+                                    ?.copyWith(fontWeight: FontWeight.w700),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 'Linha sólida = histórico  |  Linha pontilhada = projeção',
-                                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant),
                               ),
                               const SizedBox(height: 16),
                               SizedBox(
@@ -227,16 +255,27 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                                     minY: paddedMin,
                                     maxY: paddedMax.isNaN ? 1000 : paddedMax,
                                     titlesData: FlTitlesData(
-                                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                      bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                      topTitles: const AxisTitles(
+                                          sideTitles:
+                                              SideTitles(showTitles: false)),
+                                      rightTitles: const AxisTitles(
+                                          sideTitles:
+                                              SideTitles(showTitles: false)),
+                                      bottomTitles: const AxisTitles(
+                                          sideTitles:
+                                              SideTitles(showTitles: false)),
                                       leftTitles: AxisTitles(
                                         sideTitles: SideTitles(
                                           showTitles: true,
                                           reservedSize: 56,
-                                          getTitlesWidget: (value, meta) => Text(
-                                            CurrencyFormatter.formatCompact(value),
-                                            style: TextStyle(fontSize: 9, color: theme.colorScheme.onSurfaceVariant),
+                                          getTitlesWidget: (value, meta) =>
+                                              Text(
+                                            CurrencyFormatter.formatCompact(
+                                                value),
+                                            style: TextStyle(
+                                                fontSize: 9,
+                                                color: theme.colorScheme
+                                                    .onSurfaceVariant),
                                           ),
                                         ),
                                       ),
@@ -245,7 +284,8 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                                       show: true,
                                       drawVerticalLine: false,
                                       getDrawingHorizontalLine: (_) => FlLine(
-                                        color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                                        color: theme.colorScheme.outlineVariant
+                                            .withValues(alpha: 0.3),
                                         strokeWidth: 1,
                                       ),
                                     ),
@@ -253,7 +293,12 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                                     lineBarsData: [
                                       // Historical line (solid)
                                       LineChartBarData(
-                                        spots: histPoints.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value)).toList(),
+                                        spots: histPoints
+                                            .asMap()
+                                            .entries
+                                            .map((e) => FlSpot(
+                                                e.key.toDouble(), e.value))
+                                            .toList(),
                                         isCurved: true,
                                         curveSmoothness: 0.3,
                                         color: theme.colorScheme.primary,
@@ -264,8 +309,10 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                                           show: true,
                                           gradient: LinearGradient(
                                             colors: [
-                                              theme.colorScheme.primary.withValues(alpha: 0.12),
-                                              theme.colorScheme.primary.withValues(alpha: 0.01),
+                                              theme.colorScheme.primary
+                                                  .withValues(alpha: 0.12),
+                                              theme.colorScheme.primary
+                                                  .withValues(alpha: 0.01),
                                             ],
                                             begin: Alignment.topCenter,
                                             end: Alignment.bottomCenter,
@@ -274,20 +321,29 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                                       ),
                                       // Projection line (dashed effect - lighter color)
                                       LineChartBarData(
-                                        spots: projectionPoints.asMap().entries
-                                            .map((e) => FlSpot(histOffset - 1 + e.key.toDouble(), e.value))
+                                        spots: projectionPoints
+                                            .asMap()
+                                            .entries
+                                            .map((e) => FlSpot(
+                                                histOffset -
+                                                    1 +
+                                                    e.key.toDouble(),
+                                                e.value))
                                             .toList(),
                                         isCurved: true,
                                         curveSmoothness: 0.3,
-                                        color: theme.colorScheme.primary.withValues(alpha: 0.5),
+                                        color: theme.colorScheme.primary
+                                            .withValues(alpha: 0.5),
                                         barWidth: 2,
                                         isStrokeCapRound: true,
                                         dashArray: [6, 4],
                                         dotData: FlDotData(
                                           show: true,
-                                          getDotPainter: (spot, _, __, ___) => FlDotCirclePainter(
+                                          getDotPainter: (spot, _, __, ___) =>
+                                              FlDotCirclePainter(
                                             radius: 2.5,
-                                            color: theme.colorScheme.primary.withValues(alpha: 0.5),
+                                            color: theme.colorScheme.primary
+                                                .withValues(alpha: 0.5),
                                             strokeWidth: 0,
                                             strokeColor: Colors.transparent,
                                           ),
@@ -306,19 +362,26 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                            border: Border.all(
+                                color: theme.colorScheme.outlineVariant
+                                    .withValues(alpha: 0.5)),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 14, 16, 10),
                                 child: Text(
                                   'Patrimônio Projetado',
-                                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                                  style: theme.textTheme.titleSmall
+                                      ?.copyWith(fontWeight: FontWeight.w700),
                                 ),
                               ),
-                              Divider(height: 1, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
+                              Divider(
+                                  height: 1,
+                                  color: theme.colorScheme.outlineVariant
+                                      .withValues(alpha: 0.3)),
                               ...projectedMonths.asMap().entries.map((entry) {
                                 final i = entry.key;
                                 final date = entry.value;
@@ -327,17 +390,27 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                                 return Column(
                                   children: [
                                     if (i > 0)
-                                      Divider(height: 1, indent: 16, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
+                                      Divider(
+                                          height: 1,
+                                          indent: 16,
+                                          color: theme
+                                              .colorScheme.outlineVariant
+                                              .withValues(alpha: 0.3)),
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 12),
                                       child: Row(
                                         children: [
                                           Container(
                                             width: 36,
                                             height: 36,
                                             decoration: BoxDecoration(
-                                              color: (isPositive ? const Color(0xFF10B981) : theme.colorScheme.error).withValues(alpha: 0.1),
-                                              borderRadius: BorderRadius.circular(10),
+                                              color: (isPositive
+                                                      ? const Color(0xFF10B981)
+                                                      : theme.colorScheme.error)
+                                                  .withValues(alpha: 0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                             ),
                                             child: Center(
                                               child: Text(
@@ -345,7 +418,9 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                                                 style: TextStyle(
                                                   fontSize: 13,
                                                   fontWeight: FontWeight.w700,
-                                                  color: isPositive ? const Color(0xFF10B981) : theme.colorScheme.error,
+                                                  color: isPositive
+                                                      ? const Color(0xFF10B981)
+                                                      : theme.colorScheme.error,
                                                 ),
                                               ),
                                             ),
@@ -353,15 +428,22 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                                           const SizedBox(width: 12),
                                           Expanded(
                                             child: Text(
-                                              DateFormatter.formatMonthYear(date),
-                                              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                                              DateFormatter.formatMonthYear(
+                                                  date),
+                                              style: theme.textTheme.bodyMedium
+                                                  ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w600),
                                             ),
                                           ),
                                           Text(
                                             CurrencyFormatter.format(projected),
-                                            style: theme.textTheme.bodyMedium?.copyWith(
+                                            style: theme.textTheme.bodyMedium
+                                                ?.copyWith(
                                               fontWeight: FontWeight.w700,
-                                              color: isPositive ? const Color(0xFF10B981) : theme.colorScheme.error,
+                                              color: isPositive
+                                                  ? const Color(0xFF10B981)
+                                                  : theme.colorScheme.error,
                                             ),
                                           ),
                                         ],
@@ -409,7 +491,8 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+        border: Border.all(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [
@@ -433,7 +516,8 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                       ),
                       PieChartSectionData(
                         value: 100 - score,
-                        color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                        color: theme.colorScheme.outlineVariant
+                            .withValues(alpha: 0.3),
                         radius: 10,
                         title: '',
                       ),
@@ -442,7 +526,8 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                 ),
                 Text(
                   '${score.toInt()}',
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                  style: theme.textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w800),
                 ),
               ],
             ),
@@ -454,18 +539,23 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
               children: [
                 Text(
                   'Saúde Financeira',
-                  style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: scoreColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     scoreLabel,
-                    style: TextStyle(color: scoreColor, fontWeight: FontWeight.w700, fontSize: 14),
+                    style: TextStyle(
+                        color: scoreColor,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -473,7 +563,8 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                   score >= 60
                       ? 'Suas finanças estão bem controladas!'
                       : 'Atenção: revise seus gastos mensais.',
-                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -483,13 +574,15 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
     );
   }
 
-  Widget _buildSummaryItem(String label, String value, IconData icon, Color color, String sub, ThemeData theme) {
+  Widget _buildSummaryItem(String label, String value, IconData icon,
+      Color color, String sub, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+        border: Border.all(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -499,13 +592,20 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
               Icon(icon, size: 14, color: color),
               const SizedBox(width: 4),
               Expanded(
-                child: Text(label, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant)),
+                child: Text(label,
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: theme.colorScheme.onSurfaceVariant)),
               ),
             ],
           ),
           const SizedBox(height: 6),
-          Text(value, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700, color: color)),
-          Text(sub, style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.7))),
+          Text(value,
+              style: theme.textTheme.titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w700, color: color)),
+          Text(sub,
+              style:
+                  TextStyle(fontSize: 10, color: color.withValues(alpha: 0.7))),
         ],
       ),
     );

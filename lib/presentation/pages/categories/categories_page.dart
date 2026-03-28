@@ -68,7 +68,8 @@ class CategoriesPage extends StatefulWidget {
   State<CategoriesPage> createState() => _CategoriesPageState();
 }
 
-class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProviderStateMixin {
+class _CategoriesPageState extends State<CategoriesPage>
+    with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
   @override
@@ -95,18 +96,52 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
     final formKey = GlobalKey<FormState>();
 
     final iconOptions = <String>[
-      'shopping_cart', 'restaurant', 'home', 'directions_car',
-      'local_gas_station', 'credit_card', 'health_and_safety',
-      'sports_esports', 'school', 'commute', 'lightbulb', 'smartphone',
-      'fitness_center', 'movie', 'work', 'travel_explore', 'savings',
-      'account_balance', 'fastfood', 'coffee', 'flight', 'hotel',
-      'pets', 'subscriptions', 'music_note', 'book', 'local_pharmacy',
-      'cleaning_services', 'attach_money',
+      'shopping_cart',
+      'restaurant',
+      'home',
+      'directions_car',
+      'local_gas_station',
+      'credit_card',
+      'health_and_safety',
+      'sports_esports',
+      'school',
+      'commute',
+      'lightbulb',
+      'smartphone',
+      'fitness_center',
+      'movie',
+      'work',
+      'travel_explore',
+      'savings',
+      'account_balance',
+      'fastfood',
+      'coffee',
+      'flight',
+      'hotel',
+      'pets',
+      'subscriptions',
+      'music_note',
+      'book',
+      'local_pharmacy',
+      'cleaning_services',
+      'attach_money',
     ];
     final colorOptions = <String>[
-      '#E11D48', '#059669', '#3B82F6', '#F59E0B', '#7C3AED',
-      '#1E40AF', '#EC4899', '#14B8A6', '#F97316', '#10B981',
-      '#6B7280', '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16',
+      '#E11D48',
+      '#059669',
+      '#3B82F6',
+      '#F59E0B',
+      '#7C3AED',
+      '#1E40AF',
+      '#EC4899',
+      '#14B8A6',
+      '#F97316',
+      '#10B981',
+      '#6B7280',
+      '#EF4444',
+      '#8B5CF6',
+      '#06B6D4',
+      '#84CC16',
     ];
 
     showModalBottomSheet(
@@ -116,7 +151,8 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(24, 16, 24, MediaQuery.of(ctx).viewInsets.bottom + 24),
+        padding: EdgeInsets.fromLTRB(
+            24, 16, 24, MediaQuery.of(ctx).viewInsets.bottom + 24),
         child: Form(
           key: formKey,
           child: StatefulBuilder(
@@ -139,8 +175,8 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                   Text(
                     'Nova Categoria',
                     style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                          fontWeight: FontWeight.w700,
+                        ),
                   ),
                   const SizedBox(height: 20),
                   AppTextField(
@@ -158,13 +194,19 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                       prefixIcon: Icon(Icons.category),
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'expense', child: Text('Despesa')),
+                      DropdownMenuItem(
+                          value: 'expense', child: Text('Despesa')),
                       DropdownMenuItem(value: 'income', child: Text('Receita')),
                     ],
-                    onChanged: (v) => setLocalState(() => type = v ?? 'expense'),
+                    onChanged: (v) =>
+                        setLocalState(() => type = v ?? 'expense'),
                   ),
                   const SizedBox(height: 16),
-                  Text('Ícone', style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                  Text('Ícone',
+                      style: Theme.of(ctx)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   SizedBox(
                     height: 56,
@@ -180,18 +222,33 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                             width: 48,
                             margin: const EdgeInsets.only(right: 8),
                             decoration: BoxDecoration(
-                              color: sel ? _colorFromHex(selectedColor).withValues(alpha: 0.15) : Colors.grey.withValues(alpha: 0.08),
+                              color: sel
+                                  ? _colorFromHex(selectedColor)
+                                      .withValues(alpha: 0.15)
+                                  : Colors.grey.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(12),
-                              border: sel ? Border.all(color: _colorFromHex(selectedColor), width: 2) : null,
+                              border: sel
+                                  ? Border.all(
+                                      color: _colorFromHex(selectedColor),
+                                      width: 2)
+                                  : null,
                             ),
-                            child: Icon(_iconFromName(ic), size: 22, color: sel ? _colorFromHex(selectedColor) : Colors.grey),
+                            child: Icon(_iconFromName(ic),
+                                size: 22,
+                                color: sel
+                                    ? _colorFromHex(selectedColor)
+                                    : Colors.grey),
                           ),
                         );
                       },
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Text('Cor', style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                  Text('Cor',
+                      style: Theme.of(ctx)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   SizedBox(
                     height: 44,
@@ -210,10 +267,22 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                             decoration: BoxDecoration(
                               color: _colorFromHex(col),
                               shape: BoxShape.circle,
-                              border: sel ? Border.all(color: Colors.white, width: 2) : null,
-                              boxShadow: sel ? [BoxShadow(color: _colorFromHex(col).withValues(alpha: 0.5), blurRadius: 8)] : null,
+                              border: sel
+                                  ? Border.all(color: Colors.white, width: 2)
+                                  : null,
+                              boxShadow: sel
+                                  ? [
+                                      BoxShadow(
+                                          color: _colorFromHex(col)
+                                              .withValues(alpha: 0.5),
+                                          blurRadius: 8)
+                                    ]
+                                  : null,
                             ),
-                            child: sel ? const Icon(Icons.check, color: Colors.white, size: 18) : null,
+                            child: sel
+                                ? const Icon(Icons.check,
+                                    color: Colors.white, size: 18)
+                                : null,
                           ),
                         );
                       },
@@ -234,9 +303,12 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                         Navigator.pop(ctx);
                       },
                       style: FilledButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
                       ),
-                      child: const Text('Salvar', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                      child: const Text('Salvar',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 16)),
                     ),
                   ),
                 ],
@@ -292,7 +364,8 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
             margin: const EdgeInsets.symmetric(horizontal: 20),
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              color: theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -306,15 +379,20 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                       duration: const Duration(milliseconds: 200),
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        color: isSelected ? theme.colorScheme.primary : Colors.transparent,
+                        color: isSelected
+                            ? theme.colorScheme.primary
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         labels[index],
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: isSelected ? Colors.white : theme.colorScheme.onSurfaceVariant,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                          color: isSelected
+                              ? Colors.white
+                              : theme.colorScheme.onSurfaceVariant,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w400,
                         ),
                       ),
                     ),
@@ -328,10 +406,12 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
             child: BlocBuilder<CategoryCubit, CategoryState>(
               builder: (context, state) {
                 if (state is CategoryLoading) {
-                  return const AppLoadingIndicator(useShimmer: true, shimmerLines: 5);
+                  return const AppLoadingIndicator(
+                      useShimmer: true, shimmerLines: 5);
                 }
                 if (state is CategoryError) {
-                  return AppErrorWidget(message: state.message, onRetry: _loadData);
+                  return AppErrorWidget(
+                      message: state.message, onRetry: _loadData);
                 }
                 if (state is CategoryLoaded) {
                   return TabBarView(
@@ -339,11 +419,15 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                     children: [
                       _buildCategoryList(state.categories, theme),
                       _buildCategoryList(
-                        state.categories.where((c) => c.type == 'expense').toList(),
+                        state.categories
+                            .where((c) => c.type == 'expense')
+                            .toList(),
                         theme,
                       ),
                       _buildCategoryList(
-                        state.categories.where((c) => c.type == 'income').toList(),
+                        state.categories
+                            .where((c) => c.type == 'income')
+                            .toList(),
                         theme,
                       ),
                     ],
@@ -393,14 +477,16 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                   confirmText: 'Excluir',
                   confirmColor: theme.colorScheme.error,
                 ),
-                onDismissed: (_) => context.read<CategoryCubit>().deleteCategory(cat.id),
+                onDismissed: (_) =>
+                    context.read<CategoryCubit>().deleteCategory(cat.id),
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                      color: theme.colorScheme.outlineVariant
+                          .withValues(alpha: 0.5),
                     ),
                   ),
                   child: Row(
@@ -409,7 +495,8 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: _colorFromHex(cat.color).withValues(alpha: 0.12),
+                          color:
+                              _colorFromHex(cat.color).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Icon(

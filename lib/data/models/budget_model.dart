@@ -88,7 +88,9 @@ class BudgetCategoryModel extends BudgetCategory {
       id: json['id'] as int?,
       budgetId: json['budget_id'] as int,
       categoryId: json['category_id'] as int,
-      limitAmount: double.tryParse((json['limit'] ?? json['limit_amount'] ?? 0).toString()) ?? 0.0,
+      limitAmount: double.tryParse(
+              (json['limit'] ?? json['limit_amount'] ?? 0).toString()) ??
+          0.0,
       spent: double.tryParse((json['spent'] ?? 0).toString()),
       categoryName: json['category']?['name'] as String?,
       categoryIcon: json['category']?['icon'] as String?,

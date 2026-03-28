@@ -64,7 +64,8 @@ class _ExtractViewState extends State<_ExtractView> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       context.read<TransactionBloc>().add(const TransactionsFetched());
     }
   }
@@ -91,10 +92,12 @@ class _ExtractViewState extends State<_ExtractView> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.arrow_back_ios_new, size: 18, color: theme.colorScheme.onSurface),
+                    child: Icon(Icons.arrow_back_ios_new,
+                        size: 18, color: theme.colorScheme.onSurface),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -134,10 +137,12 @@ class _ExtractViewState extends State<_ExtractView> {
             child: BlocBuilder<TransactionBloc, TransactionState>(
               builder: (context, state) {
                 if (state is TransactionLoading) {
-                  return const AppLoadingIndicator(useShimmer: true, shimmerLines: 6);
+                  return const AppLoadingIndicator(
+                      useShimmer: true, shimmerLines: 6);
                 }
                 if (state is TransactionError) {
-                  return AppErrorWidget(message: state.message, onRetry: _loadData);
+                  return AppErrorWidget(
+                      message: state.message, onRetry: _loadData);
                 }
                 if (state is TransactionLoaded) {
                   final transactions = state.transactions;
@@ -149,8 +154,10 @@ class _ExtractViewState extends State<_ExtractView> {
                     );
                   }
 
-                  final credits = transactions.where((t) => t.type == 'credit').toList();
-                  final debits = transactions.where((t) => t.type == 'debit').toList();
+                  final credits =
+                      transactions.where((t) => t.type == 'credit').toList();
+                  final debits =
+                      transactions.where((t) => t.type == 'debit').toList();
                   final totalIn = credits.fold(0.0, (s, t) => s + t.amount);
                   final totalOut = debits.fold(0.0, (s, t) => s + t.amount);
                   final balance = totalIn - totalOut;
@@ -159,19 +166,42 @@ class _ExtractViewState extends State<_ExtractView> {
                     children: [
                       // Stats cards
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 4),
                         child: Row(
                           children: [
-                            Expanded(child: _statCard('Receitas', totalIn, const Color(0xFF10B981), Icons.arrow_downward, theme)),
+                            Expanded(
+                                child: _statCard(
+                                    'Receitas',
+                                    totalIn,
+                                    const Color(0xFF10B981),
+                                    Icons.arrow_downward,
+                                    theme)),
                             const SizedBox(width: 10),
-                            Expanded(child: _statCard('Despesas', totalOut, theme.colorScheme.error, Icons.arrow_upward, theme)),
+                            Expanded(
+                                child: _statCard(
+                                    'Despesas',
+                                    totalOut,
+                                    theme.colorScheme.error,
+                                    Icons.arrow_upward,
+                                    theme)),
                             const SizedBox(width: 10),
-                            Expanded(child: _statCard('Saldo', balance, balance >= 0 ? const Color(0xFF10B981) : theme.colorScheme.error, Icons.account_balance_wallet, theme)),
+                            Expanded(
+                                child: _statCard(
+                                    'Saldo',
+                                    balance,
+                                    balance >= 0
+                                        ? const Color(0xFF10B981)
+                                        : theme.colorScheme.error,
+                                    Icons.account_balance_wallet,
+                                    theme)),
                           ],
                         ),
                       ),
                       // Mini pie chart if showing all
-                      if (_typeFilter == 'all' && totalIn > 0 && totalOut > 0) ...[
+                      if (_typeFilter == 'all' &&
+                          totalIn > 0 &&
+                          totalOut > 0) ...[
                         const SizedBox(height: 8),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -186,14 +216,18 @@ class _ExtractViewState extends State<_ExtractView> {
                           separatorBuilder: (_, __) => Divider(
                             height: 1,
                             indent: 74,
-                            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                            color: theme.colorScheme.outlineVariant
+                                .withValues(alpha: 0.3),
                           ),
-                          itemCount: transactions.length + (state.hasMore ? 1 : 0),
+                          itemCount:
+                              transactions.length + (state.hasMore ? 1 : 0),
                           itemBuilder: (_, i) {
                             if (i >= transactions.length) {
                               return const Padding(
                                 padding: EdgeInsets.all(16),
-                                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2)),
                               );
                             }
                             final t = transactions[i];
@@ -206,7 +240,8 @@ class _ExtractViewState extends State<_ExtractView> {
                               isExpense: t.isDebit,
                               categoryIcon: iconFromName(t.categoryIcon),
                               categoryColor: colorFromHex(t.categoryColor),
-                              onTap: () => context.push('/transactions/${t.id}'),
+                              onTap: () =>
+                                  context.push('/transactions/${t.id}'),
                             );
                           },
                         ),
@@ -233,7 +268,9 @@ class _ExtractViewState extends State<_ExtractView> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
+          color: selected
+              ? theme.colorScheme.primary
+              : theme.colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
@@ -241,20 +278,24 @@ class _ExtractViewState extends State<_ExtractView> {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: selected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
+            color: selected
+                ? theme.colorScheme.onPrimary
+                : theme.colorScheme.onSurfaceVariant,
           ),
         ),
       ),
     );
   }
 
-  Widget _statCard(String label, double value, Color color, IconData icon, ThemeData theme) {
+  Widget _statCard(
+      String label, double value, Color color, IconData icon, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+        border: Border.all(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,13 +304,16 @@ class _ExtractViewState extends State<_ExtractView> {
             children: [
               Icon(icon, size: 14, color: color),
               const SizedBox(width: 4),
-              Text(label, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
+              Text(label,
+                  style: TextStyle(
+                      fontSize: 11, color: color, fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 4),
           Text(
             CurrencyFormatter.formatCompact(value),
-            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700, color: color),
+            style: theme.textTheme.titleSmall
+                ?.copyWith(fontWeight: FontWeight.w700, color: color),
           ),
         ],
       ),
@@ -284,7 +328,8 @@ class _ExtractViewState extends State<_ExtractView> {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+        border: Border.all(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [
@@ -317,9 +362,11 @@ class _ExtractViewState extends State<_ExtractView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _chartLegend('Receitas', pctIn * 100, const Color(0xFF10B981), theme),
+                _chartLegend(
+                    'Receitas', pctIn * 100, const Color(0xFF10B981), theme),
                 const SizedBox(height: 6),
-                _chartLegend('Despesas', (1 - pctIn) * 100, theme.colorScheme.error, theme),
+                _chartLegend('Despesas', (1 - pctIn) * 100,
+                    theme.colorScheme.error, theme),
               ],
             ),
           ),
@@ -331,13 +378,17 @@ class _ExtractViewState extends State<_ExtractView> {
   Widget _chartLegend(String label, double pct, Color color, ThemeData theme) {
     return Row(
       children: [
-        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
         const SizedBox(width: 6),
         Text(label, style: theme.textTheme.bodySmall),
         const Spacer(),
         Text(
           '${pct.toStringAsFixed(1)}%',
-          style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600, color: color),
+          style: theme.textTheme.bodySmall
+              ?.copyWith(fontWeight: FontWeight.w600, color: color),
         ),
       ],
     );

@@ -25,7 +25,20 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
   String _shortMonth(String monthKey) {
     try {
       final date = DateTime.parse('$monthKey-01');
-      final months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      final months = [
+        'Jan',
+        'Fev',
+        'Mar',
+        'Abr',
+        'Mai',
+        'Jun',
+        'Jul',
+        'Ago',
+        'Set',
+        'Out',
+        'Nov',
+        'Dez'
+      ];
       return months[date.month - 1];
     } catch (_) {
       return monthKey;
@@ -54,16 +67,19 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.arrow_back_ios_new, size: 18, color: theme.colorScheme.onSurface),
+                    child: Icon(Icons.arrow_back_ios_new,
+                        size: 18, color: theme.colorScheme.onSurface),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Text(
                   'Evolução Patrimonial',
-                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                  style: theme.textTheme.titleLarge
+                      ?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ],
             ),
@@ -72,7 +88,8 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
             child: BlocBuilder<DashboardCubit, DashboardState>(
               builder: (context, state) {
                 if (state is DashboardLoading) {
-                  return const AppLoadingIndicator(useShimmer: true, shimmerLines: 5);
+                  return const AppLoadingIndicator(
+                      useShimmer: true, shimmerLines: 5);
                 }
                 if (state is DashboardError) {
                   return AppErrorWidget(
@@ -87,9 +104,14 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.trending_up, size: 64, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
+                          Icon(Icons.trending_up,
+                              size: 64,
+                              color: theme.colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.3)),
                           const SizedBox(height: 12),
-                          Text('Sem dados disponíveis', style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                          Text('Sem dados disponíveis',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant)),
                         ],
                       ),
                     );
@@ -109,8 +131,13 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                   final paddedMax = maxY + range * 0.1;
 
                   final latestBalance = points.isNotEmpty ? points.last : 0.0;
-                  final prevBalance = points.length > 1 ? points[points.length - 2] : 0.0;
-                  final monthGrowth = prevBalance != 0 ? ((latestBalance - prevBalance) / prevBalance.abs() * 100) : 0.0;
+                  final prevBalance =
+                      points.length > 1 ? points[points.length - 2] : 0.0;
+                  final monthGrowth = prevBalance != 0
+                      ? ((latestBalance - prevBalance) /
+                          prevBalance.abs() *
+                          100)
+                      : 0.0;
 
                   return SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -124,7 +151,8 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                             gradient: LinearGradient(
                               colors: [
                                 theme.colorScheme.primary,
-                                theme.colorScheme.primary.withValues(alpha: 0.8),
+                                theme.colorScheme.primary
+                                    .withValues(alpha: 0.8),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
@@ -151,7 +179,8 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                               if (monthGrowth != 0) ...[
                                 const SizedBox(height: 6),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
                                     color: Colors.white.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(8),
@@ -176,23 +205,32 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                            border: Border.all(
+                                color: theme.colorScheme.outlineVariant
+                                    .withValues(alpha: 0.5)),
                           ),
                           padding: const EdgeInsets.fromLTRB(12, 20, 16, 12),
                           child: LineChart(
                             LineChartData(
                               minY: paddedMin,
-                              maxY: paddedMax.isNaN || paddedMax == 0 ? 1000 : paddedMax,
+                              maxY: paddedMax.isNaN || paddedMax == 0
+                                  ? 1000
+                                  : paddedMax,
                               lineTouchData: LineTouchData(
                                 touchTooltipData: LineTouchTooltipData(
                                   tooltipRoundedRadius: 8,
                                   getTooltipItems: (spots) => spots.map((spot) {
                                     final idx = spot.x.toInt();
-                                    final monthLabel = idx >= 0 && idx < chart.length ? _shortMonth(chart[idx].month) : '';
+                                    final monthLabel =
+                                        idx >= 0 && idx < chart.length
+                                            ? _shortMonth(chart[idx].month)
+                                            : '';
                                     return LineTooltipItem(
                                       '$monthLabel\n${CurrencyFormatter.format(spot.y)}',
                                       TextStyle(
-                                        color: spot.y >= 0 ? const Color(0xFF10B981) : theme.colorScheme.error,
+                                        color: spot.y >= 0
+                                            ? const Color(0xFF10B981)
+                                            : theme.colorScheme.error,
                                         fontWeight: FontWeight.w600,
                                         fontSize: 11,
                                       ),
@@ -201,20 +239,26 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                                 ),
                               ),
                               titlesData: FlTitlesData(
-                                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                topTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
+                                rightTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
                                 bottomTitles: AxisTitles(
                                   sideTitles: SideTitles(
                                     showTitles: true,
                                     reservedSize: 28,
                                     getTitlesWidget: (value, meta) {
                                       final idx = value.toInt();
-                                      if (idx < 0 || idx >= chart.length) return const SizedBox();
+                                      if (idx < 0 || idx >= chart.length)
+                                        return const SizedBox();
                                       return Padding(
                                         padding: const EdgeInsets.only(top: 4),
                                         child: Text(
                                           _shortMonth(chart[idx].month),
-                                          style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              color: theme.colorScheme
+                                                  .onSurfaceVariant),
                                         ),
                                       );
                                     },
@@ -228,7 +272,10 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                                       if (value == 0) return const SizedBox();
                                       return Text(
                                         CurrencyFormatter.formatCompact(value),
-                                        style: TextStyle(fontSize: 9, color: theme.colorScheme.onSurfaceVariant),
+                                        style: TextStyle(
+                                            fontSize: 9,
+                                            color: theme
+                                                .colorScheme.onSurfaceVariant),
                                       );
                                     },
                                   ),
@@ -238,14 +285,20 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                                 show: true,
                                 drawVerticalLine: false,
                                 getDrawingHorizontalLine: (_) => FlLine(
-                                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                                  color: theme.colorScheme.outlineVariant
+                                      .withValues(alpha: 0.3),
                                   strokeWidth: 1,
                                 ),
                               ),
                               borderData: FlBorderData(show: false),
                               lineBarsData: [
                                 LineChartBarData(
-                                  spots: points.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value)).toList(),
+                                  spots: points
+                                      .asMap()
+                                      .entries
+                                      .map((e) =>
+                                          FlSpot(e.key.toDouble(), e.value))
+                                      .toList(),
                                   isCurved: true,
                                   curveSmoothness: 0.35,
                                   color: theme.colorScheme.primary,
@@ -253,7 +306,8 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                                   isStrokeCapRound: true,
                                   dotData: FlDotData(
                                     show: true,
-                                    getDotPainter: (spot, _, __, ___) => FlDotCirclePainter(
+                                    getDotPainter: (spot, _, __, ___) =>
+                                        FlDotCirclePainter(
                                       radius: 3,
                                       color: theme.colorScheme.primary,
                                       strokeWidth: 2,
@@ -264,8 +318,10 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                                     show: true,
                                     gradient: LinearGradient(
                                       colors: [
-                                        theme.colorScheme.primary.withValues(alpha: 0.15),
-                                        theme.colorScheme.primary.withValues(alpha: 0.01),
+                                        theme.colorScheme.primary
+                                            .withValues(alpha: 0.15),
+                                        theme.colorScheme.primary
+                                            .withValues(alpha: 0.01),
                                       ],
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
@@ -282,10 +338,21 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                            border: Border.all(
+                                color: theme.colorScheme.outlineVariant
+                                    .withValues(alpha: 0.5)),
                           ),
                           child: Column(
-                            children: chart.asMap().entries.toList().reversed.take(6).toList().asMap().entries.map((outerEntry) {
+                            children: chart
+                                .asMap()
+                                .entries
+                                .toList()
+                                .reversed
+                                .take(6)
+                                .toList()
+                                .asMap()
+                                .entries
+                                .map((outerEntry) {
                               final idx = outerEntry.value.key;
                               final d = outerEntry.value.value;
                               final bal = points[idx];
@@ -294,36 +361,55 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                               return Column(
                                 children: [
                                   if (!isFirst)
-                                    Divider(height: 1, indent: 16, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
+                                    Divider(
+                                        height: 1,
+                                        indent: 16,
+                                        color: theme.colorScheme.outlineVariant
+                                            .withValues(alpha: 0.3)),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 14),
                                     child: Row(
                                       children: [
                                         Container(
                                           width: 40,
                                           height: 40,
                                           decoration: BoxDecoration(
-                                            color: (isPositive ? const Color(0xFF10B981) : theme.colorScheme.error).withValues(alpha: 0.1),
-                                            borderRadius: BorderRadius.circular(12),
+                                            color: (isPositive
+                                                    ? const Color(0xFF10B981)
+                                                    : theme.colorScheme.error)
+                                                .withValues(alpha: 0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
                                           child: Icon(
-                                            isPositive ? Icons.trending_up : Icons.trending_down,
+                                            isPositive
+                                                ? Icons.trending_up
+                                                : Icons.trending_down,
                                             size: 20,
-                                            color: isPositive ? const Color(0xFF10B981) : theme.colorScheme.error,
+                                            color: isPositive
+                                                ? const Color(0xFF10B981)
+                                                : theme.colorScheme.error,
                                           ),
                                         ),
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: Text(
                                             _monthYearLabel(d.month),
-                                            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                                            style: theme.textTheme.titleSmall
+                                                ?.copyWith(
+                                                    fontWeight:
+                                                        FontWeight.w600),
                                           ),
                                         ),
                                         Text(
                                           CurrencyFormatter.format(bal),
-                                          style: theme.textTheme.titleSmall?.copyWith(
+                                          style: theme.textTheme.titleSmall
+                                              ?.copyWith(
                                             fontWeight: FontWeight.w700,
-                                            color: isPositive ? const Color(0xFF10B981) : theme.colorScheme.error,
+                                            color: isPositive
+                                                ? const Color(0xFF10B981)
+                                                : theme.colorScheme.error,
                                           ),
                                         ),
                                       ],

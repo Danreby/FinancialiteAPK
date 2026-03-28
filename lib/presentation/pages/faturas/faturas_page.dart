@@ -60,7 +60,8 @@ class _FaturasViewState extends State<_FaturasView> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       context.read<TransactionBloc>().add(const TransactionsFetched());
     }
   }
@@ -87,10 +88,12 @@ class _FaturasViewState extends State<_FaturasView> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.arrow_back_ios_new, size: 18, color: theme.colorScheme.onSurface),
+                    child: Icon(Icons.arrow_back_ios_new,
+                        size: 18, color: theme.colorScheme.onSurface),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -118,13 +121,17 @@ class _FaturasViewState extends State<_FaturasView> {
             child: BlocBuilder<TransactionBloc, TransactionState>(
               builder: (context, state) {
                 if (state is TransactionLoading) {
-                  return const AppLoadingIndicator(useShimmer: true, shimmerLines: 6);
+                  return const AppLoadingIndicator(
+                      useShimmer: true, shimmerLines: 6);
                 }
                 if (state is TransactionError) {
-                  return AppErrorWidget(message: state.message, onRetry: _loadData);
+                  return AppErrorWidget(
+                      message: state.message, onRetry: _loadData);
                 }
                 if (state is TransactionLoaded) {
-                  final credits = state.transactions.where((t) => t.type == 'credit').toList();
+                  final credits = state.transactions
+                      .where((t) => t.type == 'credit')
+                      .toList();
                   if (credits.isEmpty) {
                     return EmptyStateWidget(
                       icon: Icons.receipt_long,
@@ -139,7 +146,8 @@ class _FaturasViewState extends State<_FaturasView> {
                     children: [
                       // Summary card
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 8),
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -160,7 +168,8 @@ class _FaturasViewState extends State<_FaturasView> {
                                   color: Colors.white.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: const Icon(Icons.receipt_long, color: Colors.white, size: 20),
+                                child: const Icon(Icons.receipt_long,
+                                    color: Colors.white, size: 20),
                               ),
                               const SizedBox(width: 14),
                               Expanded(
@@ -169,11 +178,13 @@ class _FaturasViewState extends State<_FaturasView> {
                                   children: [
                                     Text(
                                       'Total de Receitas',
-                                      style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(color: Colors.white70),
                                     ),
                                     Text(
                                       CurrencyFormatter.format(total),
-                                      style: theme.textTheme.titleLarge?.copyWith(
+                                      style:
+                                          theme.textTheme.titleLarge?.copyWith(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w800,
                                       ),
@@ -193,7 +204,8 @@ class _FaturasViewState extends State<_FaturasView> {
                                   ),
                                   Text(
                                     'transações',
-                                    style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
+                                    style: theme.textTheme.bodySmall
+                                        ?.copyWith(color: Colors.white70),
                                   ),
                                 ],
                               ),
@@ -208,14 +220,17 @@ class _FaturasViewState extends State<_FaturasView> {
                           separatorBuilder: (_, __) => Divider(
                             height: 1,
                             indent: 74,
-                            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                            color: theme.colorScheme.outlineVariant
+                                .withValues(alpha: 0.3),
                           ),
                           itemCount: credits.length + (state.hasMore ? 1 : 0),
                           itemBuilder: (_, i) {
                             if (i >= credits.length) {
                               return const Padding(
                                 padding: EdgeInsets.all(16),
-                                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2)),
                               );
                             }
                             final t = credits[i];
@@ -228,7 +243,8 @@ class _FaturasViewState extends State<_FaturasView> {
                               isExpense: false,
                               categoryIcon: iconFromName(t.categoryIcon),
                               categoryColor: colorFromHex(t.categoryColor),
-                              onTap: () => context.push('/transactions/${t.id}'),
+                              onTap: () =>
+                                  context.push('/transactions/${t.id}'),
                             );
                           },
                         ),

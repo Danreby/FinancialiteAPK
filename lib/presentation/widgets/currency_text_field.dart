@@ -29,7 +29,8 @@ class CurrencyInputFormatter extends TextInputFormatter {
       buffer.write(intStr[i]);
     }
 
-    final formatted = '${buffer.toString()},${fracPart.toString().padLeft(2, '0')}';
+    final formatted =
+        '${buffer.toString()},${fracPart.toString().padLeft(2, '0')}';
     return newValue.copyWith(
       text: formatted,
       selection: TextSelection.collapsed(offset: formatted.length),

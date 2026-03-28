@@ -28,7 +28,20 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
   String _shortMonth(String monthKey) {
     try {
       final date = DateTime.parse('$monthKey-01');
-      final months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      final months = [
+        'Jan',
+        'Fev',
+        'Mar',
+        'Abr',
+        'Mai',
+        'Jun',
+        'Jul',
+        'Ago',
+        'Set',
+        'Out',
+        'Nov',
+        'Dez'
+      ];
       return months[date.month - 1];
     } catch (_) {
       return monthKey;
@@ -57,16 +70,19 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.arrow_back_ios_new, size: 18, color: theme.colorScheme.onSurface),
+                    child: Icon(Icons.arrow_back_ios_new,
+                        size: 18, color: theme.colorScheme.onSurface),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Text(
                   'Comparativo Mensal',
-                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                  style: theme.textTheme.titleLarge
+                      ?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ],
             ),
@@ -75,7 +91,8 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
             child: BlocBuilder<DashboardCubit, DashboardState>(
               builder: (context, state) {
                 if (state is DashboardLoading) {
-                  return const AppLoadingIndicator(useShimmer: true, shimmerLines: 5);
+                  return const AppLoadingIndicator(
+                      useShimmer: true, shimmerLines: 5);
                 }
                 if (state is DashboardError) {
                   return AppErrorWidget(
@@ -90,15 +107,23 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.bar_chart, size: 64, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
+                          Icon(Icons.bar_chart,
+                              size: 64,
+                              color: theme.colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.3)),
                           const SizedBox(height: 12),
-                          Text('Sem dados disponíveis', style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                          Text('Sem dados disponíveis',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant)),
                         ],
                       ),
                     );
                   }
 
-                  final maxY = chart.fold(0.0, (m, d) => [m, d.income, d.expense].fold(0.0, (a, b) => a > b ? a : b));
+                  final maxY = chart.fold(
+                      0.0,
+                      (m, d) => [m, d.income, d.expense]
+                          .fold(0.0, (a, b) => a > b ? a : b));
 
                   return SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -108,9 +133,13 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _legendDot(color: const Color(0xFF10B981), label: 'Receitas'),
+                            _legendDot(
+                                color: const Color(0xFF10B981),
+                                label: 'Receitas'),
                             const SizedBox(width: 20),
-                            _legendDot(color: theme.colorScheme.error, label: 'Despesas'),
+                            _legendDot(
+                                color: theme.colorScheme.error,
+                                label: 'Despesas'),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -120,7 +149,9 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                            border: Border.all(
+                                color: theme.colorScheme.outlineVariant
+                                    .withValues(alpha: 0.5)),
                           ),
                           padding: const EdgeInsets.fromLTRB(12, 20, 16, 12),
                           child: BarChart(
@@ -129,13 +160,16 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
                               barTouchData: BarTouchData(
                                 touchTooltipData: BarTouchTooltipData(
                                   tooltipRoundedRadius: 8,
-                                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                  getTooltipItem:
+                                      (group, groupIndex, rod, rodIndex) {
                                     final d = chart[groupIndex];
                                     final isIncome = rodIndex == 0;
                                     return BarTooltipItem(
                                       '${isIncome ? 'Receita' : 'Despesa'}\n${CurrencyFormatter.format(rod.toY)}',
                                       TextStyle(
-                                        color: isIncome ? const Color(0xFF10B981) : theme.colorScheme.error,
+                                        color: isIncome
+                                            ? const Color(0xFF10B981)
+                                            : theme.colorScheme.error,
                                         fontWeight: FontWeight.w600,
                                         fontSize: 11,
                                       ),
@@ -144,26 +178,32 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
                                 ),
                                 touchCallback: (event, response) {
                                   setState(() {
-                                    _touchedIndex = response?.spot?.touchedBarGroupIndex ?? -1;
+                                    _touchedIndex =
+                                        response?.spot?.touchedBarGroupIndex ??
+                                            -1;
                                   });
                                 },
                               ),
                               titlesData: FlTitlesData(
-                                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                topTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
+                                rightTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
                                 bottomTitles: AxisTitles(
                                   sideTitles: SideTitles(
                                     showTitles: true,
                                     getTitlesWidget: (value, meta) {
                                       final idx = value.toInt();
-                                      if (idx < 0 || idx >= chart.length) return const SizedBox();
+                                      if (idx < 0 || idx >= chart.length)
+                                        return const SizedBox();
                                       return Padding(
                                         padding: const EdgeInsets.only(top: 4),
                                         child: Text(
                                           _shortMonth(chart[idx].month),
                                           style: TextStyle(
                                             fontSize: 10,
-                                            color: theme.colorScheme.onSurfaceVariant,
+                                            color: theme
+                                                .colorScheme.onSurfaceVariant,
                                           ),
                                         ),
                                       );
@@ -179,7 +219,10 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
                                       if (value == 0) return const SizedBox();
                                       return Text(
                                         CurrencyFormatter.formatCompact(value),
-                                        style: TextStyle(fontSize: 9, color: theme.colorScheme.onSurfaceVariant),
+                                        style: TextStyle(
+                                            fontSize: 9,
+                                            color: theme
+                                                .colorScheme.onSurfaceVariant),
                                       );
                                     },
                                   ),
@@ -189,7 +232,8 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
                                 show: true,
                                 drawVerticalLine: false,
                                 getDrawingHorizontalLine: (_) => FlLine(
-                                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                                  color: theme.colorScheme.outlineVariant
+                                      .withValues(alpha: 0.3),
                                   strokeWidth: 1,
                                 ),
                               ),
@@ -205,13 +249,15 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
                                       toY: d.income,
                                       color: const Color(0xFF10B981),
                                       width: isTouched ? 9 : 7,
-                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                                      borderRadius: const BorderRadius.vertical(
+                                          top: Radius.circular(4)),
                                     ),
                                     BarChartRodData(
                                       toY: d.expense,
                                       color: theme.colorScheme.error,
                                       width: isTouched ? 9 : 7,
-                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                                      borderRadius: const BorderRadius.vertical(
+                                          top: Radius.circular(4)),
                                     ),
                                   ],
                                 );
@@ -225,7 +271,9 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                            border: Border.all(
+                                color: theme.colorScheme.outlineVariant
+                                    .withValues(alpha: 0.5)),
                           ),
                           child: Column(
                             children: chart.reversed.take(6).map((d) {
@@ -235,44 +283,66 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
                               return Column(
                                 children: [
                                   if (!isFirst)
-                                    Divider(height: 1, indent: 16, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
+                                    Divider(
+                                        height: 1,
+                                        indent: 16,
+                                        color: theme.colorScheme.outlineVariant
+                                            .withValues(alpha: 0.3)),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 14),
                                     child: Row(
                                       children: [
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 _monthYearLabel(d.month),
-                                                style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                                                style: theme
+                                                    .textTheme.titleSmall
+                                                    ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w600),
                                               ),
                                               const SizedBox(height: 4),
                                               Row(
                                                 children: [
-                                                  _miniTag('+${CurrencyFormatter.formatCompact(d.income)}', const Color(0xFF10B981), theme),
+                                                  _miniTag(
+                                                      '+${CurrencyFormatter.formatCompact(d.income)}',
+                                                      const Color(0xFF10B981),
+                                                      theme),
                                                   const SizedBox(width: 6),
-                                                  _miniTag('-${CurrencyFormatter.formatCompact(d.expense)}', theme.colorScheme.error, theme),
+                                                  _miniTag(
+                                                      '-${CurrencyFormatter.formatCompact(d.expense)}',
+                                                      theme.colorScheme.error,
+                                                      theme),
                                                 ],
                                               ),
                                             ],
                                           ),
                                         ),
                                         Column(
-                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
                                           children: [
                                             Text(
                                               '${isPositive ? '+' : ''}${CurrencyFormatter.format(balance)}',
-                                              style: theme.textTheme.titleSmall?.copyWith(
+                                              style: theme.textTheme.titleSmall
+                                                  ?.copyWith(
                                                 fontWeight: FontWeight.w700,
-                                                color: isPositive ? const Color(0xFF10B981) : theme.colorScheme.error,
+                                                color: isPositive
+                                                    ? const Color(0xFF10B981)
+                                                    : theme.colorScheme.error,
                                               ),
                                             ),
                                             Text(
                                               'saldo do mês',
-                                              style: theme.textTheme.bodySmall?.copyWith(
-                                                color: theme.colorScheme.onSurfaceVariant,
+                                              style: theme.textTheme.bodySmall
+                                                  ?.copyWith(
+                                                color: theme.colorScheme
+                                                    .onSurfaceVariant,
                                               ),
                                             ),
                                           ],
@@ -302,9 +372,13 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
   Widget _legendDot({required Color color, required String label}) {
     return Row(
       children: [
-        Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
         const SizedBox(width: 6),
-        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+        Text(label,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
       ],
     );
   }
@@ -316,7 +390,9 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
       ),
-      child: Text(text, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
+      child: Text(text,
+          style: TextStyle(
+              fontSize: 11, color: color, fontWeight: FontWeight.w600)),
     );
   }
 
