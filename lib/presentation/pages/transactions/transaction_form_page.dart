@@ -8,9 +8,11 @@ import '../../blocs/bank/bank_cubit.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/currency_text_field.dart';
 import '../../../core/utils/validators.dart';
+import '../../../core/di/injection_container.dart';
 import '../../../domain/entities/category.dart';
 import '../../../domain/entities/card_entity.dart';
 import '../../../domain/entities/bank_account.dart';
+import '../../../domain/repositories/transaction_repository.dart';
 
 class TransactionFormPage extends StatefulWidget {
   final int? transactionId;
@@ -30,6 +32,7 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
   int? _cardUserId;
   int? _bankAccountId;
   DateTime _date = DateTime.now();
+  bool _isLoadingTransaction = false;
   bool get _isEditing => widget.transactionId != null;
 
   @override
@@ -38,6 +41,34 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
     context.read<CategoryCubit>().loadCategories();
     context.read<CardCubit>().loadCards();
     context.read<BankCubit>().loadAccounts();
+    if (_isEditing) {
+      _loadTransaction();
+    }
+  }
+
+  Future<void> _loadTransaction() async {
+    setState(() => _isLoadingTransaction = true);
+    try {
+      final repo = sl<TransactionRepository>();
+      final tx = await repo.getTransaction(widget.transactionId!);
+      if (!mounted) return;
+      setState(() {
+        _type = tx.type;
+        _descriptionController.text = tx.title;
+        _amountController.text =
+            tx.amount.toStringAsFixed(2).replaceAll('.', ',');
+        _categoryId = tx.categoryId;
+        _cardUserId = tx.cardUserId;
+        _bankAccountId = tx.bankUserId;
+        if (tx.date != null) _date = tx.date!;
+        _notesController.text = tx.description ?? '';
+        _isLoadingTransaction = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoadingTransaction = false);
+      debugPrint('[TransactionForm] Error loading transaction: $e');
+    }
   }
 
   @override
@@ -110,280 +141,292 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => setState(() => _type = 'debit'),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              height: 56,
-                              decoration: BoxDecoration(
-                                color: _type == 'debit'
-                                    ? theme.colorScheme.error
-                                    : theme.colorScheme.surfaceContainerHighest,
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.arrow_downward,
-                                    color: _type == 'debit'
-                                        ? Colors.white
-                                        : theme.colorScheme.onSurfaceVariant,
-                                    size: 20,
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'Débito',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: _type == 'debit'
-                                          ? Colors.white
-                                          : theme.colorScheme.onSurfaceVariant,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => setState(() => _type = 'credit'),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              height: 56,
-                              decoration: BoxDecoration(
-                                color: _type == 'credit'
-                                    ? const Color(0xFF10B981)
-                                    : theme.colorScheme.surfaceContainerHighest,
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.arrow_upward,
-                                    color: _type == 'credit'
-                                        ? Colors.white
-                                        : theme.colorScheme.onSurfaceVariant,
-                                    size: 20,
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'Crédito',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: _type == 'credit'
-                                          ? Colors.white
-                                          : theme.colorScheme.onSurfaceVariant,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: theme.colorScheme.outlineVariant
-                              .withValues(alpha: 0.5),
-                        ),
-                      ),
+            child: _isLoadingTransaction
+                ? const Center(child: CircularProgressIndicator())
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Form(
+                      key: _formKey,
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          AppTextField(
-                            controller: _descriptionController,
-                            label: 'Título',
-                            prefixIcon: Icons.description,
-                            validator: Validators.required,
-                            textInputAction: TextInputAction.next,
-                            maxLength: 100,
-                          ),
-                          const SizedBox(height: 16),
-                          CurrencyTextField(
-                            controller: _amountController,
-                            label: 'Valor',
-                            validator: Validators.currency,
-                          ),
-                          const SizedBox(height: 16),
-                          BlocBuilder<CategoryCubit, CategoryState>(
-                            builder: (context, state) {
-                              final categories = state is CategoryLoaded
-                                  ? state.categories
-                                  : <Category>[];
-                              return DropdownButtonFormField<int>(
-                                value: _categoryId,
-                                decoration: const InputDecoration(
-                                  labelText: 'Categoria',
-                                  prefixIcon: Icon(Icons.category),
-                                ),
-                                items: categories
-                                    .map((c) => DropdownMenuItem(
-                                          value: c.id,
-                                          child: Text(c.name),
-                                        ))
-                                    .toList(),
-                                onChanged: (v) =>
-                                    setState(() => _categoryId = v),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          BlocBuilder<CardCubit, CardState>(
-                            builder: (context, state) {
-                              final cards = state is CardLoaded
-                                  ? state.cards
-                                  : <CardUser>[];
-                              return DropdownButtonFormField<int>(
-                                value: _cardUserId,
-                                decoration: const InputDecoration(
-                                  labelText: 'Cartão (opcional)',
-                                  prefixIcon: Icon(Icons.credit_card),
-                                ),
-                                items: [
-                                  const DropdownMenuItem<int>(
-                                    value: null,
-                                    child: Text('Nenhum'),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() => _type = 'debit'),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      color: _type == 'debit'
+                                          ? theme.colorScheme.error
+                                          : theme.colorScheme
+                                              .surfaceContainerHighest,
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.arrow_downward,
+                                          color: _type == 'debit'
+                                              ? Colors.white
+                                              : theme
+                                                  .colorScheme.onSurfaceVariant,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          'Débito',
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                            color: _type == 'debit'
+                                                ? Colors.white
+                                                : theme.colorScheme
+                                                    .onSurfaceVariant,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  ...cards.map((c) => DropdownMenuItem(
-                                        value: c.id,
-                                        child: Text(
-                                            c.cardName ?? 'Cartão #${c.id}'),
-                                      )),
-                                ],
-                                onChanged: (v) =>
-                                    setState(() => _cardUserId = v),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          BlocBuilder<BankCubit, BankState>(
-                            builder: (context, state) {
-                              final accounts = state is BankLoaded
-                                  ? state.accounts
-                                  : <BankAccount>[];
-                              return DropdownButtonFormField<int>(
-                                value: _bankAccountId,
-                                decoration: const InputDecoration(
-                                  labelText: 'Banco (opcional)',
-                                  prefixIcon: Icon(Icons.account_balance),
                                 ),
-                                items: [
-                                  const DropdownMenuItem<int>(
-                                    value: null,
-                                    child: Text('Nenhum'),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() => _type = 'credit'),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      color: _type == 'credit'
+                                          ? const Color(0xFF10B981)
+                                          : theme.colorScheme
+                                              .surfaceContainerHighest,
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.arrow_upward,
+                                          color: _type == 'credit'
+                                              ? Colors.white
+                                              : theme
+                                                  .colorScheme.onSurfaceVariant,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          'Crédito',
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                            color: _type == 'credit'
+                                                ? Colors.white
+                                                : theme.colorScheme
+                                                    .onSurfaceVariant,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  ...accounts.map((a) => DropdownMenuItem(
-                                        value: a.id,
-                                        child: Text(a.displayName),
-                                      )),
-                                ],
-                                onChanged: (v) =>
-                                    setState(() => _bankAccountId = v),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          AppTextField(
-                            label: 'Data',
-                            prefixIcon: Icons.calendar_today,
-                            readOnly: true,
-                            controller: TextEditingController(
-                              text:
-                                  '${_date.day.toString().padLeft(2, '0')}/${_date.month.toString().padLeft(2, '0')}/${_date.year}',
-                            ),
-                            suffix: Container(
-                              width: 40,
-                              height: 40,
-                              margin: const EdgeInsets.only(right: 4),
-                              decoration: BoxDecoration(
-                                color:
-                                    theme.colorScheme.surfaceContainerHighest,
-                                borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
-                              child: Icon(
-                                Icons.calendar_month,
-                                color: theme.colorScheme.onSurfaceVariant,
-                                size: 20,
-                              ),
-                            ),
-                            onTap: () async {
-                              final picked = await showDatePicker(
-                                context: context,
-                                initialDate: _date,
-                                firstDate: DateTime(2020),
-                                lastDate: DateTime(2030),
-                              );
-                              if (picked != null)
-                                setState(() => _date = picked);
-                            },
+                            ],
                           ),
-                          const SizedBox(height: 16),
-                          AppTextField(
-                            controller: _notesController,
-                            label: 'Observações',
-                            prefixIcon: Icons.notes,
-                            maxLines: 3,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.colorScheme.primary
-                                .withValues(alpha: 0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: SizedBox(
-                        height: 56,
-                        width: double.infinity,
-                        child: FilledButton(
-                          onPressed: _submit,
-                          style: FilledButton.styleFrom(
-                            shape: RoundedRectangleBorder(
+                          const SizedBox(height: 20),
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface,
                               borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: theme.colorScheme.outlineVariant
+                                    .withValues(alpha: 0.5),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                AppTextField(
+                                  controller: _descriptionController,
+                                  label: 'Título',
+                                  prefixIcon: Icons.description,
+                                  validator: Validators.required,
+                                  textInputAction: TextInputAction.next,
+                                  maxLength: 100,
+                                ),
+                                const SizedBox(height: 16),
+                                CurrencyTextField(
+                                  controller: _amountController,
+                                  label: 'Valor',
+                                  validator: Validators.currency,
+                                ),
+                                const SizedBox(height: 16),
+                                BlocBuilder<CategoryCubit, CategoryState>(
+                                  builder: (context, state) {
+                                    final categories = state is CategoryLoaded
+                                        ? state.categories
+                                        : <Category>[];
+                                    return DropdownButtonFormField<int>(
+                                      value: _categoryId,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Categoria',
+                                        prefixIcon: Icon(Icons.category),
+                                      ),
+                                      items: categories
+                                          .map((c) => DropdownMenuItem(
+                                                value: c.id,
+                                                child: Text(c.name),
+                                              ))
+                                          .toList(),
+                                      onChanged: (v) =>
+                                          setState(() => _categoryId = v),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                BlocBuilder<CardCubit, CardState>(
+                                  builder: (context, state) {
+                                    final cards = state is CardLoaded
+                                        ? state.cards
+                                        : <CardUser>[];
+                                    return DropdownButtonFormField<int>(
+                                      value: _cardUserId,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Cartão (opcional)',
+                                        prefixIcon: Icon(Icons.credit_card),
+                                      ),
+                                      items: [
+                                        const DropdownMenuItem<int>(
+                                          value: null,
+                                          child: Text('Nenhum'),
+                                        ),
+                                        ...cards.map((c) => DropdownMenuItem(
+                                              value: c.id,
+                                              child: Text(c.cardName ??
+                                                  'Cartão #${c.id}'),
+                                            )),
+                                      ],
+                                      onChanged: (v) =>
+                                          setState(() => _cardUserId = v),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                BlocBuilder<BankCubit, BankState>(
+                                  builder: (context, state) {
+                                    final accounts = state is BankLoaded
+                                        ? state.accounts
+                                        : <BankAccount>[];
+                                    return DropdownButtonFormField<int>(
+                                      value: _bankAccountId,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Banco (opcional)',
+                                        prefixIcon: Icon(Icons.account_balance),
+                                      ),
+                                      items: [
+                                        const DropdownMenuItem<int>(
+                                          value: null,
+                                          child: Text('Nenhum'),
+                                        ),
+                                        ...accounts.map((a) => DropdownMenuItem(
+                                              value: a.id,
+                                              child: Text(a.displayName),
+                                            )),
+                                      ],
+                                      onChanged: (v) =>
+                                          setState(() => _bankAccountId = v),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                AppTextField(
+                                  label: 'Data',
+                                  prefixIcon: Icons.calendar_today,
+                                  readOnly: true,
+                                  controller: TextEditingController(
+                                    text:
+                                        '${_date.day.toString().padLeft(2, '0')}/${_date.month.toString().padLeft(2, '0')}/${_date.year}',
+                                  ),
+                                  suffix: Container(
+                                    width: 40,
+                                    height: 40,
+                                    margin: const EdgeInsets.only(right: 4),
+                                    decoration: BoxDecoration(
+                                      color: theme
+                                          .colorScheme.surfaceContainerHighest,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Icon(
+                                      Icons.calendar_month,
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    final picked = await showDatePicker(
+                                      context: context,
+                                      initialDate: _date,
+                                      firstDate: DateTime(2020),
+                                      lastDate: DateTime(2030),
+                                    );
+                                    if (picked != null)
+                                      setState(() => _date = picked);
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                AppTextField(
+                                  controller: _notesController,
+                                  label: 'Observações',
+                                  prefixIcon: Icons.notes,
+                                  maxLines: 3,
+                                ),
+                              ],
                             ),
                           ),
-                          child: Text(
-                            _isEditing ? 'Atualizar' : 'Salvar',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
+                          const SizedBox(height: 24),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: theme.colorScheme.primary
+                                      .withValues(alpha: 0.3),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: SizedBox(
+                              height: 56,
+                              width: double.infinity,
+                              child: FilledButton(
+                                onPressed: _submit,
+                                style: FilledButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: Text(
+                                  _isEditing ? 'Atualizar' : 'Salvar',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 32),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 32),
-                  ],
-                ),
-              ),
-            ),
+                  ),
           ),
         ],
       ),

@@ -134,7 +134,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                           );
                         }
                         final tx = state.transactions[index];
-                        final isExpense = tx.type == 'debit';
+                        final isCredit = tx.type == 'credit';
                         return Dismissible(
                           key: Key('tx_${tx.id}'),
                           direction: DismissDirection.endToStart,
@@ -169,12 +169,12 @@ class _TransactionsPageState extends State<TransactionsPage> {
                           child: TransactionTile(
                             title: tx.title,
                             subtitle:
-                                '${tx.categoryName ?? 'Sem categoria'}${tx.date != null ? ' • ${DateFormatter.shortDate(tx.date!)}' : ''}',
+                                '${isCredit ? 'Crédito' : 'Débito'} • ${tx.categoryName ?? 'Sem categoria'}${tx.date != null ? ' • ${DateFormatter.shortDate(tx.date!)}' : ''}',
                             amount: CurrencyFormatter.format(tx.amount),
-                            isExpense: isExpense,
-                            categoryIcon: isExpense
-                                ? Icons.arrow_downward_rounded
-                                : Icons.arrow_upward_rounded,
+                            isExpense: true,
+                            categoryIcon: isCredit
+                                ? Icons.credit_card
+                                : Icons.account_balance,
                             onTap: () => context.push('/transactions/${tx.id}'),
                           ),
                         );

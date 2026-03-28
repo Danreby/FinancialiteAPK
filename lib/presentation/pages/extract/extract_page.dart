@@ -126,9 +126,9 @@ class _ExtractViewState extends State<_ExtractView> {
               children: [
                 _filterChip('all', 'Todos', theme),
                 const SizedBox(width: 8),
-                _filterChip('credit', 'Receitas', theme),
+                _filterChip('credit', 'Crédito', theme),
                 const SizedBox(width: 8),
-                _filterChip('debit', 'Despesas', theme),
+                _filterChip('debit', 'Débito', theme),
               ],
             ),
           ),
@@ -172,18 +172,18 @@ class _ExtractViewState extends State<_ExtractView> {
                           children: [
                             Expanded(
                                 child: _statCard(
-                                    'Receitas',
+                                    'Crédito',
                                     totalIn,
-                                    const Color(0xFF10B981),
-                                    Icons.arrow_downward,
+                                    theme.colorScheme.error,
+                                    Icons.credit_card,
                                     theme)),
                             const SizedBox(width: 10),
                             Expanded(
                                 child: _statCard(
-                                    'Despesas',
+                                    'Débito',
                                     totalOut,
                                     theme.colorScheme.error,
-                                    Icons.arrow_upward,
+                                    Icons.account_balance,
                                     theme)),
                             const SizedBox(width: 10),
                             Expanded(
@@ -237,7 +237,7 @@ class _ExtractViewState extends State<_ExtractView> {
                                   ? DateFormatter.format(t.date!)
                                   : t.categoryName ?? '',
                               amount: CurrencyFormatter.format(t.amount),
-                              isExpense: t.isDebit,
+                              isExpense: true,
                               categoryIcon: iconFromName(t.categoryIcon),
                               categoryColor: colorFromHex(t.categoryColor),
                               onTap: () =>
@@ -343,7 +343,7 @@ class _ExtractViewState extends State<_ExtractView> {
                 sections: [
                   PieChartSectionData(
                     value: totalIn,
-                    color: const Color(0xFF10B981),
+                    color: const Color(0xFF7C3AED),
                     radius: 12,
                     title: '',
                   ),
@@ -363,9 +363,9 @@ class _ExtractViewState extends State<_ExtractView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _chartLegend(
-                    'Receitas', pctIn * 100, const Color(0xFF10B981), theme),
+                    'Crédito', pctIn * 100, const Color(0xFF7C3AED), theme),
                 const SizedBox(height: 6),
-                _chartLegend('Despesas', (1 - pctIn) * 100,
+                _chartLegend('Débito', (1 - pctIn) * 100,
                     theme.colorScheme.error, theme),
               ],
             ),

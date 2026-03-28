@@ -6,11 +6,11 @@ import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/month_selector.dart';
-import '../../widgets/transaction_tile.dart';
 import '../../../core/di/injection_container.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/icon_utils.dart';
+import '../../../domain/entities/transaction.dart';
 import '../../../domain/repositories/transaction_repository.dart';
 
 class FaturasPage extends StatelessWidget {
@@ -64,6 +64,47 @@ class _FaturasViewState extends State<_FaturasView> {
         _scrollController.position.maxScrollExtent - 200) {
       context.read<TransactionBloc>().add(const TransactionsFetched());
     }
+  }
+
+  String _monthKey() => DateFormatter.monthKey(_selectedMonth);
+
+  /// Find the parcela matching this month for a given transaction
+  TransactionParcela? _parcelaForMonth(Transaction t) {
+    final mk = _monthKey();
+    return t.parcelas?.cast<TransactionParcela?>().firstWhere(
+          (p) => p!.monthKey == mk,
+          orElse: () => null,
+        );
+  }
+
+  /// Get per-installment amount
+  double _installmentAmount(Transaction t) {
+    final parcela = _parcelaForMonth(t);
+    if (parcela != null && parcela.amount > 0) return parcela.amount;
+    if (t.installments > 1) return t.amount / t.installments;
+    return t.amount;
+  }
+
+  /// Get the display installment number for this month
+  int? _currentInstallment(Transaction t) {
+    final parcela = _parcelaForMonth(t);
+    if (parcela != null) return parcela.parcelaNumber;
+    return null;
+  }
+
+  /// Get installment status for this month
+  String _installmentStatus(Transaction t) {
+    final parcela = _parcelaForMonth(t);
+    if (parcela != null) {
+      if (parcela.paidAt != null || parcela.status == 'paid') return 'paid';
+      if (parcela.dueDate != null &&
+          parcela.dueDate!.isBefore(DateTime.now())) {
+        return 'overdue';
+      }
+      return 'pending';
+    }
+    // Fallback to transaction status
+    return t.status;
   }
 
   @override
@@ -136,11 +177,15 @@ class _FaturasViewState extends State<_FaturasView> {
                     return EmptyStateWidget(
                       icon: Icons.receipt_long,
                       title: 'Nenhuma fatura',
-                      subtitle: 'Não há receitas registradas neste mês',
+                      subtitle: 'Não há faturas registradas neste mês',
                     );
                   }
 
-                  final total = credits.fold(0.0, (s, t) => s + t.amount);
+                  final total =
+                      credits.fold(0.0, (s, t) => s + _installmentAmount(t));
+                  final paidCount = credits
+                      .where((t) => _installmentStatus(t) == 'paid')
+                      .length;
 
                   return Column(
                     children: [
@@ -153,8 +198,8 @@ class _FaturasViewState extends State<_FaturasView> {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                const Color(0xFF10B981),
-                                const Color(0xFF10B981).withValues(alpha: 0.8),
+                                theme.colorScheme.error,
+                                theme.colorScheme.error.withValues(alpha: 0.8),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(16),
@@ -168,7 +213,7 @@ class _FaturasViewState extends State<_FaturasView> {
                                   color: Colors.white.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: const Icon(Icons.receipt_long,
+                                child: const Icon(Icons.credit_card,
                                     color: Colors.white, size: 20),
                               ),
                               const SizedBox(width: 14),
@@ -177,7 +222,7 @@ class _FaturasViewState extends State<_FaturasView> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Total de Receitas',
+                                      'Total do Mês',
                                       style: theme.textTheme.bodySmall
                                           ?.copyWith(color: Colors.white70),
                                     ),
@@ -196,14 +241,14 @@ class _FaturasViewState extends State<_FaturasView> {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    '${credits.length}',
+                                    '$paidCount/${credits.length}',
                                     style: theme.textTheme.titleLarge?.copyWith(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w800,
                                     ),
                                   ),
                                   Text(
-                                    'transações',
+                                    'pagas',
                                     style: theme.textTheme.bodySmall
                                         ?.copyWith(color: Colors.white70),
                                   ),
@@ -234,15 +279,11 @@ class _FaturasViewState extends State<_FaturasView> {
                               );
                             }
                             final t = credits[i];
-                            return TransactionTile(
-                              title: t.title,
-                              subtitle: t.date != null
-                                  ? DateFormatter.format(t.date!)
-                                  : t.categoryName ?? 'Receita',
-                              amount: CurrencyFormatter.format(t.amount),
-                              isExpense: false,
-                              categoryIcon: iconFromName(t.categoryIcon),
-                              categoryColor: colorFromHex(t.categoryColor),
+                            return _FaturaItemTile(
+                              transaction: t,
+                              installmentAmount: _installmentAmount(t),
+                              currentInstallment: _currentInstallment(t),
+                              status: _installmentStatus(t),
                               onTap: () =>
                                   context.push('/transactions/${t.id}'),
                             );
@@ -257,6 +298,184 @@ class _FaturasViewState extends State<_FaturasView> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _FaturaItemTile extends StatelessWidget {
+  final Transaction transaction;
+  final double installmentAmount;
+  final int? currentInstallment;
+  final String status;
+  final VoidCallback? onTap;
+
+  const _FaturaItemTile({
+    required this.transaction,
+    required this.installmentAmount,
+    this.currentInstallment,
+    required this.status,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final hasInstallments = transaction.installments > 1;
+    final isRecurring = transaction.isRecurring;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Row(
+          children: [
+            // Category icon
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: (colorFromHex(transaction.categoryColor) ??
+                        theme.colorScheme.error)
+                    .withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                iconFromName(transaction.categoryIcon),
+                size: 22,
+                color: colorFromHex(transaction.categoryColor) ??
+                    theme.colorScheme.error,
+              ),
+            ),
+            const SizedBox(width: 14),
+            // Title, subtitle, badges
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    transaction.title,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      // Installment badge
+                      if (hasInstallments) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color:
+                                const Color(0xFF7C3AED).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '${currentInstallment ?? '?'}/${transaction.installments}',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF7C3AED),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                      ],
+                      // Recurring badge
+                      if (isRecurring) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color:
+                                const Color(0xFF3B82F6).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            'Recorrente',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF3B82F6),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                      ],
+                      // Status badge
+                      _statusBadge(theme),
+                      // Card name
+                      if (transaction.cardName != null) ...[
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            transaction.cardName!,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontSize: 10,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Amount
+            Text(
+              '- ${CurrencyFormatter.format(installmentAmount)}',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.error,
+                letterSpacing: -0.3,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _statusBadge(ThemeData theme) {
+    Color color;
+    String label;
+
+    switch (status) {
+      case 'paid':
+        color = const Color(0xFF10B981);
+        label = 'Pago';
+        break;
+      case 'overdue':
+        color = theme.colorScheme.error;
+        label = 'Vencido';
+        break;
+      default:
+        color = theme.colorScheme.onSurfaceVariant;
+        label = 'Em aberto';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
       ),
     );
   }
