@@ -163,8 +163,7 @@ class TransactionParcelaModel extends TransactionParcela {
       id: json['id'] as int?,
       transactionId:
           json['transacao_id'] as int? ?? json['transaction_id'] as int? ?? 0,
-      parcelaNumber:
-          json['installment_number'] as int? ??
+      parcelaNumber: json['installment_number'] as int? ??
           json['parcela_number'] as int? ??
           json['numero'] as int? ??
           1,
@@ -172,7 +171,8 @@ class TransactionParcelaModel extends TransactionParcela {
       dueDate: json['due_date'] != null
           ? DateTime.tryParse(json['due_date'].toString())
           : null,
-      amount: double.tryParse(json['amount']?.toString() ?? '') ?? (json['valor'] as num? ?? 0).toDouble(),
+      amount: double.tryParse(json['amount']?.toString() ?? '') ??
+          (json['valor'] as num? ?? 0).toDouble(),
       status: json['status'] as String? ?? 'pending',
       paidAt: json['paid_date'] != null
           ? DateTime.tryParse(json['paid_date'].toString())

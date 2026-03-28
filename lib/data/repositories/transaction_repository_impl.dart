@@ -10,19 +10,24 @@ import '../../domain/repositories/transaction_repository.dart';
 import '../models/transaction_model.dart';
 import 'base_offline_repository.dart';
 
-class TransactionRepositoryImpl extends BaseOfflineRepository implements TransactionRepository {
-  TransactionRepositoryImpl(ApiClient api, NetworkInfo networkInfo) : super(api, networkInfo);
+class TransactionRepositoryImpl extends BaseOfflineRepository
+    implements TransactionRepository {
+  TransactionRepositoryImpl(ApiClient api, NetworkInfo networkInfo)
+      : super(api, networkInfo);
 
   @override
-  Future<List<Transaction>> getTransactions({Map<String, dynamic>? filters, int page = 1, int perPage = 20}) async {
+  Future<List<Transaction>> getTransactions(
+      {Map<String, dynamic>? filters, int page = 1, int perPage = 20}) async {
     try {
       if (await isOnline) {
         final params = <String, dynamic>{'page': page, 'per_page': perPage};
         if (filters != null) params.addAll(filters);
-        final response = await api.get(ApiConstants.transactions, queryParameters: params);
+        final response =
+            await api.get(ApiConstants.transactions, queryParameters: params);
         final rawList = safeList(response.data);
         final list = rawList
-            .map((json) => TransactionModel.fromJson(json as Map<String, dynamic>))
+            .map((json) =>
+                TransactionModel.fromJson(json as Map<String, dynamic>))
             .toList();
 
         // Cache to local DB (non-critical — don't let caching failures lose data)
@@ -30,7 +35,8 @@ class TransactionRepositoryImpl extends BaseOfflineRepository implements Transac
           final database = await db;
           final batch = database.batch();
           for (final item in list) {
-            batch.insert('transactions', (item as TransactionModel).toDbMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+            batch.insert('transactions', (item as TransactionModel).toDbMap(),
+                conflictAlgorithm: ConflictAlgorithm.replace);
           }
           await batch.commit(noResult: true);
         } catch (cacheError) {
@@ -58,7 +64,9 @@ class TransactionRepositoryImpl extends BaseOfflineRepository implements Transac
     try {
       if (await isOnline) {
         final response = await api.get('${ApiConstants.transactions}/$id');
-        final data = response.data is Map<String, dynamic> ? response.data : response.data['data'];
+        final data = response.data is Map<String, dynamic>
+            ? response.data
+            : response.data['data'];
         return TransactionModel.fromJson(data as Map<String, dynamic>);
       }
     } catch (e) {
@@ -66,7 +74,8 @@ class TransactionRepositoryImpl extends BaseOfflineRepository implements Transac
     }
 
     final database = await db;
-    final results = await database.query('transactions', where: 'id = ?', whereArgs: [id]);
+    final results =
+        await database.query('transactions', where: 'id = ?', whereArgs: [id]);
     if (results.isNotEmpty) return TransactionModel.fromDb(results.first);
     throw const ServerException(message: 'Transação não encontrada');
   }
@@ -76,10 +85,14 @@ class TransactionRepositoryImpl extends BaseOfflineRepository implements Transac
     final sanitized = InputSanitizer.sanitizeMap(data);
 
     if (await isOnline) {
-      final response = await api.post(ApiConstants.transactions, data: sanitized);
-      final transaction = TransactionModel.fromJson(response.data['data'] ?? response.data);
+      final response =
+          await api.post(ApiConstants.transactions, data: sanitized);
+      final transaction =
+          TransactionModel.fromJson(response.data['data'] ?? response.data);
       final database = await db;
-      await database.insert('transactions', (transaction as TransactionModel).toDbMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+      await database.insert(
+          'transactions', (transaction as TransactionModel).toDbMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace);
       return transaction;
     }
 
@@ -93,23 +106,30 @@ class TransactionRepositoryImpl extends BaseOfflineRepository implements Transac
   }
 
   @override
-  Future<Transaction> updateTransaction(int id, Map<String, dynamic> data) async {
+  Future<Transaction> updateTransaction(
+      int id, Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
 
     if (await isOnline) {
-      final response = await api.put('${ApiConstants.transactions}/$id', data: sanitized);
-      final transaction = TransactionModel.fromJson(response.data['data'] ?? response.data);
+      final response =
+          await api.put('${ApiConstants.transactions}/$id', data: sanitized);
+      final transaction =
+          TransactionModel.fromJson(response.data['data'] ?? response.data);
       final database = await db;
-      await database.update('transactions', (transaction as TransactionModel).toDbMap(), where: 'id = ?', whereArgs: [id]);
+      await database.update(
+          'transactions', (transaction as TransactionModel).toDbMap(),
+          where: 'id = ?', whereArgs: [id]);
       return transaction;
     }
 
     final database = await db;
     sanitized['updated_at'] = DateTime.now().toIso8601String();
     sanitized['synced'] = 0;
-    await database.update('transactions', sanitized, where: 'id = ?', whereArgs: [id]);
+    await database
+        .update('transactions', sanitized, where: 'id = ?', whereArgs: [id]);
     await addToSyncQueue('transactions', id, 'update', sanitized);
-    final results = await database.query('transactions', where: 'id = ?', whereArgs: [id]);
+    final results =
+        await database.query('transactions', where: 'id = ?', whereArgs: [id]);
     return TransactionModel.fromDb(results.first);
   }
 
@@ -121,32 +141,42 @@ class TransactionRepositoryImpl extends BaseOfflineRepository implements Transac
       await addToSyncQueue('transactions', id, 'delete', null);
     }
     final database = await db;
-    await database.update('transactions', {'deleted_at': DateTime.now().toIso8601String()}, where: 'id = ?', whereArgs: [id]);
+    await database.update(
+        'transactions', {'deleted_at': DateTime.now().toIso8601String()},
+        where: 'id = ?', whereArgs: [id]);
   }
 
   @override
   Future<void> restoreTransaction(int id) async {
     await api.post('${ApiConstants.transactions}/$id/restore');
     final database = await db;
-    await database.update('transactions', {'deleted_at': null}, where: 'id = ?', whereArgs: [id]);
+    await database.update('transactions', {'deleted_at': null},
+        where: 'id = ?', whereArgs: [id]);
   }
 
   @override
   Future<Map<String, dynamic>> getStats({Map<String, dynamic>? filters}) async {
-    final response = await api.get(ApiConstants.transactionStats, queryParameters: filters);
+    final response =
+        await api.get(ApiConstants.transactionStats, queryParameters: filters);
     return response.data is Map<String, dynamic> ? response.data : {};
   }
 
   @override
-  Future<Map<String, dynamic>> getInsights({Map<String, dynamic>? filters}) async {
-    final response = await api.get(ApiConstants.transactionInsights, queryParameters: filters);
+  Future<Map<String, dynamic>> getInsights(
+      {Map<String, dynamic>? filters}) async {
+    final response = await api.get(ApiConstants.transactionInsights,
+        queryParameters: filters);
     return response.data is Map<String, dynamic> ? response.data : {};
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getTopSpending({Map<String, dynamic>? filters}) async {
-    final response = await api.get(ApiConstants.transactionTopSpending, queryParameters: filters);
-    return (response.data as List).map((e) => e as Map<String, dynamic>).toList();
+  Future<List<Map<String, dynamic>>> getTopSpending(
+      {Map<String, dynamic>? filters}) async {
+    final response = await api.get(ApiConstants.transactionTopSpending,
+        queryParameters: filters);
+    return (response.data as List)
+        .map((e) => e as Map<String, dynamic>)
+        .toList();
   }
 
   @override
@@ -159,7 +189,8 @@ class TransactionRepositoryImpl extends BaseOfflineRepository implements Transac
 
   @override
   Future<String> exportData({Map<String, dynamic>? filters}) async {
-    final response = await api.get(ApiConstants.transactionExport, queryParameters: filters);
+    final response =
+        await api.get(ApiConstants.transactionExport, queryParameters: filters);
     return response.data.toString();
   }
 }
