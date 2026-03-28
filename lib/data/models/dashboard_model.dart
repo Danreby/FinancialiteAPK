@@ -32,8 +32,10 @@ class DashboardDataModel extends DashboardData {
       return m['is_overdue'] == true || m['status'] == 'overdue';
     }).length;
 
-    final pendingBill = (stats['current_month_pending_bill'] as num? ?? 0).toDouble();
-    final debitTotal = (stats['current_month_debit_total'] as num? ?? 0).toDouble();
+    final pendingBill =
+        (stats['current_month_pending_bill'] as num? ?? 0).toDouble();
+    final debitTotal =
+        (stats['current_month_debit_total'] as num? ?? 0).toDouble();
 
     return DashboardDataModel(
       totalBalance: (stats['remaining_money'] as num? ?? 0).toDouble(),

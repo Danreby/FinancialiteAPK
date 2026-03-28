@@ -47,7 +47,9 @@ class TransactionModel extends Transaction {
               : null),
       description: json['description'] as String?,
       isRecurring: json['is_recurring'] == true || json['is_recurring'] == 1,
-      installments: json['total_installments'] as int? ?? json['installments'] as int? ?? 1,
+      installments: json['total_installments'] as int? ??
+          json['installments'] as int? ??
+          1,
       userId: json['user_id'] as int,
       categoryId: json['category_id'] as int?,
       cardUserId: json['card_user_id'] as int?,

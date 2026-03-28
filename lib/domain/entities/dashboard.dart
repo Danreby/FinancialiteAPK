@@ -36,7 +36,14 @@ class DashboardData extends Equatable {
   double get balance => totalIncome - totalExpense;
 
   @override
-  List<Object?> get props => [totalBalance, totalIncome, totalExpense, pendingBillAmount, monthDebitTotal, healthScore];
+  List<Object?> get props => [
+        totalBalance,
+        totalIncome,
+        totalExpense,
+        pendingBillAmount,
+        monthDebitTotal,
+        healthScore
+      ];
 }
 
 class MonthlyChartData extends Equatable {

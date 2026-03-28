@@ -43,7 +43,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       context.read<TransactionBloc>().add(const TransactionsFetched());
     }
   }
@@ -114,7 +115,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
                     child: ListView.builder(
                       controller: _scrollController,
                       padding: const EdgeInsets.only(top: 8, bottom: 100),
-                      itemCount: state.transactions.length + (state.hasMore ? 1 : 0),
+                      itemCount:
+                          state.transactions.length + (state.hasMore ? 1 : 0),
                       itemBuilder: (context, index) {
                         if (index >= state.transactions.length) {
                           return const Padding(
@@ -173,8 +175,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                             categoryIcon: isExpense
                                 ? Icons.arrow_downward_rounded
                                 : Icons.arrow_upward_rounded,
-                            onTap: () =>
-                                context.push('/transactions/${tx.id}'),
+                            onTap: () => context.push('/transactions/${tx.id}'),
                           ),
                         );
                       },
