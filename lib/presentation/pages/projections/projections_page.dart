@@ -62,8 +62,8 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                     ),
                     Text(
                       'Previs\u00e3o de gastos futuros',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant),
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -107,15 +107,16 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
           children: [
             Icon(Icons.show_chart,
                 size: 64,
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
+                color:
+                    theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
             const SizedBox(height: 12),
             Text('Nenhuma proje\u00e7\u00e3o dispon\u00edvel',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant)),
+                style: theme.textTheme.bodyLarge
+                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
             const SizedBox(height: 6),
             Text('Adicione transa\u00e7\u00f5es com parcelas ou recorrentes',
-                style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant)),
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
           ],
         ),
       );
@@ -123,18 +124,16 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
 
     final maxDebit = months.fold(
         0.0,
-        (m, d) =>
-            (d['projected_debit'] as num).toDouble() > m
-                ? (d['projected_debit'] as num).toDouble()
-                : m);
+        (m, d) => (d['projected_debit'] as num).toDouble() > m
+            ? (d['projected_debit'] as num).toDouble()
+            : m);
     final maxIncome = months.fold(
         0.0,
-        (m, d) =>
-            (d['projected_income'] as num).toDouble() > m
-                ? (d['projected_income'] as num).toDouble()
-                : m);
-    final chartMax = ((maxDebit > maxIncome ? maxDebit : maxIncome) * 1.2)
-        .ceilToDouble();
+        (m, d) => (d['projected_income'] as num).toDouble() > m
+            ? (d['projected_income'] as num).toDouble()
+            : m);
+    final chartMax =
+        ((maxDebit > maxIncome ? maxDebit : maxIncome) * 1.2).ceilToDouble();
 
     return RefreshIndicator(
       onRefresh: () async => context.read<ProjectionsCubit>().load(),
@@ -226,8 +225,7 @@ class _SummaryCard extends StatelessWidget {
                 child: Text(
                   label,
                   style: TextStyle(
-                      fontSize: 11,
-                      color: theme.colorScheme.onSurfaceVariant),
+                      fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -236,8 +234,8 @@ class _SummaryCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             value,
-            style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w700, color: color),
+            style: theme.textTheme.titleSmall
+                ?.copyWith(fontWeight: FontWeight.w700, color: color),
           ),
         ],
       ),
@@ -258,8 +256,18 @@ class _MonthlyProjectionChart extends StatelessWidget {
 
   String _monthAbbr(int month) {
     const abbrs = [
-      'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-      'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+      'Jan',
+      'Fev',
+      'Mar',
+      'Abr',
+      'Mai',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Set',
+      'Out',
+      'Nov',
+      'Dez'
     ];
     return abbrs[(month - 1).clamp(0, 11)];
   }
@@ -286,8 +294,7 @@ class _MonthlyProjectionChart extends StatelessWidget {
           Row(
             children: [
               _Legend(
-                  color: const Color(0xFF10B981),
-                  label: 'Renda (recorrente)'),
+                  color: const Color(0xFF10B981), label: 'Renda (recorrente)'),
               const SizedBox(width: 12),
               _Legend(
                   color: theme.colorScheme.error,
@@ -306,8 +313,8 @@ class _MonthlyProjectionChart extends StatelessWidget {
                   enabled: true,
                   touchTooltipData: BarTouchTooltipData(
                     getTooltipItem: (group, _, rod, __) {
-                      final isIncome =
-                          rod.color == const Color(0xFF10B981).withValues(alpha: 0.85);
+                      final isIncome = rod.color ==
+                          const Color(0xFF10B981).withValues(alpha: 0.85);
                       final label = isIncome ? 'Renda' : 'D\u00e9bito';
                       return BarTooltipItem(
                         '$label\n${CurrencyFormatter.format(rod.toY)}',
@@ -350,8 +357,7 @@ class _MonthlyProjectionChart extends StatelessWidget {
                         }
                         final monthKey = months[idx]['month'] as String;
                         final parts = monthKey.split('-');
-                        final abbr =
-                            _monthAbbr(int.tryParse(parts[1]) ?? 1);
+                        final abbr = _monthAbbr(int.tryParse(parts[1]) ?? 1);
                         return Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
@@ -369,8 +375,8 @@ class _MonthlyProjectionChart extends StatelessWidget {
                   show: true,
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (_) => FlLine(
-                    color: theme.colorScheme.outlineVariant
-                        .withValues(alpha: 0.3),
+                    color:
+                        theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
                     strokeWidth: 1,
                   ),
                 ),
@@ -378,24 +384,20 @@ class _MonthlyProjectionChart extends StatelessWidget {
                 barGroups: months.asMap().entries.map((e) {
                   final idx = e.key;
                   final m = e.value;
-                  final income =
-                      (m['projected_income'] as num).toDouble();
-                  final debit =
-                      (m['projected_debit'] as num).toDouble();
+                  final income = (m['projected_income'] as num).toDouble();
+                  final debit = (m['projected_debit'] as num).toDouble();
                   return BarChartGroupData(
                     x: idx,
                     barRods: [
                       BarChartRodData(
                         toY: income,
-                        color: const Color(0xFF10B981)
-                            .withValues(alpha: 0.85),
+                        color: const Color(0xFF10B981).withValues(alpha: 0.85),
                         width: 10,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       BarChartRodData(
                         toY: debit,
-                        color: theme.colorScheme.error
-                            .withValues(alpha: 0.85),
+                        color: theme.colorScheme.error.withValues(alpha: 0.85),
                         width: 10,
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -441,8 +443,7 @@ class _TransactionProjectionCard extends StatelessWidget {
   final Map<String, dynamic> tx;
   final ThemeData theme;
 
-  const _TransactionProjectionCard(
-      {required this.tx, required this.theme});
+  const _TransactionProjectionCard({required this.tx, required this.theme});
 
   Color _colorFromHex(String hex) {
     try {
@@ -470,8 +471,7 @@ class _TransactionProjectionCard extends StatelessWidget {
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-              color:
-                  theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
         ),
         child: Row(
           children: [
@@ -506,8 +506,8 @@ class _TransactionProjectionCard extends StatelessWidget {
                         : remaining != null
                             ? '$remaining de $total parcelas restantes \u00b7 ${tx['bank_name']}'
                             : '$total parcelas \u00b7 ${tx['bank_name']}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant),
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -526,8 +526,7 @@ class _TransactionProjectionCard extends StatelessWidget {
                 Text(
                   'por m\u00eas',
                   style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                      fontSize: 10),
+                      color: theme.colorScheme.onSurfaceVariant, fontSize: 10),
                 ),
               ],
             ),

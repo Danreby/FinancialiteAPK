@@ -14,7 +14,9 @@ class CardCubit extends Cubit<CardState> {
     emit(const CardLoading());
     try {
       final cards = await _repository.getCards();
-      final available = await _repository.getAvailableCards().catchError((_) => <CardEntity>[]);
+      final available = await _repository
+          .getAvailableCards()
+          .catchError((_) => <CardEntity>[]);
       emit(CardLoaded(cards: cards, availableCards: available));
     } catch (e) {
       emit(CardError(e.toString()));

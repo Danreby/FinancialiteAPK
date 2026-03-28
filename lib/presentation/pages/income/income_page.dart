@@ -32,7 +32,9 @@ class _IncomePageState extends State<IncomePage> {
   }
 
   void _loadData() {
-    context.read<IncomeCubit>().loadIncomes(month: DateFormatter.monthKey(_selectedMonth));
+    context
+        .read<IncomeCubit>()
+        .loadIncomes(month: DateFormatter.monthKey(_selectedMonth));
   }
 
   void _showIncomeDialog({Income? editing}) {
@@ -48,7 +50,8 @@ class _IncomePageState extends State<IncomePage> {
       context: context,
       isScrollControlled: true,
       builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+        padding: EdgeInsets.fromLTRB(
+            16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
         child: Form(
           key: formKey,
           child: StatefulBuilder(
@@ -68,7 +71,8 @@ class _IncomePageState extends State<IncomePage> {
                   validator: Validators.required,
                 ),
                 const SizedBox(height: 12),
-                CurrencyTextField(controller: amountCtrl, validator: Validators.currency),
+                CurrencyTextField(
+                    controller: amountCtrl, validator: Validators.currency),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: incomeType,
@@ -78,21 +82,26 @@ class _IncomePageState extends State<IncomePage> {
                   ),
                   items: const [
                     DropdownMenuItem(value: 'salary', child: Text('Salário')),
-                    DropdownMenuItem(value: 'freelance', child: Text('Freelance')),
-                    DropdownMenuItem(value: 'investment', child: Text('Investimento')),
+                    DropdownMenuItem(
+                        value: 'freelance', child: Text('Freelance')),
+                    DropdownMenuItem(
+                        value: 'investment', child: Text('Investimento')),
                     DropdownMenuItem(value: 'rental', child: Text('Aluguel')),
-                    DropdownMenuItem(value: 'benefit', child: Text('Benefício')),
+                    DropdownMenuItem(
+                        value: 'benefit', child: Text('Benefício')),
                     DropdownMenuItem(value: 'pix', child: Text('Pix')),
                     DropdownMenuItem(value: 'other', child: Text('Outro')),
                   ],
-                  onChanged: (v) => setLocalState(() => incomeType = v ?? 'salary'),
+                  onChanged: (v) =>
+                      setLocalState(() => incomeType = v ?? 'salary'),
                 ),
                 const SizedBox(height: 12),
                 AppTextField(
                   label: 'Data',
                   prefixIcon: Icons.calendar_today,
                   readOnly: true,
-                  controller: TextEditingController(text: DateFormatter.shortDate(date)),
+                  controller: TextEditingController(
+                      text: DateFormatter.shortDate(date)),
                   onTap: () async {
                     final picked = await showDatePicker(
                       context: context,
@@ -109,13 +118,17 @@ class _IncomePageState extends State<IncomePage> {
                     if (!formKey.currentState!.validate()) return;
                     final data = {
                       'title': titleCtrl.text.trim(),
-                      'amount': double.tryParse(amountCtrl.text.replaceAll(',', '.')) ?? 0,
+                      'amount': double.tryParse(
+                              amountCtrl.text.replaceAll(',', '.')) ??
+                          0,
                       'type': incomeType,
                       'is_recurring': false,
                       'received_at': date.toIso8601String().substring(0, 10),
                     };
                     if (editing != null) {
-                      context.read<IncomeCubit>().updateIncome(editing.id!, data);
+                      context
+                          .read<IncomeCubit>()
+                          .updateIncome(editing.id!, data);
                     } else {
                       context.read<IncomeCubit>().createIncome(data);
                     }
@@ -185,9 +198,12 @@ class _IncomePageState extends State<IncomePage> {
             child: BlocBuilder<IncomeCubit, IncomeState>(
               builder: (context, state) {
                 if (state is IncomeLoading) {
-                  return const AppLoadingIndicator(useShimmer: true, shimmerLines: 6);
+                  return const AppLoadingIndicator(
+                      useShimmer: true, shimmerLines: 6);
                 }
-                if (state is IncomeError) return AppErrorWidget(message: state.message, onRetry: _loadData);
+                if (state is IncomeError)
+                  return AppErrorWidget(
+                      message: state.message, onRetry: _loadData);
                 if (state is IncomeLoaded) {
                   return RefreshIndicator(
                     onRefresh: () async => _loadData(),
@@ -200,7 +216,8 @@ class _IncomePageState extends State<IncomePage> {
                               Expanded(
                                 child: StatCard(
                                   title: 'Total Mensal',
-                                  value: CurrencyFormatter.format(state.summary!.totalMonthly),
+                                  value: CurrencyFormatter.format(
+                                      state.summary!.totalMonthly),
                                   icon: Icons.trending_up,
                                   iconColor: Colors.green,
                                 ),
@@ -231,7 +248,8 @@ class _IncomePageState extends State<IncomePage> {
                           const SizedBox(height: 12),
                           ...state.incomes.map((income) {
                             final isReceived = income.isActive;
-                            final iconColor = isReceived ? Colors.green : Colors.orange;
+                            final iconColor =
+                                isReceived ? Colors.green : Colors.orange;
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 10),
                               child: Dismissible(
@@ -244,7 +262,8 @@ class _IncomePageState extends State<IncomePage> {
                                     color: theme.colorScheme.error,
                                     borderRadius: BorderRadius.circular(16),
                                   ),
-                                  child: const Icon(Icons.delete, color: Colors.white),
+                                  child: const Icon(Icons.delete,
+                                      color: Colors.white),
                                 ),
                                 confirmDismiss: (_) => ConfirmDialog.show(
                                   context,
@@ -253,14 +272,17 @@ class _IncomePageState extends State<IncomePage> {
                                   confirmText: 'Excluir',
                                   confirmColor: theme.colorScheme.error,
                                 ),
-                                onDismissed: (_) => context.read<IncomeCubit>().deleteIncome(income.id!),
+                                onDismissed: (_) => context
+                                    .read<IncomeCubit>()
+                                    .deleteIncome(income.id!),
                                 child: Container(
                                   padding: const EdgeInsets.all(14),
                                   decoration: BoxDecoration(
                                     color: theme.colorScheme.surface,
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                                      color: theme.colorScheme.outlineVariant
+                                          .withValues(alpha: 0.5),
                                     ),
                                   ),
                                   child: Row(
@@ -269,11 +291,15 @@ class _IncomePageState extends State<IncomePage> {
                                         width: 44,
                                         height: 44,
                                         decoration: BoxDecoration(
-                                          color: iconColor.withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(12),
+                                          color:
+                                              iconColor.withValues(alpha: 0.12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                         child: Icon(
-                                          isReceived ? Icons.check_circle : Icons.schedule,
+                                          isReceived
+                                              ? Icons.check_circle
+                                              : Icons.schedule,
                                           color: iconColor,
                                           size: 22,
                                         ),
@@ -281,21 +307,25 @@ class _IncomePageState extends State<IncomePage> {
                                       const SizedBox(width: 14),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               income.title,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: theme.textTheme.bodyLarge?.copyWith(
+                                              style: theme.textTheme.bodyLarge
+                                                  ?.copyWith(
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                             const SizedBox(height: 2),
                                             Text(
                                               income.typeLabel,
-                                              style: theme.textTheme.bodySmall?.copyWith(
-                                                color: theme.colorScheme.onSurfaceVariant,
+                                              style: theme.textTheme.bodySmall
+                                                  ?.copyWith(
+                                                color: theme.colorScheme
+                                                    .onSurfaceVariant,
                                               ),
                                             ),
                                           ],
@@ -303,11 +333,14 @@ class _IncomePageState extends State<IncomePage> {
                                       ),
                                       const SizedBox(width: 12),
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
                                         children: [
                                           Text(
-                                            CurrencyFormatter.format(income.amount),
-                                            style: theme.textTheme.titleSmall?.copyWith(
+                                            CurrencyFormatter.format(
+                                                income.amount),
+                                            style: theme.textTheme.titleSmall
+                                                ?.copyWith(
                                               fontWeight: FontWeight.w700,
                                               color: Colors.green,
                                             ),
@@ -315,17 +348,28 @@ class _IncomePageState extends State<IncomePage> {
                                           if (!isReceived) ...[
                                             const SizedBox(height: 4),
                                             GestureDetector(
-                                              onTap: () => context.read<IncomeCubit>().markAsReceived(income.id!),
+                                              onTap: () => context
+                                                  .read<IncomeCubit>()
+                                                  .markAsReceived(income.id!),
                                               child: Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 3),
                                                 decoration: BoxDecoration(
-                                                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                                                  borderRadius: BorderRadius.circular(10),
+                                                  color: theme
+                                                      .colorScheme.primary
+                                                      .withValues(alpha: 0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
                                                 ),
                                                 child: Text(
                                                   'Receber',
-                                                  style: theme.textTheme.labelSmall?.copyWith(
-                                                    color: theme.colorScheme.primary,
+                                                  style: theme
+                                                      .textTheme.labelSmall
+                                                      ?.copyWith(
+                                                    color: theme
+                                                        .colorScheme.primary,
                                                     fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
@@ -336,9 +380,14 @@ class _IncomePageState extends State<IncomePage> {
                                       ),
                                       const SizedBox(width: 4),
                                       IconButton(
-                                        icon: Icon(Icons.edit_outlined, size: 18, color: theme.colorScheme.onSurfaceVariant),
-                                        onPressed: () => _showIncomeDialog(editing: income),
-                                        constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
+                                        icon: Icon(Icons.edit_outlined,
+                                            size: 18,
+                                            color: theme
+                                                .colorScheme.onSurfaceVariant),
+                                        onPressed: () =>
+                                            _showIncomeDialog(editing: income),
+                                        constraints: const BoxConstraints(
+                                            maxWidth: 32, maxHeight: 32),
                                         padding: EdgeInsets.zero,
                                       ),
                                     ],

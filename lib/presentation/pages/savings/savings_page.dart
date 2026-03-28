@@ -41,7 +41,8 @@ class _SavingsPageState extends State<SavingsPage> {
       context: context,
       isScrollControlled: true,
       builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+        padding: EdgeInsets.fromLTRB(
+            16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
         child: Form(
           key: formKey,
           child: Column(
@@ -60,14 +61,19 @@ class _SavingsPageState extends State<SavingsPage> {
                 validator: Validators.required,
               ),
               const SizedBox(height: 12),
-              CurrencyTextField(controller: targetCtrl, label: 'Valor alvo', validator: Validators.currency),
+              CurrencyTextField(
+                  controller: targetCtrl,
+                  label: 'Valor alvo',
+                  validator: Validators.currency),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: () {
                   if (!formKey.currentState!.validate()) return;
                   final data = {
                     'title': nameCtrl.text.trim(),
-                    'target_amount': double.tryParse(targetCtrl.text.replaceAll(',', '.')) ?? 0,
+                    'target_amount':
+                        double.tryParse(targetCtrl.text.replaceAll(',', '.')) ??
+                            0,
                   };
                   if (editing != null) {
                     context.read<SavingsCubit>().updateGoal(editing.id!, data);
@@ -92,19 +98,24 @@ class _SavingsPageState extends State<SavingsPage> {
     showModalBottomSheet(
       context: context,
       builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+        padding: EdgeInsets.fromLTRB(
+            16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Adicionar Depósito', style: Theme.of(ctx).textTheme.titleLarge),
+            Text('Adicionar Depósito',
+                style: Theme.of(ctx).textTheme.titleLarge),
             const SizedBox(height: 16),
-            CurrencyTextField(controller: amountCtrl, validator: Validators.currency),
+            CurrencyTextField(
+                controller: amountCtrl, validator: Validators.currency),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: () {
                 context.read<SavingsCubit>().addDeposit(goalId, {
-                  'amount': double.tryParse(amountCtrl.text.replaceAll(',', '.')) ?? 0,
+                  'amount':
+                      double.tryParse(amountCtrl.text.replaceAll(',', '.')) ??
+                          0,
                 });
                 Navigator.pop(ctx);
               },
@@ -184,7 +195,8 @@ class _SavingsPageState extends State<SavingsPage> {
                   Expanded(
                     child: StatCard(
                       title: 'Total Economizado',
-                      value: CurrencyFormatter.format(state.summary!.totalSaved),
+                      value:
+                          CurrencyFormatter.format(state.summary!.totalSaved),
                       icon: Icons.savings,
                       iconColor: Colors.green,
                     ),
@@ -192,7 +204,8 @@ class _SavingsPageState extends State<SavingsPage> {
                   Expanded(
                     child: StatCard(
                       title: 'Meta Total',
-                      value: CurrencyFormatter.format(state.summary!.totalTarget),
+                      value:
+                          CurrencyFormatter.format(state.summary!.totalTarget),
                       icon: Icons.flag,
                       iconColor: theme.colorScheme.primary,
                     ),
@@ -215,15 +228,18 @@ class _SavingsPageState extends State<SavingsPage> {
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                          color:
+                              theme.colorScheme.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(24),
                         ),
-                        child: Icon(Icons.savings, size: 40, color: theme.colorScheme.primary),
+                        child: Icon(Icons.savings,
+                            size: 40, color: theme.colorScheme.primary),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         'Nenhuma meta',
-                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -241,9 +257,8 @@ class _SavingsPageState extends State<SavingsPage> {
                 final progress = goal.targetAmount > 0
                     ? (goal.currentAmount / goal.targetAmount).clamp(0.0, 1.0)
                     : 0.0;
-                final progressColor = progress >= 1.0
-                    ? Colors.green
-                    : theme.colorScheme.primary;
+                final progressColor =
+                    progress >= 1.0 ? Colors.green : theme.colorScheme.primary;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: InkWell(
@@ -267,7 +282,8 @@ class _SavingsPageState extends State<SavingsPage> {
                         color: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                          color: theme.colorScheme.outlineVariant
+                              .withValues(alpha: 0.5),
                         ),
                       ),
                       child: Column(
@@ -282,7 +298,8 @@ class _SavingsPageState extends State<SavingsPage> {
                                   color: progressColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(14),
                                 ),
-                                child: Icon(Icons.savings, color: progressColor, size: 22),
+                                child: Icon(Icons.savings,
+                                    color: progressColor, size: 22),
                               ),
                               const SizedBox(width: 14),
                               Expanded(
@@ -291,7 +308,8 @@ class _SavingsPageState extends State<SavingsPage> {
                                   children: [
                                     Text(
                                       goal.title,
-                                      style: theme.textTheme.titleSmall?.copyWith(
+                                      style:
+                                          theme.textTheme.titleSmall?.copyWith(
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -300,8 +318,10 @@ class _SavingsPageState extends State<SavingsPage> {
                                         padding: const EdgeInsets.only(top: 2),
                                         child: Text(
                                           'Prazo: ${DateFormatter.shortDate(goal.deadline!)}',
-                                          style: theme.textTheme.bodySmall?.copyWith(
-                                            color: theme.colorScheme.onSurfaceVariant,
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                            color: theme
+                                                .colorScheme.onSurfaceVariant,
                                           ),
                                         ),
                                       ),
@@ -309,7 +329,8 @@ class _SavingsPageState extends State<SavingsPage> {
                                 ),
                               ),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: progressColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(20),
@@ -324,9 +345,11 @@ class _SavingsPageState extends State<SavingsPage> {
                               ),
                               const SizedBox(width: 4),
                               IconButton(
-                                icon: Icon(Icons.edit_outlined, size: 18, color: Colors.white54),
+                                icon: Icon(Icons.edit_outlined,
+                                    size: 18, color: Colors.white54),
                                 onPressed: () => _showGoalDialog(editing: goal),
-                                constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
+                                constraints: const BoxConstraints(
+                                    maxWidth: 32, maxHeight: 32),
                                 padding: EdgeInsets.zero,
                               ),
                             ],
@@ -337,7 +360,8 @@ class _SavingsPageState extends State<SavingsPage> {
                             child: LinearProgressIndicator(
                               value: progress,
                               minHeight: 10,
-                              backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                              backgroundColor: theme.colorScheme.primary
+                                  .withValues(alpha: 0.1),
                               color: progressColor,
                             ),
                           ),

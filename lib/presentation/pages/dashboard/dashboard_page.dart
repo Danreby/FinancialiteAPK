@@ -534,8 +534,18 @@ class _MonthlyLineChart extends StatelessWidget {
   const _MonthlyLineChart({required this.data});
 
   static const _months = [
-    'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-    'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+    'Jan',
+    'Fev',
+    'Mar',
+    'Abr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Set',
+    'Out',
+    'Nov',
+    'Dez'
   ];
 
   @override
@@ -557,8 +567,10 @@ class _MonthlyLineChart extends StatelessWidget {
     final debitSpots = <FlSpot>[];
     for (int i = 0; i < chartData.length; i++) {
       final m = chartData[i] as dynamic;
-      creditSpots.add(FlSpot(i.toDouble(), (m.income as double).clamp(0, maxVal)));
-      debitSpots.add(FlSpot(i.toDouble(), (m.expense as double).clamp(0, maxVal)));
+      creditSpots
+          .add(FlSpot(i.toDouble(), (m.income as double).clamp(0, maxVal)));
+      debitSpots
+          .add(FlSpot(i.toDouble(), (m.expense as double).clamp(0, maxVal)));
     }
 
     String _monthLabel(String monthStr) {
@@ -595,8 +607,8 @@ class _MonthlyLineChart extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text('Crédito',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant)),
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
               const SizedBox(width: 16),
               Container(
                 width: 28,
@@ -608,8 +620,8 @@ class _MonthlyLineChart extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text('Débito',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant)),
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
             ],
           ),
           const SizedBox(height: 12),

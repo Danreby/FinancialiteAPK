@@ -52,8 +52,7 @@ class _CardsPageState extends State<CardsPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Novo Cartão',
-                    style: Theme.of(ctx).textTheme.titleLarge),
+                Text('Novo Cartão', style: Theme.of(ctx).textTheme.titleLarge),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<int>(
                   value: selectedCardId,
@@ -67,10 +66,8 @@ class _CardsPageState extends State<CardsPage> {
                             child: Text(c.name),
                           ))
                       .toList(),
-                  validator: (v) =>
-                      v == null ? 'Selecione um cartão' : null,
-                  onChanged: (v) =>
-                      setLocalState(() => selectedCardId = v),
+                  validator: (v) => v == null ? 'Selecione um cartão' : null,
+                  onChanged: (v) => setLocalState(() => selectedCardId = v),
                 ),
                 const SizedBox(height: 12),
                 CurrencyTextField(
@@ -105,7 +102,8 @@ class _CardsPageState extends State<CardsPage> {
                     if (!formKey.currentState!.validate()) return;
                     context.read<CardCubit>().createCard({
                       'card_id': selectedCardId,
-                      'credit_limit': CurrencyTextField.parseValue(limitCtrl.text),
+                      'credit_limit':
+                          CurrencyTextField.parseValue(limitCtrl.text),
                       'closing_day': int.tryParse(closingDayCtrl.text) ?? 1,
                       'due_day': int.tryParse(dueDayCtrl.text) ?? 10,
                     });
@@ -122,8 +120,10 @@ class _CardsPageState extends State<CardsPage> {
   }
 
   void _showEditDialog(CardUser card) {
-    final limitCtrl = TextEditingController(text: card.creditLimit.toStringAsFixed(2));
-    final closingDayCtrl = TextEditingController(text: card.closingDay.toString());
+    final limitCtrl =
+        TextEditingController(text: card.creditLimit.toStringAsFixed(2));
+    final closingDayCtrl =
+        TextEditingController(text: card.closingDay.toString());
     final dueDayCtrl = TextEditingController(text: card.dueDay.toString());
     final formKey = GlobalKey<FormState>();
 
@@ -131,7 +131,8 @@ class _CardsPageState extends State<CardsPage> {
       context: context,
       isScrollControlled: true,
       builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+        padding: EdgeInsets.fromLTRB(
+            16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
         child: Form(
           key: formKey,
           child: Column(
@@ -143,11 +144,14 @@ class _CardsPageState extends State<CardsPage> {
               Text(
                 card.displayName,
                 style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(ctx).colorScheme.onSurfaceVariant,
-                ),
+                      color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                    ),
               ),
               const SizedBox(height: 16),
-              CurrencyTextField(controller: limitCtrl, label: 'Limite', validator: Validators.currency),
+              CurrencyTextField(
+                  controller: limitCtrl,
+                  label: 'Limite',
+                  validator: Validators.currency),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -175,8 +179,10 @@ class _CardsPageState extends State<CardsPage> {
                 onPressed: () {
                   if (!formKey.currentState!.validate()) return;
                   context.read<CardCubit>().updateCard(card.id!, {
-                    'credit_limit': CurrencyTextField.parseValue(limitCtrl.text),
-                    'closing_day': int.tryParse(closingDayCtrl.text) ?? card.closingDay,
+                    'credit_limit':
+                        CurrencyTextField.parseValue(limitCtrl.text),
+                    'closing_day':
+                        int.tryParse(closingDayCtrl.text) ?? card.closingDay,
                     'due_day': int.tryParse(dueDayCtrl.text) ?? card.dueDay,
                   });
                   Navigator.pop(ctx);
@@ -267,12 +273,14 @@ class _CardsPageState extends State<CardsPage> {
                   color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: Icon(Icons.credit_card, size: 40, color: theme.colorScheme.primary),
+                child: Icon(Icons.credit_card,
+                    size: 40, color: theme.colorScheme.primary),
               ),
               const SizedBox(height: 16),
               Text(
                 'Nenhum cartão',
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                style: theme.textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 4),
               Text(
@@ -331,7 +339,8 @@ class _CardsPageState extends State<CardsPage> {
                   confirmText: 'Excluir',
                   confirmColor: theme.colorScheme.error,
                 ),
-                onDismissed: (_) => context.read<CardCubit>().deleteCard(card.id!),
+                onDismissed: (_) =>
+                    context.read<CardCubit>().deleteCard(card.id!),
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -362,7 +371,8 @@ class _CardsPageState extends State<CardsPage> {
                                 color: Colors.white.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Icon(Icons.credit_card, color: Colors.white, size: 22),
+                              child: const Icon(Icons.credit_card,
+                                  color: Colors.white, size: 22),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -375,9 +385,11 @@ class _CardsPageState extends State<CardsPage> {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.edit_outlined, color: Colors.white70, size: 18),
+                              icon: const Icon(Icons.edit_outlined,
+                                  color: Colors.white70, size: 18),
                               onPressed: () => _showEditDialog(card),
-                              constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
+                              constraints: const BoxConstraints(
+                                  maxWidth: 32, maxHeight: 32),
                               padding: EdgeInsets.zero,
                             ),
                             const SizedBox(width: 8),
@@ -440,7 +452,8 @@ class _CardsPageState extends State<CardsPage> {
                           child: LinearProgressIndicator(
                             value: usedPercent / 100,
                             minHeight: 8,
-                            backgroundColor: Colors.white.withValues(alpha: 0.2),
+                            backgroundColor:
+                                Colors.white.withValues(alpha: 0.2),
                             color: usedPercent > 80
                                 ? Colors.redAccent.shade100
                                 : Colors.white.withValues(alpha: 0.9),

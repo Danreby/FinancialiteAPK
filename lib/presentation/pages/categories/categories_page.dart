@@ -302,7 +302,9 @@ class _CategoriesPageState extends State<CategoriesPage>
                           'color': selectedColor,
                         };
                         if (editing != null) {
-                          context.read<CategoryCubit>().updateCategory(editing.id!, data);
+                          context
+                              .read<CategoryCubit>()
+                              .updateCategory(editing.id!, data);
                         } else {
                           context.read<CategoryCubit>().createCategory(data);
                         }
@@ -535,9 +537,13 @@ class _CategoriesPageState extends State<CategoriesPage>
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.edit_outlined, size: 18, color: theme.colorScheme.onSurfaceVariant),
-                        onPressed: () => _showCategoryDialog(editing: cat as Category),
-                        constraints: const BoxConstraints(maxWidth: 36, maxHeight: 36),
+                        icon: Icon(Icons.edit_outlined,
+                            size: 18,
+                            color: theme.colorScheme.onSurfaceVariant),
+                        onPressed: () =>
+                            _showCategoryDialog(editing: cat as Category),
+                        constraints:
+                            const BoxConstraints(maxWidth: 36, maxHeight: 36),
                         padding: EdgeInsets.zero,
                       ),
                     ],

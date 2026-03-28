@@ -31,7 +31,9 @@ class _BillsPageState extends State<BillsPage> {
   }
 
   void _loadData() {
-    context.read<BillCubit>().loadBills(month: DateFormatter.monthKey(_selectedMonth));
+    context
+        .read<BillCubit>()
+        .loadBills(month: DateFormatter.monthKey(_selectedMonth));
   }
 
   Color _statusColor(String status, ThemeData theme) {
@@ -72,7 +74,8 @@ class _BillsPageState extends State<BillsPage> {
       isScrollControlled: true,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setLocalState) => Padding(
-          padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+          padding: EdgeInsets.fromLTRB(
+              16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
           child: Form(
             key: formKey,
             child: Column(
@@ -88,7 +91,10 @@ class _BillsPageState extends State<BillsPage> {
                   validator: Validators.required,
                 ),
                 const SizedBox(height: 12),
-                CurrencyTextField(controller: amountCtrl, label: 'Valor', validator: Validators.currency),
+                CurrencyTextField(
+                    controller: amountCtrl,
+                    label: 'Valor',
+                    validator: Validators.currency),
                 const SizedBox(height: 12),
                 AppTextField(
                   controller: dueDayCtrl,
@@ -107,9 +113,11 @@ class _BillsPageState extends State<BillsPage> {
                   items: const [
                     DropdownMenuItem(value: 'monthly', child: Text('Mensal')),
                     DropdownMenuItem(value: 'yearly', child: Text('Anual')),
-                    DropdownMenuItem(value: 'none', child: Text('Sem recorrência')),
+                    DropdownMenuItem(
+                        value: 'none', child: Text('Sem recorrência')),
                   ],
-                  onChanged: (v) => setLocalState(() => recurrenceType = v ?? 'monthly'),
+                  onChanged: (v) =>
+                      setLocalState(() => recurrenceType = v ?? 'monthly'),
                 ),
                 const SizedBox(height: 16),
                 FilledButton(
@@ -185,9 +193,12 @@ class _BillsPageState extends State<BillsPage> {
             child: BlocBuilder<BillCubit, BillState>(
               builder: (context, state) {
                 if (state is BillLoading) {
-                  return const AppLoadingIndicator(useShimmer: true, shimmerLines: 6);
+                  return const AppLoadingIndicator(
+                      useShimmer: true, shimmerLines: 6);
                 }
-                if (state is BillError) return AppErrorWidget(message: state.message, onRetry: _loadData);
+                if (state is BillError)
+                  return AppErrorWidget(
+                      message: state.message, onRetry: _loadData);
                 if (state is BillLoaded) {
                   if (state.bills.isEmpty) {
                     return EmptyStateWidget(
@@ -228,7 +239,8 @@ class _BillsPageState extends State<BillsPage> {
                                 color: theme.colorScheme.error,
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              child: const Icon(Icons.delete, color: Colors.white),
+                              child:
+                                  const Icon(Icons.delete, color: Colors.white),
                             ),
                             confirmDismiss: (_) => ConfirmDialog.show(
                               context,
@@ -237,7 +249,8 @@ class _BillsPageState extends State<BillsPage> {
                               confirmText: 'Excluir',
                               confirmColor: theme.colorScheme.error,
                             ),
-                            onDismissed: (_) => context.read<BillCubit>().deleteBill(bill.id!),
+                            onDismissed: (_) =>
+                                context.read<BillCubit>().deleteBill(bill.id!),
                             child: GestureDetector(
                               onTap: () {
                                 if (status != 'paid') {
@@ -250,7 +263,8 @@ class _BillsPageState extends State<BillsPage> {
                                   color: theme.colorScheme.surface,
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
-                                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                                    color: theme.colorScheme.outlineVariant
+                                        .withValues(alpha: 0.5),
                                   ),
                                 ),
                                 child: Row(
@@ -262,26 +276,31 @@ class _BillsPageState extends State<BillsPage> {
                                         color: color.withValues(alpha: 0.12),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
-                                      child: Icon(Icons.receipt, color: color, size: 22),
+                                      child: Icon(Icons.receipt,
+                                          color: color, size: 22),
                                     ),
                                     const SizedBox(width: 14),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             bill.title,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: theme.textTheme.bodyLarge?.copyWith(
+                                            style: theme.textTheme.bodyLarge
+                                                ?.copyWith(
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
                                             'Vence: dia ${bill.dueDay}',
-                                            style: theme.textTheme.bodySmall?.copyWith(
-                                              color: theme.colorScheme.onSurfaceVariant,
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                              color: theme
+                                                  .colorScheme.onSurfaceVariant,
                                             ),
                                           ),
                                         ],
@@ -289,24 +308,30 @@ class _BillsPageState extends State<BillsPage> {
                                     ),
                                     const SizedBox(width: 12),
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
                                       children: [
                                         Text(
                                           CurrencyFormatter.format(bill.amount),
-                                          style: theme.textTheme.titleSmall?.copyWith(
+                                          style: theme.textTheme.titleSmall
+                                              ?.copyWith(
                                             fontWeight: FontWeight.w700,
                                           ),
                                         ),
                                         const SizedBox(height: 4),
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 3),
                                           decoration: BoxDecoration(
-                                            color: color.withValues(alpha: 0.12),
-                                            borderRadius: BorderRadius.circular(10),
+                                            color:
+                                                color.withValues(alpha: 0.12),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
                                           ),
                                           child: Text(
                                             _statusLabel(status),
-                                            style: theme.textTheme.labelSmall?.copyWith(
+                                            style: theme.textTheme.labelSmall
+                                                ?.copyWith(
                                               color: color,
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -338,20 +363,25 @@ class _BillsPageState extends State<BillsPage> {
     showModalBottomSheet(
       context: context,
       builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+        padding: EdgeInsets.fromLTRB(
+            16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text('Pagar Conta', style: Theme.of(ctx).textTheme.titleLarge),
             const SizedBox(height: 16),
-            CurrencyTextField(controller: amountCtrl, label: 'Valor do pagamento'),
+            CurrencyTextField(
+                controller: amountCtrl, label: 'Valor do pagamento'),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: () {
                 context.read<BillCubit>().payBill(billId, {
-                  'valor_pago': double.tryParse(amountCtrl.text.replaceAll(',', '.')) ?? amount,
-                  'data_pagamento': DateTime.now().toIso8601String().substring(0, 10),
+                  'valor_pago':
+                      double.tryParse(amountCtrl.text.replaceAll(',', '.')) ??
+                          amount,
+                  'data_pagamento':
+                      DateTime.now().toIso8601String().substring(0, 10),
                 });
                 Navigator.pop(ctx);
               },

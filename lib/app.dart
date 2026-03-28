@@ -27,7 +27,8 @@ class FinancialiteApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => sl<AuthBloc>()..add(const AuthCheckRequested())),
+        BlocProvider(
+            create: (_) => sl<AuthBloc>()..add(const AuthCheckRequested())),
         BlocProvider(create: (_) => sl<ThemeCubit>()),
         BlocProvider(create: (_) => sl<ConnectivityCubit>()),
         BlocProvider(create: (_) => sl<DashboardCubit>()),

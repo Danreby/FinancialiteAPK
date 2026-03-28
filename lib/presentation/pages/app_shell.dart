@@ -111,7 +111,8 @@ class _AppShellState extends State<AppShell> {
                 ),
                 BlocBuilder<NotificationCubit, NotificationState>(
                   builder: (context, state) {
-                    final count = state is NotificationLoaded ? state.unreadCount : 0;
+                    final count =
+                        state is NotificationLoaded ? state.unreadCount : 0;
                     return _NavItem(
                       icon: Icons.more_horiz_rounded,
                       selectedIcon: Icons.more_horiz_rounded,
@@ -151,7 +152,9 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant;
+    final color = isSelected
+        ? theme.colorScheme.primary
+        : theme.colorScheme.onSurfaceVariant;
 
     return GestureDetector(
       onTap: onTap,
@@ -175,7 +178,8 @@ class _NavItem extends StatelessWidget {
                 isLabelVisible: badgeCount > 0,
                 label: Text(
                   '$badgeCount',
-                  style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700),
+                  style:
+                      const TextStyle(fontSize: 9, fontWeight: FontWeight.w700),
                 ),
                 child: Icon(
                   isSelected ? selectedIcon : icon,

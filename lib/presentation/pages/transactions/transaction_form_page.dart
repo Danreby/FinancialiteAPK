@@ -265,7 +265,8 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                   ),
                                   ...cards.map((c) => DropdownMenuItem(
                                         value: c.id,
-                                        child: Text(c.cardName ?? 'Cartão #${c.id}'),
+                                        child: Text(
+                                            c.cardName ?? 'Cartão #${c.id}'),
                                       )),
                                 ],
                                 onChanged: (v) =>

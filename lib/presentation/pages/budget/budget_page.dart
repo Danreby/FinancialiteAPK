@@ -29,7 +29,9 @@ class _BudgetPageState extends State<BudgetPage> {
   }
 
   void _loadData() {
-    context.read<BudgetCubit>().loadBudgets(month: DateFormatter.monthKey(_selectedMonth));
+    context
+        .read<BudgetCubit>()
+        .loadBudgets(month: DateFormatter.monthKey(_selectedMonth));
   }
 
   void _showCreateDialog() {
@@ -40,7 +42,8 @@ class _BudgetPageState extends State<BudgetPage> {
       context: context,
       isScrollControlled: true,
       builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+        padding: EdgeInsets.fromLTRB(
+            16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
         child: Form(
           key: formKey,
           child: Column(
@@ -49,13 +52,17 @@ class _BudgetPageState extends State<BudgetPage> {
             children: [
               Text('Novo Orçamento', style: Theme.of(ctx).textTheme.titleLarge),
               const SizedBox(height: 16),
-              CurrencyTextField(controller: amountCtrl, label: 'Limite mensal', validator: Validators.currency),
+              CurrencyTextField(
+                  controller: amountCtrl,
+                  label: 'Limite mensal',
+                  validator: Validators.currency),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: () {
                   if (!formKey.currentState!.validate()) return;
                   context.read<BudgetCubit>().createBudget({
-                    'monthly_limit': CurrencyTextField.parseValue(amountCtrl.text),
+                    'monthly_limit':
+                        CurrencyTextField.parseValue(amountCtrl.text),
                     'month_year': DateFormatter.monthKey(_selectedMonth),
                   });
                   Navigator.pop(ctx);
@@ -121,9 +128,12 @@ class _BudgetPageState extends State<BudgetPage> {
             child: BlocBuilder<BudgetCubit, BudgetState>(
               builder: (context, state) {
                 if (state is BudgetLoading) {
-                  return const AppLoadingIndicator(useShimmer: true, shimmerLines: 5);
+                  return const AppLoadingIndicator(
+                      useShimmer: true, shimmerLines: 5);
                 }
-                if (state is BudgetError) return AppErrorWidget(message: state.message, onRetry: _loadData);
+                if (state is BudgetError)
+                  return AppErrorWidget(
+                      message: state.message, onRetry: _loadData);
                 if (state is BudgetLoaded) {
                   if (state.budgets.isEmpty) {
                     return EmptyStateWidget(
@@ -155,7 +165,9 @@ class _BudgetPageState extends State<BudgetPage> {
                             ? (spent / budget.monthlyLimit).clamp(0.0, 1.0)
                             : 0.0;
                         final isOver = spent > budget.monthlyLimit;
-                        final progressColor = isOver ? theme.colorScheme.error : theme.colorScheme.primary;
+                        final progressColor = isOver
+                            ? theme.colorScheme.error
+                            : theme.colorScheme.primary;
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: Dismissible(
@@ -168,23 +180,28 @@ class _BudgetPageState extends State<BudgetPage> {
                                 color: theme.colorScheme.error,
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              child: const Icon(Icons.delete, color: Colors.white),
+                              child:
+                                  const Icon(Icons.delete, color: Colors.white),
                             ),
                             confirmDismiss: (_) => ConfirmDialog.show(
                               context,
                               title: 'Excluir orçamento',
-                              message: 'Deseja excluir o orçamento de ${budget.monthYear}?',
+                              message:
+                                  'Deseja excluir o orçamento de ${budget.monthYear}?',
                               confirmText: 'Excluir',
                               confirmColor: theme.colorScheme.error,
                             ),
-                            onDismissed: (_) => context.read<BudgetCubit>().deleteBudget(budget.id!),
+                            onDismissed: (_) => context
+                                .read<BudgetCubit>()
+                                .deleteBudget(budget.id!),
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: theme.colorScheme.surface,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                                  color: theme.colorScheme.outlineVariant
+                                      .withValues(alpha: 0.5),
                                 ),
                               ),
                               child: Column(
@@ -196,8 +213,10 @@ class _BudgetPageState extends State<BudgetPage> {
                                         width: 48,
                                         height: 48,
                                         decoration: BoxDecoration(
-                                          color: progressColor.withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(14),
+                                          color: progressColor.withValues(
+                                              alpha: 0.12),
+                                          borderRadius:
+                                              BorderRadius.circular(14),
                                         ),
                                         child: Icon(
                                           Icons.pie_chart_rounded,
@@ -208,11 +227,13 @@ class _BudgetPageState extends State<BudgetPage> {
                                       const SizedBox(width: 14),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               'Orçamento ${budget.monthYear}',
-                                              style: theme.textTheme.bodyLarge?.copyWith(
+                                              style: theme.textTheme.bodyLarge
+                                                  ?.copyWith(
                                                 fontWeight: FontWeight.w600,
                                               ),
                                               maxLines: 1,
@@ -220,25 +241,33 @@ class _BudgetPageState extends State<BudgetPage> {
                                             ),
                                             const SizedBox(height: 2),
                                             Text(
-                                              isOver ? 'Limite excedido' : 'Dentro do limite',
-                                              style: theme.textTheme.bodySmall?.copyWith(
+                                              isOver
+                                                  ? 'Limite excedido'
+                                                  : 'Dentro do limite',
+                                              style: theme.textTheme.bodySmall
+                                                  ?.copyWith(
                                                 color: isOver
                                                     ? theme.colorScheme.error
-                                                    : theme.colorScheme.onSurfaceVariant,
+                                                    : theme.colorScheme
+                                                        .onSurfaceVariant,
                                               ),
                                             ),
                                           ],
                                         ),
                                       ),
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: progressColor.withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(10),
+                                          color: progressColor.withValues(
+                                              alpha: 0.12),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
                                         child: Text(
                                           '${(progress * 100).toStringAsFixed(0)}%',
-                                          style: theme.textTheme.labelMedium?.copyWith(
+                                          style: theme.textTheme.labelMedium
+                                              ?.copyWith(
                                             color: progressColor,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -253,25 +282,31 @@ class _BudgetPageState extends State<BudgetPage> {
                                       value: progress,
                                       minHeight: 8,
                                       color: progressColor,
-                                      backgroundColor: progressColor.withValues(alpha: 0.12),
+                                      backgroundColor:
+                                          progressColor.withValues(alpha: 0.12),
                                     ),
                                   ),
                                   const SizedBox(height: 12),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         'Gasto: ${CurrencyFormatter.format(spent)}',
-                                        style: theme.textTheme.bodySmall?.copyWith(
+                                        style:
+                                            theme.textTheme.bodySmall?.copyWith(
                                           fontWeight: FontWeight.w600,
-                                          color: theme.colorScheme.onSurfaceVariant,
+                                          color: theme
+                                              .colorScheme.onSurfaceVariant,
                                         ),
                                       ),
                                       Text(
                                         'Limite: ${CurrencyFormatter.format(budget.monthlyLimit)}',
-                                        style: theme.textTheme.bodySmall?.copyWith(
+                                        style:
+                                            theme.textTheme.bodySmall?.copyWith(
                                           fontWeight: FontWeight.w600,
-                                          color: theme.colorScheme.onSurfaceVariant,
+                                          color: theme
+                                              .colorScheme.onSurfaceVariant,
                                         ),
                                       ),
                                     ],
@@ -281,20 +316,31 @@ class _BudgetPageState extends State<BudgetPage> {
                                     Wrap(
                                       spacing: 6,
                                       runSpacing: 6,
-                                      children: (budget.categories ?? []).map((c) => Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Text(
-                                          c.categoryName ?? '',
-                                          style: theme.textTheme.labelSmall?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                            color: theme.colorScheme.onPrimaryContainer,
-                                          ),
-                                        ),
-                                      )).toList(),
+                                      children: (budget.categories ?? [])
+                                          .map((c) => Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: theme.colorScheme
+                                                      .primaryContainer
+                                                      .withValues(alpha: 0.5),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Text(
+                                                  c.categoryName ?? '',
+                                                  style: theme
+                                                      .textTheme.labelSmall
+                                                      ?.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: theme.colorScheme
+                                                        .onPrimaryContainer,
+                                                  ),
+                                                ),
+                                              ))
+                                          .toList(),
                                     ),
                                   ],
                                 ],
