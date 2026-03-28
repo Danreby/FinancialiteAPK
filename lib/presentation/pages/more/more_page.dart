@@ -66,6 +66,9 @@ class MorePage extends StatelessWidget {
           const SizedBox(height: 12),
           _buildSectionContainer(context, [
             _MenuItemData(Icons.trending_up, 'Receitas', const Color(0xFF4CAF50), () => context.push('/income')),
+            _MenuItemData(Icons.receipt_long, 'Faturas', const Color(0xFF10B981), () => context.push('/faturas')),
+            _MenuItemData(Icons.account_balance_wallet_outlined, 'Extrato', const Color(0xFF2196F3), () => context.push('/extract')),
+            _MenuItemData(Icons.show_chart, 'Projeções', const Color(0xFF7C3AED), () => context.push('/projections')),
             _MenuItemData(Icons.savings_outlined, 'Metas de Economia', const Color(0xFF2196F3), () => context.push('/savings')),
             _MenuItemData(Icons.account_balance, 'Contas Bancárias', const Color(0xFF9C27B0), () => context.push('/bank-accounts')),
             _MenuItemData(Icons.credit_card, 'Cartões', const Color(0xFFFF9800), () => context.push('/cards')),

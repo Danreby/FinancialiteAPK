@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../widgets/month_selector.dart';
 
 class ReportsPage extends StatefulWidget {
@@ -50,7 +51,7 @@ class _ReportsPageState extends State<ReportsPage> {
                   color: theme.colorScheme.primary,
                   title: 'Gastos por Categoria',
                   subtitle: 'Veja como seus gastos estão distribuídos',
-                  onTap: () {},
+                  onTap: () => context.push('/reports/categories'),
                 ),
                 const SizedBox(height: 12),
                 _buildReportCard(
@@ -59,7 +60,7 @@ class _ReportsPageState extends State<ReportsPage> {
                   color: Colors.blue,
                   title: 'Comparativo Mensal',
                   subtitle: 'Compare receitas e despesas ao longo dos meses',
-                  onTap: () {},
+                  onTap: () => context.push('/reports/monthly'),
                 ),
                 const SizedBox(height: 12),
                 _buildReportCard(
@@ -68,7 +69,7 @@ class _ReportsPageState extends State<ReportsPage> {
                   color: const Color(0xFF10B981),
                   title: 'Evolução Patrimonial',
                   subtitle: 'Acompanhe a evolução do seu patrimônio',
-                  onTap: () {},
+                  onTap: () => context.push('/reports/evolution'),
                 ),
                 const SizedBox(height: 12),
                 _buildReportCard(
@@ -77,7 +78,7 @@ class _ReportsPageState extends State<ReportsPage> {
                   color: Colors.amber,
                   title: 'Contas a Pagar',
                   subtitle: 'Resumo das contas pendentes e pagas',
-                  onTap: () {},
+                  onTap: () => context.push('/bills'),
                 ),
                 const SizedBox(height: 20),
               ],

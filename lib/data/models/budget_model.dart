@@ -16,8 +16,9 @@ class BudgetModel extends Budget {
 
   factory BudgetModel.fromJson(Map<String, dynamic> json) {
     List<BudgetCategory>? categories;
-    if (json['categories'] != null) {
-      categories = (json['categories'] as List)
+    final rawCategories = json['budget_categories'] ?? json['categories'];
+    if (rawCategories != null) {
+      categories = (rawCategories as List)
           .map((c) => BudgetCategoryModel.fromJson(c))
           .toList();
     }
@@ -87,8 +88,8 @@ class BudgetCategoryModel extends BudgetCategory {
       id: json['id'] as int?,
       budgetId: json['budget_id'] as int,
       categoryId: json['category_id'] as int,
-      limitAmount: (json['limit_amount'] as num).toDouble(),
-      spent: (json['spent'] as num?)?.toDouble(),
+      limitAmount: double.tryParse((json['limit'] ?? json['limit_amount'] ?? 0).toString()) ?? 0.0,
+      spent: double.tryParse((json['spent'] ?? 0).toString()),
       categoryName: json['category']?['name'] as String?,
       categoryIcon: json['category']?['icon'] as String?,
       categoryColor: json['category']?['color'] as String?,

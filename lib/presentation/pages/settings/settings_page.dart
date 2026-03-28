@@ -145,15 +145,13 @@ class SettingsPage extends StatelessWidget {
                                             width: 12,
                                             height: 12,
                                             decoration: BoxDecoration(
-                                              color: themeState.colorSchemeName == 'rose'
-                                                  ? const Color(0xFFE91E63)
-                                                  : const Color(0xFF4CAF50),
+                                              color: theme.colorScheme.primary,
                                               shape: BoxShape.circle,
                                             ),
                                           ),
                                           const SizedBox(width: 6),
                                           Text(
-                                            themeState.colorSchemeName == 'rose' ? 'Rose' : 'Forest',
+                                            _themeLabel(themeState.colorSchemeName),
                                             style: theme.textTheme.bodySmall?.copyWith(
                                               color: theme.colorScheme.onSurfaceVariant,
                                             ),
@@ -327,8 +325,28 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
+  String _themeLabel(String name) {
+    const labels = {
+      'rose': 'Rose',
+      'forest': 'Forest',
+      'black': 'Black',
+      'gold': 'Gold',
+      'lavender': 'Lavender',
+      'midnight': 'Midnight',
+    };
+    return labels[name] ?? name;
+  }
+
   void _showColorSchemeSheet(BuildContext context, String current) {
     final theme = Theme.of(context);
+    final schemes = [
+      ('rose', 'Rose', const Color(0xFFE11D48)),
+      ('forest', 'Forest', const Color(0xFF059669)),
+      ('black', 'Black', const Color(0xFF1F2937)),
+      ('gold', 'Gold', const Color(0xFFD97706)),
+      ('lavender', 'Lavender', const Color(0xFF7C3AED)),
+      ('midnight', 'Midnight', const Color(0xFF1E40AF)),
+    ];
     showModalBottomSheet(
       context: context,
       backgroundColor: theme.colorScheme.surface,
@@ -341,7 +359,6 @@ class SettingsPage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Drag handle
             Center(
               child: Container(
                 width: 40,
@@ -359,97 +376,59 @@ class SettingsPage extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 20),
-            // Rose option
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {
-                  context.read<ThemeCubit>().setColorScheme('rose');
-                  Navigator.pop(ctx);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFE91E63),
-                          shape: BoxShape.circle,
+            const SizedBox(height: 16),
+            ...schemes.asMap().entries.map((entry) {
+              final i = entry.key;
+              final (key, label, color) = entry.value;
+              return Column(
+                children: [
+                  if (i > 0)
+                    Divider(height: 1, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        context.read<ThemeCubit>().setColorScheme(key);
+                        Navigator.pop(ctx);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: color,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                label,
+                                style: Theme.of(ctx).textTheme.bodyLarge?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            Radio<String>(
+                              value: key,
+                              groupValue: current,
+                              onChanged: (v) {
+                                context.read<ThemeCubit>().setColorScheme(v!);
+                                Navigator.pop(ctx);
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Text(
-                          'Rose',
-                          style: Theme.of(ctx).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      Radio<String>(
-                        value: 'rose',
-                        groupValue: current,
-                        onChanged: (v) {
-                          context.read<ThemeCubit>().setColorScheme(v!);
-                          Navigator.pop(ctx);
-                        },
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
-            Divider(
-              height: 1,
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-            ),
-            // Forest option
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {
-                  context.read<ThemeCubit>().setColorScheme('forest');
-                  Navigator.pop(ctx);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF4CAF50),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Text(
-                          'Forest',
-                          style: Theme.of(ctx).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      Radio<String>(
-                        value: 'forest',
-                        groupValue: current,
-                        onChanged: (v) {
-                          context.read<ThemeCubit>().setColorScheme(v!);
-                          Navigator.pop(ctx);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+                ],
+              );
+            }),
           ],
         ),
       ),

@@ -13,6 +13,14 @@ class ThemeState extends Equatable {
     switch (colorSchemeName) {
       case 'forest':
         return AppColorScheme.forest;
+      case 'black':
+        return AppColorScheme.black;
+      case 'gold':
+        return AppColorScheme.gold;
+      case 'lavender':
+        return AppColorScheme.lavender;
+      case 'midnight':
+        return AppColorScheme.midnight;
       case 'rose':
       default:
         return AppColorScheme.rose;

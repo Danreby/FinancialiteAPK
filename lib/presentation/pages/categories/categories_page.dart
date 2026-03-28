@@ -8,6 +8,59 @@ import '../../widgets/confirm_dialog.dart';
 import '../../widgets/app_text_field.dart';
 import '../../../core/utils/validators.dart';
 
+IconData _iconFromName(String? name) {
+  const map = <String, IconData>{
+    'shopping_cart': Icons.shopping_cart,
+    'restaurant': Icons.restaurant,
+    'home': Icons.home,
+    'directions_car': Icons.directions_car,
+    'local_gas_station': Icons.local_gas_station,
+    'credit_card': Icons.credit_card,
+    'health_and_safety': Icons.health_and_safety,
+    'sports_esports': Icons.sports_esports,
+    'school': Icons.school,
+    'commute': Icons.commute,
+    'lightbulb': Icons.lightbulb,
+    'phone': Icons.phone,
+    'smartphone': Icons.smartphone,
+    'wifi': Icons.wifi,
+    'local_hospital': Icons.local_hospital,
+    'fitness_center': Icons.fitness_center,
+    'movie': Icons.movie,
+    'work': Icons.work,
+    'business': Icons.business,
+    'travel_explore': Icons.travel_explore,
+    'savings': Icons.savings,
+    'money': Icons.money,
+    'account_balance': Icons.account_balance,
+    'fastfood': Icons.fastfood,
+    'coffee': Icons.coffee,
+    'flight': Icons.flight,
+    'hotel': Icons.hotel,
+    'pets': Icons.pets,
+    'child_care': Icons.child_care,
+    'subscriptions': Icons.subscriptions,
+    'music_note': Icons.music_note,
+    'book': Icons.book,
+    'sports': Icons.sports,
+    'local_pharmacy': Icons.local_pharmacy,
+    'local_laundry_service': Icons.local_laundry_service,
+    'cleaning_services': Icons.cleaning_services,
+    'construction': Icons.construction,
+    'attach_money': Icons.attach_money,
+  };
+  return map[name] ?? Icons.category;
+}
+
+Color _colorFromHex(String? hex) {
+  if (hex == null || hex.isEmpty) return Colors.grey;
+  try {
+    return Color(int.parse(hex.replaceAll('#', '0xFF')));
+  } catch (_) {
+    return Colors.grey;
+  }
+}
+
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
 
@@ -36,10 +89,25 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
 
   void _showCreateDialog() {
     final nameCtrl = TextEditingController();
-    String type = 'despesa';
-    String? icon;
-    String? color;
+    String type = 'expense';
+    String selectedIcon = 'category';
+    String selectedColor = '#6B7280';
     final formKey = GlobalKey<FormState>();
+
+    final iconOptions = <String>[
+      'shopping_cart', 'restaurant', 'home', 'directions_car',
+      'local_gas_station', 'credit_card', 'health_and_safety',
+      'sports_esports', 'school', 'commute', 'lightbulb', 'smartphone',
+      'fitness_center', 'movie', 'work', 'travel_explore', 'savings',
+      'account_balance', 'fastfood', 'coffee', 'flight', 'hotel',
+      'pets', 'subscriptions', 'music_note', 'book', 'local_pharmacy',
+      'cleaning_services', 'attach_money',
+    ];
+    final colorOptions = <String>[
+      '#E11D48', '#059669', '#3B82F6', '#F59E0B', '#7C3AED',
+      '#1E40AF', '#EC4899', '#14B8A6', '#F97316', '#10B981',
+      '#6B7280', '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16',
+    ];
 
     showModalBottomSheet(
       context: context,
@@ -52,69 +120,127 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
         child: Form(
           key: formKey,
           child: StatefulBuilder(
-            builder: (context, setLocalState) => Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2),
+            builder: (context, setLocalState) => SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
                   ),
-                ),
-                Text(
-                  'Nova Categoria',
-                  style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                AppTextField(
-                  controller: nameCtrl,
-                  label: 'Nome',
-                  prefixIcon: Icons.label,
-                  validator: Validators.required,
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: type,
-                  decoration: const InputDecoration(
-                    labelText: 'Tipo',
-                    prefixIcon: Icon(Icons.category),
-                  ),
-                  items: const [
-                    DropdownMenuItem(value: 'despesa', child: Text('Despesa')),
-                    DropdownMenuItem(value: 'receita', child: Text('Receita')),
-                    DropdownMenuItem(value: 'ambos', child: Text('Ambos')),
-                  ],
-                  onChanged: (v) => setLocalState(() => type = v ?? 'despesa'),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  height: 56,
-                  child: FilledButton(
-                    onPressed: () {
-                      if (!formKey.currentState!.validate()) return;
-                      context.read<CategoryCubit>().createCategory({
-                        'nome': nameCtrl.text.trim(),
-                        'tipo': type,
-                        if (icon != null) 'icone': icon,
-                        if (color != null) 'cor': color,
-                      });
-                      Navigator.pop(ctx);
-                    },
-                    style: FilledButton.styleFrom(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  Text(
+                    'Nova Categoria',
+                    style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
                     ),
-                    child: const Text('Salvar', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  AppTextField(
+                    controller: nameCtrl,
+                    label: 'Nome',
+                    prefixIcon: Icons.label,
+                    validator: Validators.required,
+                    maxLength: 50,
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: type,
+                    decoration: const InputDecoration(
+                      labelText: 'Tipo',
+                      prefixIcon: Icon(Icons.category),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'expense', child: Text('Despesa')),
+                      DropdownMenuItem(value: 'income', child: Text('Receita')),
+                    ],
+                    onChanged: (v) => setLocalState(() => type = v ?? 'expense'),
+                  ),
+                  const SizedBox(height: 16),
+                  Text('Ícone', style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 56,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: iconOptions.length,
+                      itemBuilder: (_, i) {
+                        final ic = iconOptions[i];
+                        final sel = ic == selectedIcon;
+                        return GestureDetector(
+                          onTap: () => setLocalState(() => selectedIcon = ic),
+                          child: Container(
+                            width: 48,
+                            margin: const EdgeInsets.only(right: 8),
+                            decoration: BoxDecoration(
+                              color: sel ? _colorFromHex(selectedColor).withValues(alpha: 0.15) : Colors.grey.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(12),
+                              border: sel ? Border.all(color: _colorFromHex(selectedColor), width: 2) : null,
+                            ),
+                            child: Icon(_iconFromName(ic), size: 22, color: sel ? _colorFromHex(selectedColor) : Colors.grey),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text('Cor', style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 44,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: colorOptions.length,
+                      itemBuilder: (_, i) {
+                        final col = colorOptions[i];
+                        final sel = col == selectedColor;
+                        return GestureDetector(
+                          onTap: () => setLocalState(() => selectedColor = col),
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            margin: const EdgeInsets.only(right: 8),
+                            decoration: BoxDecoration(
+                              color: _colorFromHex(col),
+                              shape: BoxShape.circle,
+                              border: sel ? Border.all(color: Colors.white, width: 2) : null,
+                              boxShadow: sel ? [BoxShadow(color: _colorFromHex(col).withValues(alpha: 0.5), blurRadius: 8)] : null,
+                            ),
+                            child: sel ? const Icon(Icons.check, color: Colors.white, size: 18) : null,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 56,
+                    child: FilledButton(
+                      onPressed: () {
+                        if (!formKey.currentState!.validate()) return;
+                        context.read<CategoryCubit>().createCategory({
+                          'name': nameCtrl.text.trim(),
+                          'type': type,
+                          'icon': selectedIcon,
+                          'color': selectedColor,
+                        });
+                        Navigator.pop(ctx);
+                      },
+                      style: FilledButton.styleFrom(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                      child: const Text('Salvar', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -213,11 +339,11 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                     children: [
                       _buildCategoryList(state.categories, theme),
                       _buildCategoryList(
-                        state.categories.where((c) => c.type == 'despesa' || c.type == 'ambos').toList(),
+                        state.categories.where((c) => c.type == 'expense').toList(),
                         theme,
                       ),
                       _buildCategoryList(
-                        state.categories.where((c) => c.type == 'receita' || c.type == 'ambos').toList(),
+                        state.categories.where((c) => c.type == 'income').toList(),
                         theme,
                       ),
                     ],
@@ -283,14 +409,12 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                          color: _colorFromHex(cat.color).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Icon(
-                          cat.icon != null
-                              ? IconData(int.tryParse(cat.icon!) ?? 0xe14f, fontFamily: 'MaterialIcons')
-                              : Icons.category,
-                          color: theme.colorScheme.primary,
+                          _iconFromName(cat.icon),
+                          color: _colorFromHex(cat.color),
                           size: 22,
                         ),
                       ),
@@ -333,12 +457,10 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
 
   String _typeLabel(String type) {
     switch (type) {
-      case 'despesa':
+      case 'expense':
         return 'Despesa';
-      case 'receita':
+      case 'income':
         return 'Receita';
-      case 'ambos':
-        return 'Ambos';
       default:
         return type;
     }

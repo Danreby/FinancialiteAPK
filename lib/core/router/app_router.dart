@@ -22,6 +22,12 @@ import '../../presentation/pages/notifications/notifications_page.dart';
 import '../../presentation/pages/profile/profile_page.dart';
 import '../../presentation/pages/settings/settings_page.dart';
 import '../../presentation/pages/reports/reports_page.dart';
+import '../../presentation/pages/reports/report_category_page.dart';
+import '../../presentation/pages/reports/report_monthly_page.dart';
+import '../../presentation/pages/reports/report_evolution_page.dart';
+import '../../presentation/pages/faturas/faturas_page.dart';
+import '../../presentation/pages/extract/extract_page.dart';
+import '../../presentation/pages/projections/projections_page.dart';
 
 class AppRouter {
   AppRouter._();
@@ -129,6 +135,30 @@ class AppRouter {
           GoRoute(
             path: '/reports',
             pageBuilder: (context, state) => const NoTransitionPage(child: ReportsPage()),
+          ),
+          GoRoute(
+            path: '/reports/categories',
+            builder: (context, state) => const ReportCategoryPage(),
+          ),
+          GoRoute(
+            path: '/reports/monthly',
+            builder: (context, state) => const ReportMonthlyPage(),
+          ),
+          GoRoute(
+            path: '/reports/evolution',
+            builder: (context, state) => const ReportEvolutionPage(),
+          ),
+          GoRoute(
+            path: '/faturas',
+            builder: (context, state) => const FaturasPage(),
+          ),
+          GoRoute(
+            path: '/extract',
+            builder: (context, state) => const ExtractPage(),
+          ),
+          GoRoute(
+            path: '/projections',
+            builder: (context, state) => const ProjectionsPage(),
           ),
         ],
       ),

@@ -4,8 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../blocs/transaction/transaction_bloc.dart';
 import '../../blocs/category/category_cubit.dart';
 import '../../widgets/app_text_field.dart';
-import '../../widgets/currency_text_field.dart';
-import '../../../core/utils/validators.dart';
+import '../../widgets/currency_text_field.dart';import '../../../core/utils/validators.dart';
 import '../../../domain/entities/category.dart';
 
 class TransactionFormPage extends StatefulWidget {
@@ -21,7 +20,7 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
   final _descriptionController = TextEditingController();
   final _amountController = TextEditingController();
   final _notesController = TextEditingController();
-  String _type = 'despesa';
+  String _type = 'debit';
   int? _categoryId;
   DateTime _date = DateTime.now();
   bool get _isEditing => widget.transactionId != null;
@@ -43,12 +42,12 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     final data = {
-      'descricao': _descriptionController.text.trim(),
-      'valor': double.tryParse(_amountController.text.replaceAll(',', '.')) ?? 0,
-      'tipo': _type,
-      'categoria_id': _categoryId,
-      'data': _date.toIso8601String().substring(0, 10),
-      'observacoes': _notesController.text.trim(),
+      'title': _descriptionController.text.trim(),
+      'amount': CurrencyTextField.parseValue(_amountController.text),
+      'type': _type,
+      'category_id': _categoryId,
+      'date': _date.toIso8601String().substring(0, 10),
+      'description': _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
     };
     if (_isEditing) {
       context.read<TransactionBloc>().add(TransactionUpdated(widget.transactionId!, data));
@@ -108,13 +107,13 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                       children: [
                         Expanded(
                           child: GestureDetector(
-                            onTap: () => setState(() => _type = 'despesa'),
+                            onTap: () => setState(() => _type = 'debit'),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               height: 56,
                               decoration: BoxDecoration(
-                                color: _type == 'despesa'
-                                    ? theme.colorScheme.primary
+                                color: _type == 'debit'
+                                    ? theme.colorScheme.error
                                     : theme.colorScheme.surfaceContainerHighest,
                                 borderRadius: BorderRadius.circular(14),
                               ),
@@ -123,7 +122,7 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                 children: [
                                   Icon(
                                     Icons.arrow_downward,
-                                    color: _type == 'despesa'
+                                    color: _type == 'debit'
                                         ? Colors.white
                                         : theme.colorScheme.onSurfaceVariant,
                                     size: 20,
@@ -132,7 +131,7 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                   Text(
                                     'Despesa',
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: _type == 'despesa'
+                                      color: _type == 'debit'
                                           ? Colors.white
                                           : theme.colorScheme.onSurfaceVariant,
                                       fontWeight: FontWeight.w600,
@@ -146,13 +145,13 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: GestureDetector(
-                            onTap: () => setState(() => _type = 'receita'),
+                            onTap: () => setState(() => _type = 'credit'),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               height: 56,
                               decoration: BoxDecoration(
-                                color: _type == 'receita'
-                                    ? theme.colorScheme.primary
+                                color: _type == 'credit'
+                                    ? const Color(0xFF10B981)
                                     : theme.colorScheme.surfaceContainerHighest,
                                 borderRadius: BorderRadius.circular(14),
                               ),
@@ -161,7 +160,7 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                 children: [
                                   Icon(
                                     Icons.arrow_upward,
-                                    color: _type == 'receita'
+                                    color: _type == 'credit'
                                         ? Colors.white
                                         : theme.colorScheme.onSurfaceVariant,
                                     size: 20,
@@ -170,7 +169,7 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                   Text(
                                     'Receita',
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: _type == 'receita'
+                                      color: _type == 'credit'
                                           ? Colors.white
                                           : theme.colorScheme.onSurfaceVariant,
                                       fontWeight: FontWeight.w600,
@@ -197,10 +196,11 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                         children: [
                           AppTextField(
                             controller: _descriptionController,
-                            label: 'Descrição',
+                            label: 'Título',
                             prefixIcon: Icons.description,
                             validator: Validators.required,
                             textInputAction: TextInputAction.next,
+                            maxLength: 100,
                           ),
                           const SizedBox(height: 16),
                           CurrencyTextField(

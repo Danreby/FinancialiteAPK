@@ -14,7 +14,10 @@ class BudgetCubit extends Cubit<BudgetState> {
     emit(const BudgetLoading());
     try {
       final budgets = await _repository.getBudgets();
-      emit(BudgetLoaded(budgets: budgets));
+      final filtered = month != null
+          ? budgets.where((b) => b.monthYear == month).toList()
+          : budgets;
+      emit(BudgetLoaded(budgets: filtered));
     } catch (e) {
       emit(BudgetError(e.toString()));
     }

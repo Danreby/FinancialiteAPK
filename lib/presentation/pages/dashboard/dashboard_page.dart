@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:go_router/go_router.dart';
 import '../../blocs/dashboard/dashboard_cubit.dart';
 import '../../widgets/app_loading_indicator.dart';
@@ -279,9 +280,22 @@ class _DashboardPageState extends State<DashboardPage> {
             ],
           ),
         ),
-        // Upcoming Bills
-        if (data.upcomingBills.isNotEmpty) ...[
+        // Monthly Chart
+        if (data.monthlyChart.isNotEmpty) ...[
           const SizedBox(height: 28),
+          SectionHeader(
+            title: 'Evolução Mensal',
+            actionText: 'Ver relatórios',
+            onAction: () => context.push('/reports'),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: _MonthlyBarChart(data: data.monthlyChart),
+          ),
+        ],
+        // Upcoming Bills
+        if (data.upcomingBills.isNotEmpty) ...[          const SizedBox(height: 28),
           SectionHeader(
             title: 'Próximas Contas',
             actionText: 'Ver todas',
@@ -503,6 +517,137 @@ class _BalanceRow extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _MonthlyBarChart extends StatelessWidget {
+  final List data;
+  const _MonthlyBarChart({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final incomeColor = const Color(0xFF10B981);
+    final expenseColor = theme.colorScheme.error;
+
+    // Take last 6 months
+    final chartData = data.length > 6 ? data.sublist(data.length - 6) : data;
+    double maxVal = 0;
+    for (final d in chartData) {
+      final m = d as dynamic;
+      if (m.income > maxVal) maxVal = m.income as double;
+      if (m.expense > maxVal) maxVal = m.expense as double;
+    }
+    maxVal = maxVal == 0 ? 1000 : (maxVal * 1.2);
+
+    return Container(
+      height: 220,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+      child: Column(
+        children: [
+          // Legend
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(width: 12, height: 12, decoration: BoxDecoration(color: incomeColor, borderRadius: BorderRadius.circular(3))),
+              const SizedBox(width: 6),
+              Text('Receitas', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+              const SizedBox(width: 16),
+              Container(width: 12, height: 12, decoration: BoxDecoration(color: expenseColor, borderRadius: BorderRadius.circular(3))),
+              const SizedBox(width: 6),
+              Text('Despesas', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Expanded(
+            child: BarChart(
+              BarChartData(
+                alignment: BarChartAlignment.spaceAround,
+                maxY: maxVal,
+                barTouchData: BarTouchData(
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipColor: (_) => theme.colorScheme.surfaceContainerHighest,
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      final m = chartData[groupIndex] as dynamic;
+                      final val = rodIndex == 0 ? m.income as double : m.expense as double;
+                      return BarTooltipItem(
+                        CurrencyFormatter.format(val),
+                        theme.textTheme.labelSmall!.copyWith(
+                          color: rodIndex == 0 ? incomeColor : expenseColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                titlesData: FlTitlesData(
+                  show: true,
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, meta) {
+                        final i = value.toInt();
+                        if (i < 0 || i >= chartData.length) return const SizedBox.shrink();
+                        final m = (chartData[i] as dynamic).month as String;
+                        final parts = m.split('-');
+                        final label = parts.length == 2
+                            ? ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][(int.parse(parts[1]) - 1).clamp(0, 11)]
+                            : m;
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(label, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                        );
+                      },
+                    ),
+                  ),
+                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                ),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  getDrawingHorizontalLine: (_) => FlLine(
+                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    strokeWidth: 1,
+                    dashArray: [4, 4],
+                  ),
+                ),
+                borderData: FlBorderData(show: false),
+                barGroups: List.generate(chartData.length, (i) {
+                  final m = chartData[i] as dynamic;
+                  return BarChartGroupData(
+                    x: i,
+                    barRods: [
+                      BarChartRodData(
+                        toY: (m.income as double).clamp(0, maxVal),
+                        color: incomeColor,
+                        width: 10,
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                      ),
+                      BarChartRodData(
+                        toY: (m.expense as double).clamp(0, maxVal),
+                        color: expenseColor,
+                        width: 10,
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                      ),
+                    ],
+                    barsSpace: 4,
+                  );
+                }),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
