@@ -193,4 +193,18 @@ class TransactionRepositoryImpl extends BaseOfflineRepository
         await api.get(ApiConstants.transactionExport, queryParameters: filters);
     return response.data.toString();
   }
+
+  @override
+  Future<Map<String, dynamic>> getFaturas(
+      {required String month, int? bankUserId, int? categoryId}) async {
+    final params = <String, dynamic>{'month': month};
+    if (bankUserId != null) params['bank_user_id'] = bankUserId;
+    if (categoryId != null) params['category_id'] = categoryId;
+    final response =
+        await api.get(ApiConstants.transactionFaturas, queryParameters: params);
+    final data = response.data is Map<String, dynamic>
+        ? response.data
+        : (response.data['data'] ?? {});
+    return data as Map<String, dynamic>;
+  }
 }

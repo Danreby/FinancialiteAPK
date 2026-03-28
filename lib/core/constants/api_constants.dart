@@ -20,6 +20,7 @@ class ApiConstants {
   static const String transactionTopSpending = '/transacoes/top-spending';
   static const String transactionExport = '/transacoes/export';
   static const String transactionPayMonth = '/transacoes/pay-month';
+  static const String transactionFaturas = '/transacoes/faturas';
 
   static const String incomes = '/incomes';
   static const String incomeSummary = '/incomes/summary';

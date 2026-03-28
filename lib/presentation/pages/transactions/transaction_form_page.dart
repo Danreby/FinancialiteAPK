@@ -32,6 +32,8 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
   int? _cardUserId;
   int? _bankAccountId;
   DateTime _date = DateTime.now();
+  bool _isRecurring = false;
+  final _installmentsController = TextEditingController(text: '1');
   bool _isLoadingTransaction = false;
   bool get _isEditing => widget.transactionId != null;
 
@@ -60,6 +62,8 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
         _categoryId = tx.categoryId;
         _cardUserId = tx.cardUserId;
         _bankAccountId = tx.bankUserId;
+        _isRecurring = tx.isRecurring;
+        _installmentsController.text = tx.installments.toString();
         if (tx.date != null) _date = tx.date!;
         _notesController.text = tx.description ?? '';
         _isLoadingTransaction = false;
@@ -76,6 +80,7 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
     _descriptionController.dispose();
     _amountController.dispose();
     _notesController.dispose();
+    _installmentsController.dispose();
     super.dispose();
   }
 
@@ -87,6 +92,12 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
       'type': _type,
       'category_id': _categoryId,
       'date': _date.toIso8601String().substring(0, 10),
+      'total_installments': _type == 'debit'
+          ? 1
+          : _isRecurring
+              ? 1
+              : int.tryParse(_installmentsController.text) ?? 1,
+      'is_recurring': _type == 'debit' ? false : _isRecurring,
       'description': _notesController.text.trim().isEmpty
           ? null
           : _notesController.text.trim(),
@@ -265,6 +276,59 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                   controller: _amountController,
                                   label: 'Valor',
                                   validator: Validators.currency,
+                                ),
+                                const SizedBox(height: 16),
+                                Opacity(
+                                  opacity: _type != 'debit' && !_isRecurring
+                                      ? 1.0
+                                      : 0.5,
+                                  child: IgnorePointer(
+                                    ignoring: _type == 'debit' || _isRecurring,
+                                    child: AppTextField(
+                                      controller: _installmentsController,
+                                      label: 'Parcelas',
+                                      prefixIcon: Icons.format_list_numbered,
+                                      keyboardType: TextInputType.number,
+                                      readOnly:
+                                          _type == 'debit' || _isRecurring,
+                                      validator: (v) {
+                                        if (_type == 'debit' || _isRecurring)
+                                          return null;
+                                        final n = int.tryParse(v ?? '');
+                                        if (n == null || n < 1)
+                                          return 'Mínimo 1';
+                                        if (n > 360) return 'Máximo 360';
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Transação recorrente',
+                                      style:
+                                          theme.textTheme.bodyMedium?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Switch(
+                                      value: _isRecurring,
+                                      onChanged: _type == 'debit'
+                                          ? null
+                                          : (v) {
+                                              setState(() {
+                                                _isRecurring = v;
+                                                if (v)
+                                                  _installmentsController.text =
+                                                      '1';
+                                              });
+                                            },
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 16),
                                 BlocBuilder<CategoryCubit, CategoryState>(
