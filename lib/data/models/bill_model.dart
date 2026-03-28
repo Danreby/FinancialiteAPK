@@ -27,7 +27,7 @@ class BillModel extends Bill {
     return BillModel(
       id: json['id'] as int?,
       title: json['title'] as String,
-      amount: (json['amount'] as num).toDouble(),
+      amount: double.tryParse(json['amount'].toString()) ?? 0.0,
       dueDay: json['due_day'] as int,
       recurrenceType: json['recurrence_type'] as String? ?? 'monthly',
       isActive: json['is_active'] == true || json['is_active'] == 1,
@@ -38,35 +38,39 @@ class BillModel extends Bill {
       categoryIcon: json['category']?['icon'] as String?,
       categoryColor: json['category']?['color'] as String?,
       lastPayment: lastPayment,
-      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) : null,
-      updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at'].toString()) : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'].toString())
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'].toString())
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'title': title,
-    'amount': amount,
-    'due_day': dueDay,
-    'recurrence_type': recurrenceType,
-    'is_active': isActive,
-    'category_id': categoryId,
-    'description': description,
-  };
+        'title': title,
+        'amount': amount,
+        'due_day': dueDay,
+        'recurrence_type': recurrenceType,
+        'is_active': isActive,
+        'category_id': categoryId,
+        'description': description,
+      };
 
   Map<String, dynamic> toDbMap() => {
-    if (id != null) 'id': id,
-    'title': title,
-    'amount': amount,
-    'due_day': dueDay,
-    'recurrence_type': recurrenceType,
-    'is_active': isActive ? 1 : 0,
-    'category_id': categoryId,
-    'user_id': userId,
-    'description': description,
-    'created_at': createdAt?.toIso8601String(),
-    'updated_at': updatedAt?.toIso8601String(),
-    'synced': 0,
-  };
+        if (id != null) 'id': id,
+        'title': title,
+        'amount': amount,
+        'due_day': dueDay,
+        'recurrence_type': recurrenceType,
+        'is_active': isActive ? 1 : 0,
+        'category_id': categoryId,
+        'user_id': userId,
+        'description': description,
+        'created_at': createdAt?.toIso8601String(),
+        'updated_at': updatedAt?.toIso8601String(),
+        'synced': 0,
+      };
 
   factory BillModel.fromDb(Map<String, dynamic> map) {
     return BillModel(
@@ -79,8 +83,12 @@ class BillModel extends Bill {
       categoryId: map['category_id'] as int?,
       userId: map['user_id'] as int,
       description: map['description'] as String?,
-      createdAt: map['created_at'] != null ? DateTime.tryParse(map['created_at'].toString()) : null,
-      updatedAt: map['updated_at'] != null ? DateTime.tryParse(map['updated_at'].toString()) : null,
+      createdAt: map['created_at'] != null
+          ? DateTime.tryParse(map['created_at'].toString())
+          : null,
+      updatedAt: map['updated_at'] != null
+          ? DateTime.tryParse(map['updated_at'].toString())
+          : null,
     );
   }
 }
@@ -99,9 +107,13 @@ class BillPaymentModel extends BillPayment {
     return BillPaymentModel(
       id: json['id'] as int?,
       billId: json['bill_id'] as int,
-      amount: (json['amount'] as num).toDouble(),
-      dueDate: json['due_date'] != null ? DateTime.tryParse(json['due_date'].toString()) : null,
-      paidDate: json['paid_date'] != null ? DateTime.tryParse(json['paid_date'].toString()) : null,
+      amount: double.tryParse(json['amount'].toString()) ?? 0.0,
+      dueDate: json['due_date'] != null
+          ? DateTime.tryParse(json['due_date'].toString())
+          : null,
+      paidDate: json['paid_date'] != null
+          ? DateTime.tryParse(json['paid_date'].toString())
+          : null,
       status: json['status'] as String? ?? 'pending',
     );
   }

@@ -17,36 +17,42 @@ class BudgetModel extends Budget {
   factory BudgetModel.fromJson(Map<String, dynamic> json) {
     List<BudgetCategory>? categories;
     if (json['categories'] != null) {
-      categories = (json['categories'] as List).map((c) => BudgetCategoryModel.fromJson(c)).toList();
+      categories = (json['categories'] as List)
+          .map((c) => BudgetCategoryModel.fromJson(c))
+          .toList();
     }
     return BudgetModel(
       id: json['id'] as int?,
-      monthlyLimit: (json['monthly_limit'] as num).toDouble(),
+      monthlyLimit: double.tryParse(json['monthly_limit'].toString()) ?? 0.0,
       monthYear: json['month_year'] as String,
       userId: json['user_id'] as int,
       totalSpent: (json['total_spent'] as num?)?.toDouble(),
       remaining: (json['remaining'] as num?)?.toDouble(),
       percentage: (json['percentage'] as num?)?.toDouble(),
       categories: categories,
-      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) : null,
-      updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at'].toString()) : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'].toString())
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'].toString())
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'monthly_limit': monthlyLimit,
-    'month_year': monthYear,
-  };
+        'monthly_limit': monthlyLimit,
+        'month_year': monthYear,
+      };
 
   Map<String, dynamic> toDbMap() => {
-    if (id != null) 'id': id,
-    'monthly_limit': monthlyLimit,
-    'month_year': monthYear,
-    'user_id': userId,
-    'created_at': createdAt?.toIso8601String(),
-    'updated_at': updatedAt?.toIso8601String(),
-    'synced': 0,
-  };
+        if (id != null) 'id': id,
+        'monthly_limit': monthlyLimit,
+        'month_year': monthYear,
+        'user_id': userId,
+        'created_at': createdAt?.toIso8601String(),
+        'updated_at': updatedAt?.toIso8601String(),
+        'synced': 0,
+      };
 
   factory BudgetModel.fromDb(Map<String, dynamic> map) {
     return BudgetModel(
@@ -54,8 +60,12 @@ class BudgetModel extends Budget {
       monthlyLimit: (map['monthly_limit'] as num).toDouble(),
       monthYear: map['month_year'] as String,
       userId: map['user_id'] as int,
-      createdAt: map['created_at'] != null ? DateTime.tryParse(map['created_at'].toString()) : null,
-      updatedAt: map['updated_at'] != null ? DateTime.tryParse(map['updated_at'].toString()) : null,
+      createdAt: map['created_at'] != null
+          ? DateTime.tryParse(map['created_at'].toString())
+          : null,
+      updatedAt: map['updated_at'] != null
+          ? DateTime.tryParse(map['updated_at'].toString())
+          : null,
     );
   }
 }
