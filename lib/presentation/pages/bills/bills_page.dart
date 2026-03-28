@@ -36,11 +36,11 @@ class _BillsPageState extends State<BillsPage> {
 
   Color _statusColor(String status, ThemeData theme) {
     switch (status) {
-      case 'pago':
+      case 'paid':
         return Colors.green;
-      case 'vencido':
+      case 'overdue':
         return theme.colorScheme.error;
-      case 'parcialmente_pago':
+      case 'partial':
         return Colors.orange;
       default:
         return theme.colorScheme.primary;
@@ -49,11 +49,11 @@ class _BillsPageState extends State<BillsPage> {
 
   String _statusLabel(String status) {
     switch (status) {
-      case 'pago':
+      case 'paid':
         return 'Pago';
-      case 'vencido':
+      case 'overdue':
         return 'Vencido';
-      case 'parcialmente_pago':
+      case 'partial':
         return 'Parcial';
       default:
         return 'Pendente';
@@ -61,66 +61,72 @@ class _BillsPageState extends State<BillsPage> {
   }
 
   void _showCreateDialog() {
-    final descCtrl = TextEditingController();
+    final titleCtrl = TextEditingController();
     final amountCtrl = TextEditingController();
-    DateTime dueDate = DateTime.now();
+    final dueDayCtrl = TextEditingController();
+    String recurrenceType = 'monthly';
     final formKey = GlobalKey<FormState>();
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text('Nova Conta', style: Theme.of(ctx).textTheme.titleLarge),
-              const SizedBox(height: 16),
-              AppTextField(
-                controller: descCtrl,
-                label: 'Descrição',
-                prefixIcon: Icons.description,
-                validator: Validators.required,
-              ),
-              const SizedBox(height: 12),
-              CurrencyTextField(controller: amountCtrl, validator: Validators.currency),
-              const SizedBox(height: 12),
-              StatefulBuilder(
-                builder: (context, setLocalState) => AppTextField(
-                  label: 'Vencimento',
-                  prefixIcon: Icons.calendar_today,
-                  readOnly: true,
-                  controller: TextEditingController(
-                    text: DateFormatter.shortDate(dueDate),
-                  ),
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: dueDate,
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2030),
-                    );
-                    if (picked != null) setLocalState(() => dueDate = picked);
-                  },
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setLocalState) => Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('Nova Conta', style: Theme.of(ctx).textTheme.titleLarge),
+                const SizedBox(height: 16),
+                AppTextField(
+                  controller: titleCtrl,
+                  label: 'Título',
+                  prefixIcon: Icons.description,
+                  validator: Validators.required,
                 ),
-              ),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: () {
-                  if (!formKey.currentState!.validate()) return;
-                  context.read<BillCubit>().createBill({
-                    'descricao': descCtrl.text.trim(),
-                    'valor': double.tryParse(amountCtrl.text.replaceAll(',', '.')) ?? 0,
-                    'data_vencimento': dueDate.toIso8601String().substring(0, 10),
-                  });
-                  Navigator.pop(ctx);
-                },
-                child: const Text('Salvar'),
-              ),
-            ],
+                const SizedBox(height: 12),
+                CurrencyTextField(controller: amountCtrl, label: 'Valor', validator: Validators.currency),
+                const SizedBox(height: 12),
+                AppTextField(
+                  controller: dueDayCtrl,
+                  label: 'Dia do vencimento (1-31)',
+                  prefixIcon: Icons.calendar_today,
+                  keyboardType: TextInputType.number,
+                  validator: Validators.dayOfMonth,
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: recurrenceType,
+                  decoration: const InputDecoration(
+                    labelText: 'Recorrência',
+                    prefixIcon: Icon(Icons.repeat),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'monthly', child: Text('Mensal')),
+                    DropdownMenuItem(value: 'yearly', child: Text('Anual')),
+                    DropdownMenuItem(value: 'none', child: Text('Sem recorrência')),
+                  ],
+                  onChanged: (v) => setLocalState(() => recurrenceType = v ?? 'monthly'),
+                ),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: () {
+                    if (!formKey.currentState!.validate()) return;
+                    context.read<BillCubit>().createBill({
+                      'title': titleCtrl.text.trim(),
+                      'amount': CurrencyTextField.parseValue(amountCtrl.text),
+                      'due_day': int.tryParse(dueDayCtrl.text) ?? 1,
+                      'recurrence_type': recurrenceType,
+                    });
+                    Navigator.pop(ctx);
+                  },
+                  child: const Text('Salvar'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -208,7 +214,7 @@ class _BillsPageState extends State<BillsPage> {
                           );
                         }
                         final bill = state.bills[index - 1];
-                        final status = bill.lastPayment?.status ?? 'pendente';
+                        final status = bill.lastPayment?.status ?? 'pending';
                         final color = _statusColor(status, theme);
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
@@ -234,7 +240,7 @@ class _BillsPageState extends State<BillsPage> {
                             onDismissed: (_) => context.read<BillCubit>().deleteBill(bill.id!),
                             child: GestureDetector(
                               onTap: () {
-                                if (status != 'pago') {
+                                if (status != 'paid') {
                                   _showPayDialog(bill.id!, bill.amount);
                                 }
                               },

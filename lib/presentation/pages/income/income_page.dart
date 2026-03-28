@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/income/income_cubit.dart';
+import '../../../domain/entities/income.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
@@ -34,10 +35,13 @@ class _IncomePageState extends State<IncomePage> {
     context.read<IncomeCubit>().loadIncomes(month: DateFormatter.monthKey(_selectedMonth));
   }
 
-  void _showCreateDialog() {
-    final descCtrl = TextEditingController();
-    final amountCtrl = TextEditingController();
-    DateTime date = DateTime.now();
+  void _showIncomeDialog({Income? editing}) {
+    final titleCtrl = TextEditingController(text: editing?.title ?? '');
+    final amountCtrl = TextEditingController(
+      text: editing != null ? editing.amount.toStringAsFixed(2) : '',
+    );
+    String incomeType = editing?.type ?? 'salary';
+    DateTime date = editing?.createdAt ?? DateTime.now();
     final formKey = GlobalKey<FormState>();
 
     showModalBottomSheet(
@@ -47,23 +51,44 @@ class _IncomePageState extends State<IncomePage> {
         padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
         child: Form(
           key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text('Nova Receita', style: Theme.of(ctx).textTheme.titleLarge),
-              const SizedBox(height: 16),
-              AppTextField(
-                controller: descCtrl,
-                label: 'Descrição',
-                prefixIcon: Icons.description,
-                validator: Validators.required,
-              ),
-              const SizedBox(height: 12),
-              CurrencyTextField(controller: amountCtrl, validator: Validators.currency),
-              const SizedBox(height: 12),
-              StatefulBuilder(
-                builder: (context, setLocalState) => AppTextField(
+          child: StatefulBuilder(
+            builder: (context, setLocalState) => Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  editing != null ? 'Editar Receita' : 'Nova Receita',
+                  style: Theme.of(ctx).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 16),
+                AppTextField(
+                  controller: titleCtrl,
+                  label: 'Título',
+                  prefixIcon: Icons.description,
+                  validator: Validators.required,
+                ),
+                const SizedBox(height: 12),
+                CurrencyTextField(controller: amountCtrl, validator: Validators.currency),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: incomeType,
+                  decoration: const InputDecoration(
+                    labelText: 'Tipo',
+                    prefixIcon: Icon(Icons.category_outlined),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'salary', child: Text('Salário')),
+                    DropdownMenuItem(value: 'freelance', child: Text('Freelance')),
+                    DropdownMenuItem(value: 'investment', child: Text('Investimento')),
+                    DropdownMenuItem(value: 'rental', child: Text('Aluguel')),
+                    DropdownMenuItem(value: 'benefit', child: Text('Benefício')),
+                    DropdownMenuItem(value: 'pix', child: Text('Pix')),
+                    DropdownMenuItem(value: 'other', child: Text('Outro')),
+                  ],
+                  onChanged: (v) => setLocalState(() => incomeType = v ?? 'salary'),
+                ),
+                const SizedBox(height: 12),
+                AppTextField(
                   label: 'Data',
                   prefixIcon: Icons.calendar_today,
                   readOnly: true,
@@ -78,26 +103,35 @@ class _IncomePageState extends State<IncomePage> {
                     if (picked != null) setLocalState(() => date = picked);
                   },
                 ),
-              ),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: () {
-                  if (!formKey.currentState!.validate()) return;
-                  context.read<IncomeCubit>().createIncome({
-                    'descricao': descCtrl.text.trim(),
-                    'valor': double.tryParse(amountCtrl.text.replaceAll(',', '.')) ?? 0,
-                    'data': date.toIso8601String().substring(0, 10),
-                  });
-                  Navigator.pop(ctx);
-                },
-                child: const Text('Salvar'),
-              ),
-            ],
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: () {
+                    if (!formKey.currentState!.validate()) return;
+                    final data = {
+                      'title': titleCtrl.text.trim(),
+                      'amount': double.tryParse(amountCtrl.text.replaceAll(',', '.')) ?? 0,
+                      'type': incomeType,
+                      'is_recurring': false,
+                      'received_at': date.toIso8601String().substring(0, 10),
+                    };
+                    if (editing != null) {
+                      context.read<IncomeCubit>().updateIncome(editing.id!, data);
+                    } else {
+                      context.read<IncomeCubit>().createIncome(data);
+                    }
+                    Navigator.pop(ctx);
+                  },
+                  child: const Text('Salvar'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
+  void _showCreateDialog() => _showIncomeDialog();
 
   @override
   Widget build(BuildContext context) {
@@ -299,6 +333,13 @@ class _IncomePageState extends State<IncomePage> {
                                             ),
                                           ],
                                         ],
+                                      ),
+                                      const SizedBox(width: 4),
+                                      IconButton(
+                                        icon: Icon(Icons.edit_outlined, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                                        onPressed: () => _showIncomeDialog(editing: income),
+                                        constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
+                                        padding: EdgeInsets.zero,
                                       ),
                                     ],
                                   ),

@@ -25,7 +25,7 @@ class _AppShellState extends State<AppShell> {
     if (location.startsWith('/dashboard')) return 0;
     if (location.startsWith('/transactions')) return 1;
     if (location.startsWith('/bills')) return 2;
-    if (location.startsWith('/budget')) return 3;
+    if (location.startsWith('/faturas')) return 3;
     if (location.startsWith('/more')) return 4;
     return 0;
   }
@@ -42,7 +42,7 @@ class _AppShellState extends State<AppShell> {
         context.go('/bills');
         break;
       case 3:
-        context.go('/budget');
+        context.go('/faturas');
         break;
       case 4:
         context.go('/more');
@@ -103,9 +103,9 @@ class _AppShellState extends State<AppShell> {
                   onTap: () => _onItemTapped(2),
                 ),
                 _NavItem(
-                  icon: Icons.pie_chart_outline_rounded,
-                  selectedIcon: Icons.pie_chart_rounded,
-                  label: 'Orçamento',
+                  icon: Icons.credit_card_outlined,
+                  selectedIcon: Icons.credit_card_rounded,
+                  label: 'Faturas',
                   isSelected: selectedIndex == 3,
                   onTap: () => _onItemTapped(3),
                 ),

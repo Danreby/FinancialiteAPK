@@ -10,6 +10,7 @@ import '../../widgets/currency_text_field.dart';
 import '../../widgets/section_header.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
+import '../../../domain/entities/card_entity.dart';
 
 class CardsPage extends StatefulWidget {
   const CardsPage({super.key});
@@ -28,10 +29,102 @@ class _CardsPageState extends State<CardsPage> {
   void _loadData() => context.read<CardCubit>().loadCards();
 
   void _showCreateDialog() {
-    final nameCtrl = TextEditingController();
+    int? selectedCardId;
     final limitCtrl = TextEditingController();
     final closingDayCtrl = TextEditingController();
     final dueDayCtrl = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    final cardState = context.read<CardCubit>().state;
+    final availableCards =
+        cardState is CardLoaded ? cardState.availableCards : <CardEntity>[];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setLocalState) => Padding(
+          padding: EdgeInsets.fromLTRB(
+              16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('Novo Cartão',
+                    style: Theme.of(ctx).textTheme.titleLarge),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<int>(
+                  value: selectedCardId,
+                  decoration: const InputDecoration(
+                    labelText: 'Selecione o cartão',
+                    prefixIcon: Icon(Icons.credit_card),
+                  ),
+                  items: availableCards
+                      .map((c) => DropdownMenuItem(
+                            value: c.id,
+                            child: Text(c.name),
+                          ))
+                      .toList(),
+                  validator: (v) =>
+                      v == null ? 'Selecione um cartão' : null,
+                  onChanged: (v) =>
+                      setLocalState(() => selectedCardId = v),
+                ),
+                const SizedBox(height: 12),
+                CurrencyTextField(
+                    controller: limitCtrl,
+                    label: 'Limite',
+                    validator: Validators.currency),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppTextField(
+                        controller: closingDayCtrl,
+                        label: 'Dia do fechamento',
+                        keyboardType: TextInputType.number,
+                        validator: Validators.dayOfMonth,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: AppTextField(
+                        controller: dueDayCtrl,
+                        label: 'Dia do vencimento',
+                        keyboardType: TextInputType.number,
+                        validator: Validators.dayOfMonth,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: () {
+                    if (!formKey.currentState!.validate()) return;
+                    context.read<CardCubit>().createCard({
+                      'card_id': selectedCardId,
+                      'credit_limit': CurrencyTextField.parseValue(limitCtrl.text),
+                      'closing_day': int.tryParse(closingDayCtrl.text) ?? 1,
+                      'due_day': int.tryParse(dueDayCtrl.text) ?? 10,
+                    });
+                    Navigator.pop(ctx);
+                  },
+                  child: const Text('Salvar'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showEditDialog(CardUser card) {
+    final limitCtrl = TextEditingController(text: card.creditLimit.toStringAsFixed(2));
+    final closingDayCtrl = TextEditingController(text: card.closingDay.toString());
+    final dueDayCtrl = TextEditingController(text: card.dueDay.toString());
     final formKey = GlobalKey<FormState>();
 
     showModalBottomSheet(
@@ -45,15 +138,15 @@ class _CardsPageState extends State<CardsPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Novo Cartão', style: Theme.of(ctx).textTheme.titleLarge),
-              const SizedBox(height: 16),
-              AppTextField(
-                controller: nameCtrl,
-                label: 'Nome do cartão',
-                prefixIcon: Icons.credit_card,
-                validator: Validators.required,
+              Text('Editar Cartão', style: Theme.of(ctx).textTheme.titleLarge),
+              const SizedBox(height: 4),
+              Text(
+                card.displayName,
+                style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               CurrencyTextField(controller: limitCtrl, label: 'Limite', validator: Validators.currency),
               const SizedBox(height: 12),
               Row(
@@ -81,11 +174,10 @@ class _CardsPageState extends State<CardsPage> {
               FilledButton(
                 onPressed: () {
                   if (!formKey.currentState!.validate()) return;
-                  context.read<CardCubit>().createCard({
-                    'nome': nameCtrl.text.trim(),
-                    'limite': double.tryParse(limitCtrl.text.replaceAll(',', '.')) ?? 0,
-                    'dia_fechamento': int.tryParse(closingDayCtrl.text) ?? 1,
-                    'dia_vencimento': int.tryParse(dueDayCtrl.text) ?? 10,
+                  context.read<CardCubit>().updateCard(card.id!, {
+                    'credit_limit': CurrencyTextField.parseValue(limitCtrl.text),
+                    'closing_day': int.tryParse(closingDayCtrl.text) ?? card.closingDay,
+                    'due_day': int.tryParse(dueDayCtrl.text) ?? card.dueDay,
                   });
                   Navigator.pop(ctx);
                 },
@@ -282,6 +374,13 @@ class _CardsPageState extends State<CardsPage> {
                                 ),
                               ),
                             ),
+                            IconButton(
+                              icon: const Icon(Icons.edit_outlined, color: Colors.white70, size: 18),
+                              onPressed: () => _showEditDialog(card),
+                              constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
+                              padding: EdgeInsets.zero,
+                            ),
+                            const SizedBox(width: 8),
                             Container(
                               width: 40,
                               height: 30,

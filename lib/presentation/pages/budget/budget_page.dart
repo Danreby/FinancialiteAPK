@@ -6,7 +6,6 @@ import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/month_selector.dart';
 import '../../widgets/confirm_dialog.dart';
-import '../../widgets/app_text_field.dart';
 import '../../widgets/currency_text_field.dart';
 import '../../widgets/section_header.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -34,7 +33,6 @@ class _BudgetPageState extends State<BudgetPage> {
   }
 
   void _showCreateDialog() {
-    final nameCtrl = TextEditingController();
     final amountCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
@@ -51,22 +49,14 @@ class _BudgetPageState extends State<BudgetPage> {
             children: [
               Text('Novo Orçamento', style: Theme.of(ctx).textTheme.titleLarge),
               const SizedBox(height: 16),
-              AppTextField(
-                controller: nameCtrl,
-                label: 'Nome',
-                prefixIcon: Icons.label,
-                validator: Validators.required,
-              ),
-              const SizedBox(height: 12),
-              CurrencyTextField(controller: amountCtrl, label: 'Limite', validator: Validators.currency),
+              CurrencyTextField(controller: amountCtrl, label: 'Limite mensal', validator: Validators.currency),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: () {
                   if (!formKey.currentState!.validate()) return;
                   context.read<BudgetCubit>().createBudget({
-                    'nome': nameCtrl.text.trim(),
-                    'valor_limite': double.tryParse(amountCtrl.text.replaceAll(',', '.')) ?? 0,
-                    'mes': DateFormatter.monthKey(_selectedMonth),
+                    'monthly_limit': CurrencyTextField.parseValue(amountCtrl.text),
+                    'month_year': DateFormatter.monthKey(_selectedMonth),
                   });
                   Navigator.pop(ctx);
                 },

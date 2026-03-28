@@ -3,10 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../blocs/transaction/transaction_bloc.dart';
 import '../../blocs/category/category_cubit.dart';
+import '../../blocs/card/card_cubit.dart';
+import '../../blocs/bank/bank_cubit.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/currency_text_field.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/category.dart';
+import '../../../domain/entities/card_entity.dart';
+import '../../../domain/entities/bank_account.dart';
 
 class TransactionFormPage extends StatefulWidget {
   final int? transactionId;
@@ -23,6 +27,8 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
   final _notesController = TextEditingController();
   String _type = 'debit';
   int? _categoryId;
+  int? _cardUserId;
+  int? _bankAccountId;
   DateTime _date = DateTime.now();
   bool get _isEditing => widget.transactionId != null;
 
@@ -30,6 +36,8 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
   void initState() {
     super.initState();
     context.read<CategoryCubit>().loadCategories();
+    context.read<CardCubit>().loadCards();
+    context.read<BankCubit>().loadAccounts();
   }
 
   @override
@@ -51,6 +59,7 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
       'description': _notesController.text.trim().isEmpty
           ? null
           : _notesController.text.trim(),
+      if (_cardUserId != null) 'bank_user_id': _cardUserId,
     };
     if (_isEditing) {
       context
@@ -234,6 +243,60 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                     .toList(),
                                 onChanged: (v) =>
                                     setState(() => _categoryId = v),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          BlocBuilder<CardCubit, CardState>(
+                            builder: (context, state) {
+                              final cards = state is CardLoaded
+                                  ? state.cards
+                                  : <CardUser>[];
+                              return DropdownButtonFormField<int>(
+                                value: _cardUserId,
+                                decoration: const InputDecoration(
+                                  labelText: 'Cartão (opcional)',
+                                  prefixIcon: Icon(Icons.credit_card),
+                                ),
+                                items: [
+                                  const DropdownMenuItem<int>(
+                                    value: null,
+                                    child: Text('Nenhum'),
+                                  ),
+                                  ...cards.map((c) => DropdownMenuItem(
+                                        value: c.id,
+                                        child: Text(c.cardName ?? 'Cartão #${c.id}'),
+                                      )),
+                                ],
+                                onChanged: (v) =>
+                                    setState(() => _cardUserId = v),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          BlocBuilder<BankCubit, BankState>(
+                            builder: (context, state) {
+                              final accounts = state is BankLoaded
+                                  ? state.accounts
+                                  : <BankAccount>[];
+                              return DropdownButtonFormField<int>(
+                                value: _bankAccountId,
+                                decoration: const InputDecoration(
+                                  labelText: 'Banco (opcional)',
+                                  prefixIcon: Icon(Icons.account_balance),
+                                ),
+                                items: [
+                                  const DropdownMenuItem<int>(
+                                    value: null,
+                                    child: Text('Nenhum'),
+                                  ),
+                                  ...accounts.map((a) => DropdownMenuItem(
+                                        value: a.id,
+                                        child: Text(a.displayName),
+                                      )),
+                                ],
+                                onChanged: (v) =>
+                                    setState(() => _bankAccountId = v),
                               );
                             },
                           ),

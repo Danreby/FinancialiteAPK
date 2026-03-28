@@ -18,6 +18,7 @@ import 'presentation/blocs/card/card_cubit.dart';
 import 'presentation/blocs/category/category_cubit.dart';
 import 'presentation/blocs/notification/notification_cubit.dart';
 import 'presentation/blocs/profile/profile_cubit.dart';
+import 'presentation/blocs/projections/projections_cubit.dart';
 
 class FinancialiteApp extends StatelessWidget {
   const FinancialiteApp({super.key});
@@ -40,6 +41,7 @@ class FinancialiteApp extends StatelessWidget {
         BlocProvider(create: (_) => sl<CategoryCubit>()),
         BlocProvider(create: (_) => sl<NotificationCubit>()),
         BlocProvider(create: (_) => sl<ProfileCubit>()),
+        BlocProvider(create: (_) => sl<ProjectionsCubit>()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, themeState) {

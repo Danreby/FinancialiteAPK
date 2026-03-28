@@ -228,7 +228,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   children: [
                     Expanded(
                       child: _BalanceRow(
-                        label: 'Receitas',
+                        label: 'Crédito',
                         value: CurrencyFormatter.format(data.totalIncome),
                         icon: Icons.arrow_upward_rounded,
                         color: const Color(0xFF34D399),
@@ -241,7 +241,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     Expanded(
                       child: _BalanceRow(
-                        label: 'Despesas',
+                        label: 'Débito',
                         value: CurrencyFormatter.format(data.totalExpense),
                         icon: Icons.arrow_downward_rounded,
                         color: const Color(0xFFFB7185),
@@ -292,7 +292,7 @@ class _DashboardPageState extends State<DashboardPage> {
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: _MonthlyBarChart(data: data.monthlyChart),
+            child: _MonthlyLineChart(data: data.monthlyChart),
           ),
         ],
         // Upcoming Bills
@@ -529,28 +529,49 @@ class _BalanceRow extends StatelessWidget {
   }
 }
 
-class _MonthlyBarChart extends StatelessWidget {
+class _MonthlyLineChart extends StatelessWidget {
   final List data;
-  const _MonthlyBarChart({required this.data});
+  const _MonthlyLineChart({required this.data});
+
+  static const _months = [
+    'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+    'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+  ];
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final incomeColor = const Color(0xFF10B981);
-    final expenseColor = theme.colorScheme.error;
+    final creditColor = const Color(0xFF10B981);
+    final debitColor = theme.colorScheme.error;
 
-    // Take last 6 months
     final chartData = data.length > 6 ? data.sublist(data.length - 6) : data;
     double maxVal = 0;
     for (final d in chartData) {
       final m = d as dynamic;
-      if (m.income > maxVal) maxVal = m.income as double;
-      if (m.expense > maxVal) maxVal = m.expense as double;
+      if ((m.income as double) > maxVal) maxVal = m.income as double;
+      if ((m.expense as double) > maxVal) maxVal = m.expense as double;
     }
-    maxVal = maxVal == 0 ? 1000 : (maxVal * 1.2);
+    maxVal = maxVal == 0 ? 1000 : (maxVal * 1.25);
+
+    final creditSpots = <FlSpot>[];
+    final debitSpots = <FlSpot>[];
+    for (int i = 0; i < chartData.length; i++) {
+      final m = chartData[i] as dynamic;
+      creditSpots.add(FlSpot(i.toDouble(), (m.income as double).clamp(0, maxVal)));
+      debitSpots.add(FlSpot(i.toDouble(), (m.expense as double).clamp(0, maxVal)));
+    }
+
+    String _monthLabel(String monthStr) {
+      final parts = monthStr.split('-');
+      if (parts.length == 2) {
+        final idx = (int.parse(parts[1]) - 1).clamp(0, 11);
+        return _months[idx];
+      }
+      return monthStr;
+    }
 
     return Container(
-      height: 220,
+      height: 240,
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
@@ -558,93 +579,92 @@ class _MonthlyBarChart extends StatelessWidget {
           color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+      padding: const EdgeInsets.fromLTRB(8, 20, 16, 12),
       child: Column(
         children: [
-          // Legend
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                      color: incomeColor,
-                      borderRadius: BorderRadius.circular(3))),
+                width: 28,
+                height: 3,
+                decoration: BoxDecoration(
+                  color: creditColor,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
               const SizedBox(width: 6),
-              Text('Receitas',
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+              Text('Crédito',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant)),
               const SizedBox(width: 16),
               Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                      color: expenseColor,
-                      borderRadius: BorderRadius.circular(3))),
+                width: 28,
+                height: 3,
+                decoration: BoxDecoration(
+                  color: debitColor,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
               const SizedBox(width: 6),
-              Text('Despesas',
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+              Text('Débito',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant)),
             ],
           ),
           const SizedBox(height: 12),
           Expanded(
-            child: BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceAround,
+            child: LineChart(
+              LineChartData(
+                minY: 0,
                 maxY: maxVal,
-                barTouchData: BarTouchData(
-                  touchTooltipData: BarTouchTooltipData(
+                clipData: const FlClipData.all(),
+                lineTouchData: LineTouchData(
+                  touchTooltipData: LineTouchTooltipData(
                     getTooltipColor: (_) =>
                         theme.colorScheme.surfaceContainerHighest,
-                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      final m = chartData[groupIndex] as dynamic;
-                      final val = rodIndex == 0
-                          ? m.income as double
-                          : m.expense as double;
-                      return BarTooltipItem(
-                        CurrencyFormatter.format(val),
+                    getTooltipItems: (spots) => spots.map((s) {
+                      final isCredit = s.barIndex == 0;
+                      return LineTooltipItem(
+                        CurrencyFormatter.format(s.y),
                         theme.textTheme.labelSmall!.copyWith(
-                          color: rodIndex == 0 ? incomeColor : expenseColor,
+                          color: isCredit ? creditColor : debitColor,
                           fontWeight: FontWeight.w700,
                         ),
                       );
-                    },
+                    }).toList(),
                   ),
                 ),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  getDrawingHorizontalLine: (_) => FlLine(
+                    color: theme.colorScheme.outlineVariant
+                        .withValues(alpha: 0.25),
+                    strokeWidth: 1,
+                    dashArray: [4, 4],
+                  ),
+                ),
+                borderData: FlBorderData(show: false),
                 titlesData: FlTitlesData(
                   show: true,
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
+                      reservedSize: 28,
                       getTitlesWidget: (value, meta) {
                         final i = value.toInt();
                         if (i < 0 || i >= chartData.length)
                           return const SizedBox.shrink();
                         final m = (chartData[i] as dynamic).month as String;
-                        final parts = m.split('-');
-                        final label = parts.length == 2
-                            ? [
-                                'Jan',
-                                'Fev',
-                                'Mar',
-                                'Abr',
-                                'Mai',
-                                'Jun',
-                                'Jul',
-                                'Ago',
-                                'Set',
-                                'Out',
-                                'Nov',
-                                'Dez'
-                              ][(int.parse(parts[1]) - 1).clamp(0, 11)]
-                            : m;
                         return Padding(
                           padding: const EdgeInsets.only(top: 6),
-                          child: Text(label,
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant)),
+                          child: Text(
+                            _monthLabel(m),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
                         );
                       },
                     ),
@@ -656,40 +676,68 @@ class _MonthlyBarChart extends StatelessWidget {
                   rightTitles: const AxisTitles(
                       sideTitles: SideTitles(showTitles: false)),
                 ),
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  getDrawingHorizontalLine: (_) => FlLine(
-                    color:
-                        theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                    strokeWidth: 1,
-                    dashArray: [4, 4],
+                lineBarsData: [
+                  // Credit line
+                  LineChartBarData(
+                    spots: creditSpots,
+                    isCurved: true,
+                    curveSmoothness: 0.35,
+                    color: creditColor,
+                    barWidth: 2.5,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, pct, bar, idx) =>
+                          FlDotCirclePainter(
+                        radius: 3.5,
+                        color: creditColor,
+                        strokeWidth: 2,
+                        strokeColor: theme.colorScheme.surface,
+                      ),
+                    ),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          creditColor.withValues(alpha: 0.18),
+                          creditColor.withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                borderData: FlBorderData(show: false),
-                barGroups: List.generate(chartData.length, (i) {
-                  final m = chartData[i] as dynamic;
-                  return BarChartGroupData(
-                    x: i,
-                    barRods: [
-                      BarChartRodData(
-                        toY: (m.income as double).clamp(0, maxVal),
-                        color: incomeColor,
-                        width: 10,
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(4)),
+                  // Debit line
+                  LineChartBarData(
+                    spots: debitSpots,
+                    isCurved: true,
+                    curveSmoothness: 0.35,
+                    color: debitColor,
+                    barWidth: 2.5,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, pct, bar, idx) =>
+                          FlDotCirclePainter(
+                        radius: 3.5,
+                        color: debitColor,
+                        strokeWidth: 2,
+                        strokeColor: theme.colorScheme.surface,
                       ),
-                      BarChartRodData(
-                        toY: (m.expense as double).clamp(0, maxVal),
-                        color: expenseColor,
-                        width: 10,
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(4)),
+                    ),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          debitColor.withValues(alpha: 0.12),
+                          debitColor.withValues(alpha: 0.0),
+                        ],
                       ),
-                    ],
-                    barsSpace: 4,
-                  );
-                }),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

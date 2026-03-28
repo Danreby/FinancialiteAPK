@@ -17,9 +17,14 @@ class CardLoading extends CardState {
 class CardLoaded extends CardState {
   final List<CardUser> cards;
   final Map<String, dynamic>? currentInvoice;
-  const CardLoaded({required this.cards, this.currentInvoice});
+  final List<CardEntity> availableCards;
+  const CardLoaded({
+    required this.cards,
+    this.currentInvoice,
+    this.availableCards = const [],
+  });
   @override
-  List<Object?> get props => [cards, currentInvoice];
+  List<Object?> get props => [cards, currentInvoice, availableCards];
 }
 
 class CardError extends CardState {

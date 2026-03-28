@@ -14,7 +14,8 @@ class CardCubit extends Cubit<CardState> {
     emit(const CardLoading());
     try {
       final cards = await _repository.getCards();
-      emit(CardLoaded(cards: cards));
+      final available = await _repository.getAvailableCards().catchError((_) => <CardEntity>[]);
+      emit(CardLoaded(cards: cards, availableCards: available));
     } catch (e) {
       emit(CardError(e.toString()));
     }
@@ -25,7 +26,11 @@ class CardCubit extends Cubit<CardState> {
       final invoice = await _repository.getInvoice(cardId, month: month);
       if (state is CardLoaded) {
         final current = state as CardLoaded;
-        emit(CardLoaded(cards: current.cards, currentInvoice: invoice));
+        emit(CardLoaded(
+          cards: current.cards,
+          currentInvoice: invoice,
+          availableCards: current.availableCards,
+        ));
       }
     } catch (e) {
       emit(CardError(e.toString()));
@@ -57,6 +62,7 @@ class CardCubit extends Cubit<CardState> {
         final current = state as CardLoaded;
         emit(CardLoaded(
           cards: current.cards.where((c) => c.id != id).toList(),
+          availableCards: current.availableCards,
         ));
       }
     } catch (e) {

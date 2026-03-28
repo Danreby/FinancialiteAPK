@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/savings/savings_cubit.dart';
+import '../../../domain/entities/savings_goal.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
@@ -29,10 +30,11 @@ class _SavingsPageState extends State<SavingsPage> {
 
   void _loadData() => context.read<SavingsCubit>().loadGoals();
 
-  void _showCreateDialog() {
-    final nameCtrl = TextEditingController();
-    final targetCtrl = TextEditingController();
-    DateTime? deadline;
+  void _showGoalDialog({SavingsGoal? editing}) {
+    final nameCtrl = TextEditingController(text: editing?.title ?? '');
+    final targetCtrl = TextEditingController(
+      text: editing != null ? editing.targetAmount.toStringAsFixed(2) : '',
+    );
     final formKey = GlobalKey<FormState>();
 
     showModalBottomSheet(
@@ -46,7 +48,10 @@ class _SavingsPageState extends State<SavingsPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Nova Meta', style: Theme.of(ctx).textTheme.titleLarge),
+              Text(
+                editing != null ? 'Editar Meta' : 'Nova Meta',
+                style: Theme.of(ctx).textTheme.titleLarge,
+              ),
               const SizedBox(height: 16),
               AppTextField(
                 controller: nameCtrl,
@@ -56,35 +61,19 @@ class _SavingsPageState extends State<SavingsPage> {
               ),
               const SizedBox(height: 12),
               CurrencyTextField(controller: targetCtrl, label: 'Valor alvo', validator: Validators.currency),
-              const SizedBox(height: 12),
-              StatefulBuilder(
-                builder: (context, setLocalState) => AppTextField(
-                  label: 'Prazo (opcional)',
-                  prefixIcon: Icons.calendar_today,
-                  readOnly: true,
-                  controller: TextEditingController(
-                    text: deadline != null ? DateFormatter.shortDate(deadline!) : '',
-                  ),
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now().add(const Duration(days: 90)),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2035),
-                    );
-                    if (picked != null) setLocalState(() => deadline = picked);
-                  },
-                ),
-              ),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: () {
                   if (!formKey.currentState!.validate()) return;
-                  context.read<SavingsCubit>().createGoal({
-                    'nome': nameCtrl.text.trim(),
-                    'valor_alvo': double.tryParse(targetCtrl.text.replaceAll(',', '.')) ?? 0,
-                    if (deadline != null) 'prazo': deadline!.toIso8601String().substring(0, 10),
-                  });
+                  final data = {
+                    'title': nameCtrl.text.trim(),
+                    'target_amount': double.tryParse(targetCtrl.text.replaceAll(',', '.')) ?? 0,
+                  };
+                  if (editing != null) {
+                    context.read<SavingsCubit>().updateGoal(editing.id!, data);
+                  } else {
+                    context.read<SavingsCubit>().createGoal(data);
+                  }
                   Navigator.pop(ctx);
                 },
                 child: const Text('Salvar'),
@@ -95,6 +84,8 @@ class _SavingsPageState extends State<SavingsPage> {
       ),
     );
   }
+
+  void _showCreateDialog() => _showGoalDialog();
 
   void _showDepositDialog(int goalId) {
     final amountCtrl = TextEditingController();
@@ -113,7 +104,7 @@ class _SavingsPageState extends State<SavingsPage> {
             FilledButton(
               onPressed: () {
                 context.read<SavingsCubit>().addDeposit(goalId, {
-                  'valor': double.tryParse(amountCtrl.text.replaceAll(',', '.')) ?? 0,
+                  'amount': double.tryParse(amountCtrl.text.replaceAll(',', '.')) ?? 0,
                 });
                 Navigator.pop(ctx);
               },
@@ -330,6 +321,13 @@ class _SavingsPageState extends State<SavingsPage> {
                                     color: progressColor,
                                   ),
                                 ),
+                              ),
+                              const SizedBox(width: 4),
+                              IconButton(
+                                icon: Icon(Icons.edit_outlined, size: 18, color: Colors.white54),
+                                onPressed: () => _showGoalDialog(editing: goal),
+                                constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
+                                padding: EdgeInsets.zero,
                               ),
                             ],
                           ),

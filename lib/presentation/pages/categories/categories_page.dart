@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/category/category_cubit.dart';
+import '../../../domain/entities/category.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
@@ -88,11 +89,11 @@ class _CategoriesPageState extends State<CategoriesPage>
 
   void _loadData() => context.read<CategoryCubit>().loadCategories();
 
-  void _showCreateDialog() {
-    final nameCtrl = TextEditingController();
-    String type = 'expense';
-    String selectedIcon = 'category';
-    String selectedColor = '#6B7280';
+  void _showCategoryDialog({Category? editing}) {
+    final nameCtrl = TextEditingController(text: editing?.name ?? '');
+    String type = editing?.type ?? 'expense';
+    String selectedIcon = editing?.icon ?? 'category';
+    String selectedColor = editing?.color ?? '#6B7280';
     final formKey = GlobalKey<FormState>();
 
     final iconOptions = <String>[
@@ -173,7 +174,7 @@ class _CategoriesPageState extends State<CategoriesPage>
                     ),
                   ),
                   Text(
-                    'Nova Categoria',
+                    editing != null ? 'Editar Categoria' : 'Nova Categoria',
                     style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
@@ -294,12 +295,17 @@ class _CategoriesPageState extends State<CategoriesPage>
                     child: FilledButton(
                       onPressed: () {
                         if (!formKey.currentState!.validate()) return;
-                        context.read<CategoryCubit>().createCategory({
+                        final data = {
                           'name': nameCtrl.text.trim(),
                           'type': type,
                           'icon': selectedIcon,
                           'color': selectedColor,
-                        });
+                        };
+                        if (editing != null) {
+                          context.read<CategoryCubit>().updateCategory(editing.id!, data);
+                        } else {
+                          context.read<CategoryCubit>().createCategory(data);
+                        }
                         Navigator.pop(ctx);
                       },
                       style: FilledButton.styleFrom(
@@ -319,6 +325,8 @@ class _CategoriesPageState extends State<CategoriesPage>
       ),
     );
   }
+
+  void _showCreateDialog() => _showCategoryDialog();
 
   @override
   Widget build(BuildContext context) {
@@ -526,10 +534,11 @@ class _CategoriesPageState extends State<CategoriesPage>
                           ],
                         ),
                       ),
-                      Icon(
-                        Icons.chevron_right,
-                        color: theme.colorScheme.onSurfaceVariant,
-                        size: 20,
+                      IconButton(
+                        icon: Icon(Icons.edit_outlined, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                        onPressed: () => _showCategoryDialog(editing: cat as Category),
+                        constraints: const BoxConstraints(maxWidth: 36, maxHeight: 36),
+                        padding: EdgeInsets.zero,
                       ),
                     ],
                   ),

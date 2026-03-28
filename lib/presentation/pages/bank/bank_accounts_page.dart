@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../blocs/bank/bank_cubit.dart';
+import '../../../domain/entities/bank_account.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/confirm_dialog.dart';
-import '../../widgets/app_text_field.dart';
 import '../../widgets/currency_text_field.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/section_header.dart';
@@ -25,14 +25,74 @@ class _BankAccountsPageState extends State<BankAccountsPage> {
   void initState() {
     super.initState();
     _loadData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<BankCubit>().loadBanks();
+    });
   }
 
   void _loadData() => context.read<BankCubit>().loadAccounts();
 
   void _showCreateDialog() {
-    final nameCtrl = TextEditingController();
+    int? selectedBankId;
     final balanceCtrl = TextEditingController();
-    String accountType = 'corrente';
+    final formKey = GlobalKey<FormState>();
+
+    final bankState = context.read<BankCubit>().state;
+    final availableBanks = bankState is BankLoaded ? (bankState.availableBanks ?? <Bank>[]) : <Bank>[];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setLocalState) => Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('Nova Conta Bancária', style: Theme.of(ctx).textTheme.titleLarge),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<int>(
+                  value: selectedBankId,
+                  decoration: const InputDecoration(
+                    labelText: 'Banco',
+                    prefixIcon: Icon(Icons.account_balance),
+                  ),
+                  items: availableBanks
+                      .map((b) => DropdownMenuItem(
+                            value: b.id,
+                            child: Text(b.name),
+                          ))
+                      .toList(),
+                  validator: (v) => v == null ? 'Selecione um banco' : null,
+                  onChanged: (v) => setLocalState(() => selectedBankId = v),
+                ),
+                const SizedBox(height: 12),
+                CurrencyTextField(controller: balanceCtrl, label: 'Saldo inicial'),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: () {
+                    if (!formKey.currentState!.validate()) return;
+                    context.read<BankCubit>().createAccount({
+                      'bank_id': selectedBankId,
+                      'balance': double.tryParse(balanceCtrl.text.replaceAll(',', '.')) ?? 0,
+                    });
+                    Navigator.pop(ctx);
+                  },
+                  child: const Text('Salvar'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showEditDialog(BankAccount account) {
+    final balanceCtrl = TextEditingController(text: account.balance.toStringAsFixed(2));
     final formKey = GlobalKey<FormState>();
 
     showModalBottomSheet(
@@ -42,51 +102,32 @@ class _BankAccountsPageState extends State<BankAccountsPage> {
         padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
         child: Form(
           key: formKey,
-          child: StatefulBuilder(
-            builder: (context, setLocalState) => Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text('Nova Conta Bancária', style: Theme.of(ctx).textTheme.titleLarge),
-                const SizedBox(height: 16),
-                AppTextField(
-                  controller: nameCtrl,
-                  label: 'Nome da conta',
-                  prefixIcon: Icons.account_balance,
-                  validator: Validators.required,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('Editar Saldo', style: Theme.of(ctx).textTheme.titleLarge),
+              const SizedBox(height: 4),
+              Text(
+                account.displayName,
+                style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(ctx).colorScheme.onSurfaceVariant,
                 ),
-                const SizedBox(height: 12),
-                CurrencyTextField(controller: balanceCtrl, label: 'Saldo inicial'),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: accountType,
-                  decoration: const InputDecoration(
-                    labelText: 'Tipo',
-                    prefixIcon: Icon(Icons.category),
-                  ),
-                  items: const [
-                    DropdownMenuItem(value: 'corrente', child: Text('Corrente')),
-                    DropdownMenuItem(value: 'poupanca', child: Text('Poupança')),
-                    DropdownMenuItem(value: 'investimento', child: Text('Investimento')),
-                    DropdownMenuItem(value: 'carteira', child: Text('Carteira')),
-                  ],
-                  onChanged: (v) => setLocalState(() => accountType = v ?? 'corrente'),
-                ),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: () {
-                    if (!formKey.currentState!.validate()) return;
-                    context.read<BankCubit>().createAccount({
-                      'nome': nameCtrl.text.trim(),
-                      'saldo': double.tryParse(balanceCtrl.text.replaceAll(',', '.')) ?? 0,
-                      'tipo': accountType,
-                    });
-                    Navigator.pop(ctx);
-                  },
-                  child: const Text('Salvar'),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 16),
+              CurrencyTextField(controller: balanceCtrl, label: 'Saldo atual', validator: Validators.currency),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () {
+                  if (!formKey.currentState!.validate()) return;
+                  context.read<BankCubit>().updateAccount(account.id!, {
+                    'balance': double.tryParse(balanceCtrl.text.replaceAll(',', '.')) ?? 0,
+                  });
+                  Navigator.pop(ctx);
+                },
+                child: const Text('Salvar'),
+              ),
+            ],
           ),
         ),
       ),
@@ -283,6 +324,13 @@ class _BankAccountsPageState extends State<BankAccountsPage> {
                             fontWeight: FontWeight.w700,
                             color: account.balance >= 0 ? Colors.green : theme.colorScheme.error,
                           ),
+                        ),
+                        const SizedBox(width: 4),
+                        IconButton(
+                          icon: Icon(Icons.edit_outlined, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                          onPressed: () => _showEditDialog(account),
+                          constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
+                          padding: EdgeInsets.zero,
                         ),
                       ],
                     ),
