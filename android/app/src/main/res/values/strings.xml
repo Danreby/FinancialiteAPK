@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Web OAuth 2.0 client ID – used by google_sign_in to request an id_token -->
+    <!-- Android OAuth 2.0 client ID – identifies this app to Google Play Services -->
+    <string name="default_web_client_id">105982257579-4j6b0c49u7n207e8oqiulso71jq76fkj.apps.googleusercontent.com</string>
+    <!-- Web OAuth 2.0 client ID – used by google_sign_in to request an id_token for the backend -->
     <string name="server_client_id">105982257579-bj5rmr9qcuuggr3rmf081ib4ri4ckfvh.apps.googleusercontent.com</string>
 </resources>
