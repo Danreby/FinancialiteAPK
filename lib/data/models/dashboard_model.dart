@@ -17,40 +17,66 @@ class DashboardDataModel extends DashboardData {
   });
 
   factory DashboardDataModel.fromJson(Map<String, dynamic> json) {
-    List<MonthlyChartData> chart = [];
-    if (json['monthly_chart'] != null) {
-      chart = (json['monthly_chart'] as List).map((c) => MonthlyChartDataModel.fromJson(c)).toList();
-    }
+    final stats = json['stats'] as Map<String, dynamic>? ?? {};
+    final insights = json['insights'] as Map<String, dynamic>? ?? {};
+    final financialHealth =
+        insights['financial_health'] as Map<String, dynamic>? ?? {};
+    final upcomingBillsList = insights['upcoming_bills'] as List? ?? [];
+    final monthlySummary = stats['monthly_summary'] as List? ?? [];
+    final topCategoriesList = stats['top_spending_categories'] as List? ?? [];
 
-    List<CategorySpending> categories = [];
-    if (json['top_categories'] != null) {
-      categories = (json['top_categories'] as List).map((c) => CategorySpendingModel.fromJson(c)).toList();
-    }
-
-    List<UpcomingBill> upcoming = [];
-    if (json['upcoming_bills'] != null) {
-      upcoming = (json['upcoming_bills'] as List).map((b) => UpcomingBillModel.fromJson(b)).toList();
-    }
+    final pendingBillCount = upcomingBillsList.where((b) {
+      final m = b as Map<String, dynamic>;
+      return m['is_overdue'] == true || m['status'] == 'overdue';
+    }).length;
 
     return DashboardDataModel(
-      totalBalance: (json['total_balance'] as num? ?? 0).toDouble(),
-      totalIncome: (json['total_income'] as num? ?? 0).toDouble(),
-      totalExpense: (json['total_expense'] as num? ?? 0).toDouble(),
-      monthlyBudget: (json['monthly_budget'] as num? ?? 0).toDouble(),
-      budgetSpent: (json['budget_spent'] as num? ?? 0).toDouble(),
-      budgetPercentage: (json['budget_percentage'] as num? ?? 0).toDouble(),
-      savingsTotal: (json['savings_total'] as num? ?? 0).toDouble(),
-      pendingBills: json['pending_bills'] as int? ?? 0,
-      healthScore: (json['health_score'] as num? ?? 0).toDouble(),
-      monthlyChart: chart,
-      topCategories: categories,
-      upcomingBills: upcoming,
+      totalBalance: (stats['remaining_money'] as num? ?? 0).toDouble(),
+      totalIncome: (stats['total_monthly_income'] as num? ?? 0).toDouble(),
+      totalExpense: ((stats['current_month_pending_bill'] as num? ?? 0) +
+              (stats['current_month_debit_total'] as num? ?? 0))
+          .toDouble(),
+      monthlyBudget: 0,
+      budgetSpent: 0,
+      budgetPercentage: 0,
+      savingsTotal: 0,
+      pendingBills: pendingBillCount,
+      healthScore: (financialHealth['score'] as num? ?? 0).toDouble(),
+      monthlyChart: monthlySummary.map((item) {
+        final m = item as Map<String, dynamic>;
+        return MonthlyChartDataModel(
+          month: m['month_key'] as String? ?? '',
+          income: (m['credit_total'] as num? ?? 0).toDouble(),
+          expense: (m['debit_total'] as num? ?? 0).toDouble(),
+        );
+      }).toList(),
+      topCategories: topCategoriesList.map((item) {
+        final m = item as Map<String, dynamic>;
+        return CategorySpendingModel(
+          name: m['category_name'] as String? ?? 'Sem categoria',
+          icon: m['category_icon'] as String?,
+          color: m['category_color'] as String?,
+          amount: (m['total'] as num? ?? 0).toDouble(),
+          percentage: 0,
+        );
+      }).toList(),
+      upcomingBills: upcomingBillsList.map((item) {
+        final m = item as Map<String, dynamic>;
+        return UpcomingBillModel(
+          id: (m['id'] as num).toInt(),
+          title: m['title'] as String,
+          amount: (m['amount'] as num? ?? 0).toDouble(),
+          dueDay: m['due_day'] as int? ?? 0,
+          categoryName: null,
+        );
+      }).toList(),
     );
   }
 }
 
 class MonthlyChartDataModel extends MonthlyChartData {
-  const MonthlyChartDataModel({required super.month, required super.income, required super.expense});
+  const MonthlyChartDataModel(
+      {required super.month, required super.income, required super.expense});
 
   factory MonthlyChartDataModel.fromJson(Map<String, dynamic> json) {
     return MonthlyChartDataModel(
@@ -62,7 +88,12 @@ class MonthlyChartDataModel extends MonthlyChartData {
 }
 
 class CategorySpendingModel extends CategorySpending {
-  const CategorySpendingModel({required super.name, super.icon, super.color, required super.amount, required super.percentage});
+  const CategorySpendingModel(
+      {required super.name,
+      super.icon,
+      super.color,
+      required super.amount,
+      required super.percentage});
 
   factory CategorySpendingModel.fromJson(Map<String, dynamic> json) {
     return CategorySpendingModel(
@@ -76,7 +107,12 @@ class CategorySpendingModel extends CategorySpending {
 }
 
 class UpcomingBillModel extends UpcomingBill {
-  const UpcomingBillModel({required super.id, required super.title, required super.amount, required super.dueDay, super.categoryName});
+  const UpcomingBillModel(
+      {required super.id,
+      required super.title,
+      required super.amount,
+      required super.dueDay,
+      super.categoryName});
 
   factory UpcomingBillModel.fromJson(Map<String, dynamic> json) {
     return UpcomingBillModel(

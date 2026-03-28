@@ -6,20 +6,24 @@ import '../../domain/repositories/notification_repository.dart';
 import '../models/notification_model.dart';
 import 'base_offline_repository.dart';
 
-class NotificationRepositoryImpl extends BaseOfflineRepository implements NotificationRepository {
-  NotificationRepositoryImpl(ApiClient api, NetworkInfo networkInfo) : super(api, networkInfo);
+class NotificationRepositoryImpl extends BaseOfflineRepository
+    implements NotificationRepository {
+  NotificationRepositoryImpl(ApiClient api, NetworkInfo networkInfo)
+      : super(api, networkInfo);
 
   @override
   Future<List<AppNotification>> getNotifications() async {
     try {
       if (await isOnline) {
         final response = await api.get(ApiConstants.notifications);
-        return (response.data['data'] as List? ?? response.data as List)
-            .map((j) => NotificationModel.fromJson(j)).toList();
+        return safeList(response.data)
+            .map((j) => NotificationModel.fromJson(j))
+            .toList();
       }
     } catch (_) {}
     final database = await db;
-    final results = await database.query('notifications', orderBy: 'created_at DESC', limit: 50);
+    final results = await database.query('notifications',
+        orderBy: 'created_at DESC', limit: 50);
     return results.map((r) => NotificationModel.fromDb(r)).toList();
   }
 
@@ -32,7 +36,8 @@ class NotificationRepositoryImpl extends BaseOfflineRepository implements Notifi
       }
     } catch (_) {}
     final database = await db;
-    final result = await database.rawQuery('SELECT COUNT(*) as count FROM notifications WHERE is_read = 0');
+    final result = await database.rawQuery(
+        'SELECT COUNT(*) as count FROM notifications WHERE is_read = 0');
     return result.first['count'] as int? ?? 0;
   }
 
@@ -42,7 +47,8 @@ class NotificationRepositoryImpl extends BaseOfflineRepository implements Notifi
       await api.patch('${ApiConstants.notifications}/$id/read');
     }
     final database = await db;
-    await database.update('notifications', {'is_read': 1}, where: 'id = ?', whereArgs: [id]);
+    await database.update('notifications', {'is_read': 1},
+        where: 'id = ?', whereArgs: [id]);
   }
 
   @override

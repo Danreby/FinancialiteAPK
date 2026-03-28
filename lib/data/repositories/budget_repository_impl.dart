@@ -7,20 +7,24 @@ import '../../domain/repositories/budget_repository.dart';
 import '../models/budget_model.dart';
 import 'base_offline_repository.dart';
 
-class BudgetRepositoryImpl extends BaseOfflineRepository implements BudgetRepository {
-  BudgetRepositoryImpl(ApiClient api, NetworkInfo networkInfo) : super(api, networkInfo);
+class BudgetRepositoryImpl extends BaseOfflineRepository
+    implements BudgetRepository {
+  BudgetRepositoryImpl(ApiClient api, NetworkInfo networkInfo)
+      : super(api, networkInfo);
 
   @override
   Future<List<Budget>> getBudgets() async {
     try {
       if (await isOnline) {
         final response = await api.get(ApiConstants.budgets);
-        final list = (response.data['data'] as List? ?? response.data as List)
-            .map((j) => BudgetModel.fromJson(j)).toList();
+        final list = safeList(response.data)
+            .map((j) => BudgetModel.fromJson(j))
+            .toList();
         final database = await db;
         final batch = database.batch();
         for (final item in list) {
-          batch.insert('budgets', (item as BudgetModel).toDbMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+          batch.insert('budgets', (item as BudgetModel).toDbMap(),
+              conflictAlgorithm: ConflictAlgorithm.replace);
         }
         await batch.commit(noResult: true);
         return list;

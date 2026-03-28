@@ -8,27 +8,33 @@ import '../../domain/repositories/income_repository.dart';
 import '../models/income_model.dart';
 import 'base_offline_repository.dart';
 
-class IncomeRepositoryImpl extends BaseOfflineRepository implements IncomeRepository {
-  IncomeRepositoryImpl(ApiClient api, NetworkInfo networkInfo) : super(api, networkInfo);
+class IncomeRepositoryImpl extends BaseOfflineRepository
+    implements IncomeRepository {
+  IncomeRepositoryImpl(ApiClient api, NetworkInfo networkInfo)
+      : super(api, networkInfo);
 
   @override
   Future<List<Income>> getIncomes({Map<String, dynamic>? filters}) async {
     try {
       if (await isOnline) {
-        final response = await api.get(ApiConstants.incomes, queryParameters: filters);
-        final list = (response.data['data'] as List? ?? response.data as List)
-            .map((j) => IncomeModel.fromJson(j)).toList();
+        final response =
+            await api.get(ApiConstants.incomes, queryParameters: filters);
+        final list = safeList(response.data)
+            .map((j) => IncomeModel.fromJson(j))
+            .toList();
         final database = await db;
         final batch = database.batch();
         for (final item in list) {
-          batch.insert('incomes', (item as IncomeModel).toDbMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+          batch.insert('incomes', (item as IncomeModel).toDbMap(),
+              conflictAlgorithm: ConflictAlgorithm.replace);
         }
         await batch.commit(noResult: true);
         return list;
       }
     } catch (_) {}
     final database = await db;
-    final results = await database.query('incomes', where: 'deleted_at IS NULL', orderBy: 'created_at DESC');
+    final results = await database.query('incomes',
+        where: 'deleted_at IS NULL', orderBy: 'created_at DESC');
     return results.map((r) => IncomeModel.fromDb(r)).toList();
   }
 
@@ -51,13 +57,16 @@ class IncomeRepositoryImpl extends BaseOfflineRepository implements IncomeReposi
   Future<Income> updateIncome(int id, Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
     if (await isOnline) {
-      final response = await api.put('${ApiConstants.incomes}/$id', data: sanitized);
+      final response =
+          await api.put('${ApiConstants.incomes}/$id', data: sanitized);
       return IncomeModel.fromJson(response.data['data'] ?? response.data);
     }
     final database = await db;
-    await database.update('incomes', sanitized, where: 'id = ?', whereArgs: [id]);
+    await database
+        .update('incomes', sanitized, where: 'id = ?', whereArgs: [id]);
     await addToSyncQueue('incomes', id, 'update', sanitized);
-    final results = await database.query('incomes', where: 'id = ?', whereArgs: [id]);
+    final results =
+        await database.query('incomes', where: 'id = ?', whereArgs: [id]);
     return IncomeModel.fromDb(results.first);
   }
 
@@ -69,7 +78,9 @@ class IncomeRepositoryImpl extends BaseOfflineRepository implements IncomeReposi
       await addToSyncQueue('incomes', id, 'delete', null);
     }
     final database = await db;
-    await database.update('incomes', {'deleted_at': DateTime.now().toIso8601String()}, where: 'id = ?', whereArgs: [id]);
+    await database.update(
+        'incomes', {'deleted_at': DateTime.now().toIso8601String()},
+        where: 'id = ?', whereArgs: [id]);
   }
 
   @override

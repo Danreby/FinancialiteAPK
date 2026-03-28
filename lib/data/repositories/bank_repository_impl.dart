@@ -8,27 +8,32 @@ import '../../domain/repositories/bank_repository.dart';
 import '../models/bank_model.dart';
 import 'base_offline_repository.dart';
 
-class BankRepositoryImpl extends BaseOfflineRepository implements BankRepository {
-  BankRepositoryImpl(ApiClient api, NetworkInfo networkInfo) : super(api, networkInfo);
+class BankRepositoryImpl extends BaseOfflineRepository
+    implements BankRepository {
+  BankRepositoryImpl(ApiClient api, NetworkInfo networkInfo)
+      : super(api, networkInfo);
 
   @override
   Future<List<BankAccount>> getAccounts() async {
     try {
       if (await isOnline) {
         final response = await api.get(ApiConstants.bankAccounts);
-        final list = (response.data['data'] as List? ?? response.data as List)
-            .map((j) => BankAccountModel.fromJson(j)).toList();
+        final list = safeList(response.data)
+            .map((j) => BankAccountModel.fromJson(j))
+            .toList();
         final database = await db;
         final batch = database.batch();
         for (final item in list) {
-          batch.insert('bank_users', (item as BankAccountModel).toDbMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+          batch.insert('bank_users', (item as BankAccountModel).toDbMap(),
+              conflictAlgorithm: ConflictAlgorithm.replace);
         }
         await batch.commit(noResult: true);
         return list;
       }
     } catch (_) {}
     final database = await db;
-    final results = await database.query('bank_users', orderBy: 'created_at DESC');
+    final results =
+        await database.query('bank_users', orderBy: 'created_at DESC');
     return results.map((r) => BankAccountModel.fromDb(r)).toList();
   }
 
@@ -48,7 +53,8 @@ class BankRepositoryImpl extends BaseOfflineRepository implements BankRepository
   @override
   Future<BankAccount> updateAccount(int id, Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response = await api.put('${ApiConstants.bankAccounts}/$id', data: sanitized);
+    final response =
+        await api.put('${ApiConstants.bankAccounts}/$id', data: sanitized);
     return BankAccountModel.fromJson(response.data['data'] ?? response.data);
   }
 
@@ -68,13 +74,15 @@ class BankRepositoryImpl extends BaseOfflineRepository implements BankRepository
   @override
   Future<List<Bank>> getAvailableBanks() async {
     final response = await api.get(ApiConstants.bankAccountsBanks);
-    return (response.data['data'] as List? ?? response.data as List).map((j) => BankModel.fromJson(j)).toList();
+    return safeList(response.data).map((j) => BankModel.fromJson(j)).toList();
   }
 
   @override
   Future<List<BankTransfer>> getTransfers() async {
     final response = await api.get(ApiConstants.bankTransfers);
-    return (response.data['data'] as List? ?? response.data as List).map((j) => BankTransferModel.fromJson(j)).toList();
+    return safeList(response.data)
+        .map((j) => BankTransferModel.fromJson(j))
+        .toList();
   }
 
   @override

@@ -6,29 +6,35 @@ import '../../domain/repositories/card_repository.dart';
 import '../models/card_model.dart';
 import 'base_offline_repository.dart';
 
-class CardRepositoryImpl extends BaseOfflineRepository implements CardRepository {
-  CardRepositoryImpl(ApiClient api, NetworkInfo networkInfo) : super(api, networkInfo);
+class CardRepositoryImpl extends BaseOfflineRepository
+    implements CardRepository {
+  CardRepositoryImpl(ApiClient api, NetworkInfo networkInfo)
+      : super(api, networkInfo);
 
   @override
   Future<List<CardUser>> getCards() async {
     try {
       if (await isOnline) {
         final response = await api.get(ApiConstants.cards);
-        return (response.data['data'] as List? ?? response.data as List)
-            .map((j) => CardUserModel.fromJson(j)).toList();
+        return safeList(response.data)
+            .map((j) => CardUserModel.fromJson(j))
+            .toList();
       }
     } catch (_) {}
     final database = await db;
-    final results = await database.query('card_users', orderBy: 'created_at DESC');
-    return results.map((r) => CardUserModel(
-      id: r['id'] as int?,
-      userId: r['user_id'] as int,
-      cardId: r['card_id'] as int,
-      dueDay: r['due_day'] as int? ?? 10,
-      closingDay: r['closing_day'] as int? ?? 3,
-      creditLimit: (r['credit_limit'] as num? ?? 0).toDouble(),
-      nickname: r['nickname'] as String?,
-    )).toList();
+    final results =
+        await database.query('card_users', orderBy: 'created_at DESC');
+    return results
+        .map((r) => CardUserModel(
+              id: r['id'] as int?,
+              userId: r['user_id'] as int,
+              cardId: r['card_id'] as int,
+              dueDay: r['due_day'] as int? ?? 10,
+              closingDay: r['closing_day'] as int? ?? 3,
+              creditLimit: (r['credit_limit'] as num? ?? 0).toDouble(),
+              nickname: r['nickname'] as String?,
+            ))
+        .toList();
   }
 
   @override
@@ -54,15 +60,19 @@ class CardRepositoryImpl extends BaseOfflineRepository implements CardRepository
   Future<List<CardEntity>> getAvailableCards() async {
     final response = await api.get(ApiConstants.cardsAvailable);
     return (response.data['data'] as List? ?? response.data as List)
-        .map((j) => CardEntityModel.fromJson(j)).toList();
+        .map((j) => CardEntityModel.fromJson(j))
+        .toList();
   }
 
   @override
   Future<Map<String, dynamic>?> getInvoice(int cardId, {String? month}) async {
     final params = <String, dynamic>{};
     if (month != null) params['month'] = month;
-    final response = await api.get('${ApiConstants.cards}/$cardId/invoice', queryParameters: params);
-    return response.data is Map ? Map<String, dynamic>.from(response.data) : null;
+    final response = await api.get('${ApiConstants.cards}/$cardId/invoice',
+        queryParameters: params);
+    return response.data is Map
+        ? Map<String, dynamic>.from(response.data)
+        : null;
   }
 
   @override

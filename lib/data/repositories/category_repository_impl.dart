@@ -8,21 +8,26 @@ import '../../domain/repositories/category_repository.dart';
 import '../models/category_model.dart';
 import 'base_offline_repository.dart';
 
-class CategoryRepositoryImpl extends BaseOfflineRepository implements CategoryRepository {
-  CategoryRepositoryImpl(ApiClient api, NetworkInfo networkInfo) : super(api, networkInfo);
+class CategoryRepositoryImpl extends BaseOfflineRepository
+    implements CategoryRepository {
+  CategoryRepositoryImpl(ApiClient api, NetworkInfo networkInfo)
+      : super(api, networkInfo);
 
   @override
   Future<List<Category>> getCategories({String? type}) async {
     try {
       if (await isOnline) {
         final params = type != null ? {'type': type} : null;
-        final response = await api.get(ApiConstants.categories, queryParameters: params);
-        final list = (response.data['data'] as List? ?? response.data as List)
-            .map((j) => CategoryModel.fromJson(j)).toList();
+        final response =
+            await api.get(ApiConstants.categories, queryParameters: params);
+        final list = safeList(response.data)
+            .map((j) => CategoryModel.fromJson(j))
+            .toList();
         final database = await db;
         final batch = database.batch();
         for (final item in list) {
-          batch.insert('categories', (item as CategoryModel).toDbMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+          batch.insert('categories', (item as CategoryModel).toDbMap(),
+              conflictAlgorithm: ConflictAlgorithm.replace);
         }
         await batch.commit(noResult: true);
         return list;
@@ -31,7 +36,8 @@ class CategoryRepositoryImpl extends BaseOfflineRepository implements CategoryRe
     final database = await db;
     final where = type != null ? 'type = ?' : null;
     final whereArgs = type != null ? [type] : null;
-    final results = await database.query('categories', where: where, whereArgs: whereArgs, orderBy: 'name ASC');
+    final results = await database.query('categories',
+        where: where, whereArgs: whereArgs, orderBy: 'name ASC');
     return results.map((r) => CategoryModel.fromDb(r)).toList();
   }
 
@@ -45,7 +51,8 @@ class CategoryRepositoryImpl extends BaseOfflineRepository implements CategoryRe
   @override
   Future<Category> updateCategory(int id, Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response = await api.put('${ApiConstants.categories}/$id', data: sanitized);
+    final response =
+        await api.put('${ApiConstants.categories}/$id', data: sanitized);
     return CategoryModel.fromJson(response.data['data'] ?? response.data);
   }
 
