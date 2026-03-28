@@ -97,8 +97,6 @@ Future<void> init() async {
       () => DashboardRepositoryImpl(sl()));
   sl.registerLazySingleton<ProjectionsRepository>(
       () => ProjectionsRepositoryImpl(sl()));
-  sl.registerLazySingleton<ProjectionsRepository>(
-      () => ProjectionsRepositoryImpl(sl()));
 
   // Services
   sl.registerLazySingleton(() => SyncService(sl(), sl()));
