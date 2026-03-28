@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart' hide Transaction;
 import '../../core/constants/api_constants.dart';
 import '../../core/error/exceptions.dart';
@@ -19,19 +20,27 @@ class TransactionRepositoryImpl extends BaseOfflineRepository implements Transac
         final params = <String, dynamic>{'page': page, 'per_page': perPage};
         if (filters != null) params.addAll(filters);
         final response = await api.get(ApiConstants.transactions, queryParameters: params);
-        final list = (response.data['data'] as List? ?? response.data as List)
-            .map((json) => TransactionModel.fromJson(json))
+        final rawList = safeList(response.data);
+        final list = rawList
+            .map((json) => TransactionModel.fromJson(json as Map<String, dynamic>))
             .toList();
 
-        final database = await db;
-        final batch = database.batch();
-        for (final item in list) {
-          batch.insert('transactions', (item as TransactionModel).toDbMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+        // Cache to local DB (non-critical — don't let caching failures lose data)
+        try {
+          final database = await db;
+          final batch = database.batch();
+          for (final item in list) {
+            batch.insert('transactions', (item as TransactionModel).toDbMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+          }
+          await batch.commit(noResult: true);
+        } catch (cacheError) {
+          debugPrint('[TransactionRepo] Cache error: $cacheError');
         }
-        await batch.commit(noResult: true);
         return list;
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[TransactionRepo] getTransactions error: $e');
+    }
 
     final database = await db;
     final results = await database.query(
@@ -49,9 +58,12 @@ class TransactionRepositoryImpl extends BaseOfflineRepository implements Transac
     try {
       if (await isOnline) {
         final response = await api.get('${ApiConstants.transactions}/$id');
-        return TransactionModel.fromJson(response.data['data'] ?? response.data);
+        final data = response.data is Map<String, dynamic> ? response.data : response.data['data'];
+        return TransactionModel.fromJson(data as Map<String, dynamic>);
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[TransactionRepo] getTransaction error: $e');
+    }
 
     final database = await db;
     final results = await database.query('transactions', where: 'id = ?', whereArgs: [id]);

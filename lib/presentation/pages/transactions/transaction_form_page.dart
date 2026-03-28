@@ -143,7 +143,7 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'Despesa',
+                                    'Débito',
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: _type == 'debit'
                                           ? Colors.white
@@ -181,7 +181,7 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'Receita',
+                                    'Crédito',
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: _type == 'credit'
                                           ? Colors.white

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/network/api_client.dart';
@@ -21,16 +22,22 @@ class BillRepositoryImpl extends BaseOfflineRepository
             await api.get(ApiConstants.bills, queryParameters: filters);
         final list =
             safeList(response.data).map((j) => BillModel.fromJson(j)).toList();
-        final database = await db;
-        final batch = database.batch();
-        for (final item in list) {
-          batch.insert('bills', (item as BillModel).toDbMap(),
-              conflictAlgorithm: ConflictAlgorithm.replace);
+        try {
+          final database = await db;
+          final batch = database.batch();
+          for (final item in list) {
+            batch.insert('bills', (item as BillModel).toDbMap(),
+                conflictAlgorithm: ConflictAlgorithm.replace);
+          }
+          await batch.commit(noResult: true);
+        } catch (cacheError) {
+          debugPrint('[BillRepo] Cache error: $cacheError');
         }
-        await batch.commit(noResult: true);
         return list;
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[BillRepo] getBills error: $e');
+    }
     final database = await db;
     final results = await database.query('bills',
         where: 'deleted_at IS NULL', orderBy: 'due_day ASC');

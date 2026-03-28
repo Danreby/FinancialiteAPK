@@ -162,18 +162,23 @@ class TransactionParcelaModel extends TransactionParcela {
     return TransactionParcelaModel(
       id: json['id'] as int?,
       transactionId:
-          json['transaction_id'] as int? ?? json['transacao_id'] as int? ?? 0,
+          json['transacao_id'] as int? ?? json['transaction_id'] as int? ?? 0,
       parcelaNumber:
-          json['parcela_number'] as int? ?? json['numero'] as int? ?? 1,
+          json['installment_number'] as int? ??
+          json['parcela_number'] as int? ??
+          json['numero'] as int? ??
+          1,
       monthKey: json['month_key'] as String? ?? '',
       dueDate: json['due_date'] != null
           ? DateTime.tryParse(json['due_date'].toString())
           : null,
-      amount: (json['amount'] as num? ?? json['valor'] as num? ?? 0).toDouble(),
+      amount: double.tryParse(json['amount']?.toString() ?? '') ?? (json['valor'] as num? ?? 0).toDouble(),
       status: json['status'] as String? ?? 'pending',
-      paidAt: json['paid_at'] != null
-          ? DateTime.tryParse(json['paid_at'].toString())
-          : null,
+      paidAt: json['paid_date'] != null
+          ? DateTime.tryParse(json['paid_date'].toString())
+          : (json['paid_at'] != null
+              ? DateTime.tryParse(json['paid_at'].toString())
+              : null),
     );
   }
 
