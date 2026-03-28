@@ -132,7 +132,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                           );
                         }
                         final tx = state.transactions[index];
-                        final isExpense = tx.type == 'despesa';
+                        final isExpense = tx.type == 'debit';
                         return Dismissible(
                           key: Key('tx_${tx.id}'),
                           direction: DismissDirection.endToStart,

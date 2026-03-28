@@ -5,6 +5,8 @@ class DashboardDataModel extends DashboardData {
     super.totalBalance,
     super.totalIncome,
     super.totalExpense,
+    super.pendingBillAmount,
+    super.monthDebitTotal,
     super.monthlyBudget,
     super.budgetSpent,
     super.budgetPercentage,
@@ -30,12 +32,15 @@ class DashboardDataModel extends DashboardData {
       return m['is_overdue'] == true || m['status'] == 'overdue';
     }).length;
 
+    final pendingBill = (stats['current_month_pending_bill'] as num? ?? 0).toDouble();
+    final debitTotal = (stats['current_month_debit_total'] as num? ?? 0).toDouble();
+
     return DashboardDataModel(
       totalBalance: (stats['remaining_money'] as num? ?? 0).toDouble(),
       totalIncome: (stats['total_monthly_income'] as num? ?? 0).toDouble(),
-      totalExpense: ((stats['current_month_pending_bill'] as num? ?? 0) +
-              (stats['current_month_debit_total'] as num? ?? 0))
-          .toDouble(),
+      totalExpense: (pendingBill + debitTotal),
+      pendingBillAmount: pendingBill,
+      monthDebitTotal: debitTotal,
       monthlyBudget: 0,
       budgetSpent: 0,
       budgetPercentage: 0,

@@ -40,12 +40,14 @@ class TransactionModel extends Transaction {
       amount: double.tryParse(json['amount'].toString()) ?? 0.0,
       type: json['type'] as String,
       status: json['status'] as String? ?? 'pending',
-      date: json['date'] != null
-          ? DateTime.tryParse(json['date'].toString())
-          : null,
+      date: json['paid_date'] != null
+          ? DateTime.tryParse(json['paid_date'].toString())
+          : (json['created_at'] != null
+              ? DateTime.tryParse(json['created_at'].toString())
+              : null),
       description: json['description'] as String?,
       isRecurring: json['is_recurring'] == true || json['is_recurring'] == 1,
-      installments: json['installments'] as int? ?? 1,
+      installments: json['total_installments'] as int? ?? json['installments'] as int? ?? 1,
       userId: json['user_id'] as int,
       categoryId: json['category_id'] as int?,
       cardUserId: json['card_user_id'] as int?,
@@ -56,9 +58,9 @@ class TransactionModel extends Transaction {
           json['category_icon'] as String?,
       categoryColor: json['category']?['color'] as String? ??
           json['category_color'] as String?,
-      cardName: json['card_user']?['card']?['name'] as String? ??
+      cardName: json['bank_user']?['card']?['name'] as String? ??
           json['card_name'] as String?,
-      bankName: json['bank_user']?['bank']?['name'] as String? ??
+      bankName: json['bank_user']?['card']?['name'] as String? ??
           json['bank_name'] as String?,
       parcelas: parcelas,
       createdAt: json['created_at'] != null

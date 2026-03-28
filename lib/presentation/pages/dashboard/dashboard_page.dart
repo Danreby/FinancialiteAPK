@@ -228,7 +228,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   children: [
                     Expanded(
                       child: _BalanceRow(
-                        label: 'Crédito',
+                        label: 'Receitas',
                         value: CurrencyFormatter.format(data.totalIncome),
                         icon: Icons.arrow_upward_rounded,
                         color: const Color(0xFF34D399),
@@ -241,10 +241,37 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     Expanded(
                       child: _BalanceRow(
-                        label: 'Débito',
+                        label: 'Despesas',
                         value: CurrencyFormatter.format(data.totalExpense),
                         icon: Icons.arrow_downward_rounded,
                         color: const Color(0xFFFB7185),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Credit (pending invoice) vs Debit (month total) row
+                Row(
+                  children: [
+                    Expanded(
+                      child: _BalanceRow(
+                        label: 'Crédito',
+                        value: CurrencyFormatter.format(data.pendingBillAmount),
+                        icon: Icons.credit_card_rounded,
+                        color: const Color(0xFF60A5FA),
+                      ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 36,
+                      color: Colors.white.withValues(alpha: 0.2),
+                    ),
+                    Expanded(
+                      child: _BalanceRow(
+                        label: 'Débito',
+                        value: CurrencyFormatter.format(data.monthDebitTotal),
+                        icon: Icons.account_balance_rounded,
+                        color: const Color(0xFFFBBF24),
                       ),
                     ),
                   ],

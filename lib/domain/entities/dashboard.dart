@@ -4,6 +4,8 @@ class DashboardData extends Equatable {
   final double totalBalance;
   final double totalIncome;
   final double totalExpense;
+  final double pendingBillAmount;
+  final double monthDebitTotal;
   final double monthlyBudget;
   final double budgetSpent;
   final double budgetPercentage;
@@ -18,6 +20,8 @@ class DashboardData extends Equatable {
     this.totalBalance = 0,
     this.totalIncome = 0,
     this.totalExpense = 0,
+    this.pendingBillAmount = 0,
+    this.monthDebitTotal = 0,
     this.monthlyBudget = 0,
     this.budgetSpent = 0,
     this.budgetPercentage = 0,
@@ -32,7 +36,7 @@ class DashboardData extends Equatable {
   double get balance => totalIncome - totalExpense;
 
   @override
-  List<Object?> get props => [totalBalance, totalIncome, totalExpense, healthScore];
+  List<Object?> get props => [totalBalance, totalIncome, totalExpense, pendingBillAmount, monthDebitTotal, healthScore];
 }
 
 class MonthlyChartData extends Equatable {
