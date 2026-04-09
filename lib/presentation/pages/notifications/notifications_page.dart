@@ -43,15 +43,52 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     letterSpacing: -0.5,
                   ),
                 ),
-                GestureDetector(
-                  onTap: () => context.read<NotificationCubit>().markAllAsRead(),
-                  child: Text(
-                    'Ler tudo',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.w600,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () => context.read<NotificationCubit>().markAllAsRead(),
+                      child: Text(
+                        'Ler tudo',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 16),
+                    GestureDetector(
+                      onTap: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('Limpar notificações'),
+                            content: const Text('Deseja remover todas as notificações?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx, false),
+                                child: const Text('Cancelar'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx, true),
+                                child: const Text('Limpar'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm == true && context.mounted) {
+                          context.read<NotificationCubit>().clearAll();
+                        }
+                      },
+                      child: Text(
+                        'Limpar tudo',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.error,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
