@@ -298,8 +298,12 @@ class _SavingsPageState extends State<SavingsPage> {
                                   color: progressColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(14),
                                 ),
-                                child: Icon(Icons.savings,
-                                    color: progressColor, size: 22),
+                                child: Center(
+                                  child: goal.icon != null && goal.icon!.isNotEmpty
+                                      ? Text(goal.icon!, style: const TextStyle(fontSize: 22))
+                                      : Icon(Icons.savings,
+                                          color: progressColor, size: 22),
+                                ),
                               ),
                               const SizedBox(width: 14),
                               Expanded(
