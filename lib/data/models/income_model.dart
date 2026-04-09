@@ -121,7 +121,7 @@ class IncomeSummaryModel extends IncomeSummary {
 
   factory IncomeSummaryModel.fromJson(Map<String, dynamic> json) {
     return IncomeSummaryModel(
-      totalMonthly: (json['total_monthly'] as num? ?? 0).toDouble(),
+      totalMonthly: (json['total_monthly'] as num? ?? json['total_monthly_income'] as num? ?? 0).toDouble(),
       activeCount: json['active_count'] as int? ?? 0,
       inactiveCount: json['inactive_count'] as int? ?? 0,
     );

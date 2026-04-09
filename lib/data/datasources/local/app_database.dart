@@ -194,10 +194,15 @@ class AppDatabase {
         amount REAL NOT NULL,
         type TEXT NOT NULL,
         payment_day INTEGER,
+        is_recurring INTEGER DEFAULT 1,
+        payment_day_type TEXT,
+        payment_day_value INTEGER,
         is_active INTEGER DEFAULT 1,
         bank_user_id INTEGER,
+        bank_account_id INTEGER,
         user_id INTEGER NOT NULL,
         description TEXT,
+        received_at TEXT,
         created_at TEXT,
         updated_at TEXT,
         deleted_at TEXT,
@@ -309,7 +314,15 @@ class AppDatabase {
     await db.execute('CREATE INDEX idx_sync_queue_table ON sync_queue(table_name, processed_at)');
   }
 
-  static Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {}
+  static Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE incomes ADD COLUMN is_recurring INTEGER DEFAULT 1');
+      await db.execute('ALTER TABLE incomes ADD COLUMN payment_day_type TEXT');
+      await db.execute('ALTER TABLE incomes ADD COLUMN payment_day_value INTEGER');
+      await db.execute('ALTER TABLE incomes ADD COLUMN bank_account_id INTEGER');
+      await db.execute('ALTER TABLE incomes ADD COLUMN received_at TEXT');
+    }
+  }
 
   static Future<void> clearAll() async {
     final db = await database;

@@ -12,5 +12,5 @@ class StorageConstants {
   static const String isFirstLaunch = 'is_first_launch';
 
   static const String dbName = 'financialite.db';
-  static const int dbVersion = 1;
+  static const int dbVersion = 2;
 }

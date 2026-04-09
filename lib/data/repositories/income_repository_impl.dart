@@ -22,13 +22,15 @@ class IncomeRepositoryImpl extends BaseOfflineRepository
         final list = safeList(response.data)
             .map((j) => IncomeModel.fromJson(j))
             .toList();
-        final database = await db;
-        final batch = database.batch();
-        for (final item in list) {
-          batch.insert('incomes', (item as IncomeModel).toDbMap(),
-              conflictAlgorithm: ConflictAlgorithm.replace);
-        }
-        await batch.commit(noResult: true);
+        try {
+          final database = await db;
+          final batch = database.batch();
+          for (final item in list) {
+            batch.insert('incomes', (item as IncomeModel).toDbMap(),
+                conflictAlgorithm: ConflictAlgorithm.replace);
+          }
+          await batch.commit(noResult: true);
+        } catch (_) {}
         return list;
       }
     } catch (_) {}
@@ -91,6 +93,9 @@ class IncomeRepositoryImpl extends BaseOfflineRepository
   @override
   Future<IncomeSummary> getSummary() async {
     final response = await api.get(ApiConstants.incomeSummary);
-    return IncomeSummaryModel.fromJson(response.data);
+    final data = response.data is Map && response.data['data'] != null
+        ? response.data['data'] as Map<String, dynamic>
+        : response.data as Map<String, dynamic>;
+    return IncomeSummaryModel.fromJson(data);
   }
 }
