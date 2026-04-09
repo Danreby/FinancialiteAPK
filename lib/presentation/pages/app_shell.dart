@@ -109,19 +109,12 @@ class _AppShellState extends State<AppShell> {
                   isSelected: selectedIndex == 3,
                   onTap: () => _onItemTapped(3),
                 ),
-                BlocBuilder<NotificationCubit, NotificationState>(
-                  builder: (context, state) {
-                    final count =
-                        state is NotificationLoaded ? state.unreadCount : 0;
-                    return _NavItem(
-                      icon: Icons.more_horiz_rounded,
-                      selectedIcon: Icons.more_horiz_rounded,
-                      label: 'Mais',
-                      isSelected: selectedIndex == 4,
-                      badgeCount: count,
-                      onTap: () => _onItemTapped(4),
-                    );
-                  },
+                _NavItem(
+                  icon: Icons.more_horiz_rounded,
+                  selectedIcon: Icons.more_horiz_rounded,
+                  label: 'Mais',
+                  isSelected: selectedIndex == 4,
+                  onTap: () => _onItemTapped(4),
                 ),
               ],
             ),

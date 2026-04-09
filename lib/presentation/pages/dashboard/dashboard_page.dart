@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:go_router/go_router.dart';
 import '../../blocs/dashboard/dashboard_cubit.dart';
+import '../../blocs/notification/notification_cubit.dart';
+import '../../blocs/savings/savings_cubit.dart';
+import '../../widgets/income_form_dialog.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/stat_card.dart';
@@ -31,6 +34,7 @@ class _DashboardPageState extends State<DashboardPage> {
   void _loadData() {
     final monthKey = DateFormatter.monthKey(_selectedMonth);
     context.read<DashboardCubit>().load(month: monthKey);
+    context.read<SavingsCubit>().loadGoals();
   }
 
   @override
@@ -69,21 +73,33 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ],
                     ),
-                    GestureDetector(
-                      onTap: () => context.push('/notifications'),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest
-                              .withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Icon(
-                          Icons.notifications_outlined,
-                          color: theme.colorScheme.onSurface,
-                          size: 22,
-                        ),
-                      ),
+                    BlocBuilder<NotificationCubit, NotificationState>(
+                      builder: (context, notifState) {
+                        final unread = notifState is NotificationLoaded ? notifState.unreadCount : 0;
+                        return GestureDetector(
+                          onTap: () => context.push('/notifications'),
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerHighest
+                                  .withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Badge(
+                              isLabelVisible: unread > 0,
+                              label: Text(
+                                '$unread',
+                                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700),
+                              ),
+                              child: Icon(
+                                Icons.notifications_outlined,
+                                color: theme.colorScheme.onSurface,
+                                size: 22,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -297,12 +313,19 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: StatCard(
-                  title: 'Economias',
-                  value: CurrencyFormatter.format(data.savingsTotal),
-                  icon: Icons.savings_rounded,
-                  iconColor: const Color(0xFF3B82F6),
-                  onTap: () => context.push('/savings'),
+                child: BlocBuilder<SavingsCubit, SavingsState>(
+                  builder: (context, savingsState) {
+                    final total = savingsState is SavingsLoaded
+                        ? (savingsState.summary?.totalSaved ?? 0.0)
+                        : 0.0;
+                    return StatCard(
+                      title: 'Metas',
+                      value: CurrencyFormatter.format(total),
+                      icon: Icons.savings_rounded,
+                      iconColor: const Color(0xFF3B82F6),
+                      onTap: () => context.push('/savings'),
+                    );
+                  },
                 ),
               ),
             ],
@@ -328,7 +351,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   label: 'Nova Entrada',
                   icon: Icons.arrow_upward_rounded,
                   color: const Color(0xFF10B981),
-                  onTap: () => context.push('/income'),
+                  onTap: () => showIncomeFormDialog(context),
                 ),
               ),
             ],

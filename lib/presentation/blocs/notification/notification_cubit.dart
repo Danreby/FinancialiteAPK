@@ -89,4 +89,13 @@ class NotificationCubit extends Cubit<NotificationState> {
       emit(NotificationError(e.toString()));
     }
   }
+
+  Future<void> clearAll() async {
+    try {
+      await _repository.clearAll();
+      emit(const NotificationLoaded(notifications: [], unreadCount: 0));
+    } catch (e) {
+      emit(NotificationError(e.toString()));
+    }
+  }
 }
