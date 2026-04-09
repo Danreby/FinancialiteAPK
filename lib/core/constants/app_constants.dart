@@ -2,7 +2,7 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'Financialite';
-  static const String appVersion = '1.0.0';
+  static const String appVersion = '1.1.0';
   static const String locale = 'pt_BR';
   static const String currency = 'BRL';
   static const String currencySymbol = 'R\$';
