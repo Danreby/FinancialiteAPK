@@ -4,14 +4,12 @@ import 'package:go_router/go_router.dart';
 import '../../blocs/transaction/transaction_bloc.dart';
 import '../../blocs/category/category_cubit.dart';
 import '../../blocs/card/card_cubit.dart';
-import '../../blocs/bank/bank_cubit.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/currency_text_field.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/di/injection_container.dart';
 import '../../../domain/entities/category.dart';
 import '../../../domain/entities/card_entity.dart';
-import '../../../domain/entities/bank_account.dart';
 import '../../../domain/repositories/transaction_repository.dart';
 
 class TransactionFormPage extends StatefulWidget {
@@ -30,7 +28,6 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
   String _type = 'debit';
   int? _categoryId;
   int? _cardUserId;
-  int? _bankAccountId;
   DateTime _date = DateTime.now();
   bool _isRecurring = false;
   final _installmentsController = TextEditingController(text: '1');
@@ -42,7 +39,6 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
     super.initState();
     context.read<CategoryCubit>().loadCategories();
     context.read<CardCubit>().loadCards();
-    context.read<BankCubit>().loadAccounts();
     if (_isEditing) {
       _loadTransaction();
     }
@@ -61,7 +57,6 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
             tx.amount.toStringAsFixed(2).replaceAll('.', ',');
         _categoryId = tx.categoryId;
         _cardUserId = tx.cardUserId;
-        _bankAccountId = tx.bankUserId;
         _isRecurring = tx.isRecurring;
         _installmentsController.text = tx.installments.toString();
         if (tx.date != null) _date = tx.date!;
@@ -378,33 +373,6 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                       ],
                                       onChanged: (v) =>
                                           setState(() => _cardUserId = v),
-                                    );
-                                  },
-                                ),
-                                const SizedBox(height: 16),
-                                BlocBuilder<BankCubit, BankState>(
-                                  builder: (context, state) {
-                                    final accounts = state is BankLoaded
-                                        ? state.accounts
-                                        : <BankAccount>[];
-                                    return DropdownButtonFormField<int>(
-                                      value: _bankAccountId,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Banco (opcional)',
-                                        prefixIcon: Icon(Icons.account_balance),
-                                      ),
-                                      items: [
-                                        const DropdownMenuItem<int>(
-                                          value: null,
-                                          child: Text('Nenhum'),
-                                        ),
-                                        ...accounts.map((a) => DropdownMenuItem(
-                                              value: a.id,
-                                              child: Text(a.displayName),
-                                            )),
-                                      ],
-                                      onChanged: (v) =>
-                                          setState(() => _bankAccountId = v),
                                     );
                                   },
                                 ),
