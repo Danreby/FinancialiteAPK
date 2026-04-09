@@ -5,13 +5,11 @@ import '../../blocs/bill/bill_cubit.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
-import '../../widgets/month_selector.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/currency_text_field.dart';
 import '../../widgets/section_header.dart';
 import '../../../core/utils/currency_formatter.dart';
-import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/validators.dart';
 
 class BillsPage extends StatefulWidget {
@@ -22,8 +20,6 @@ class BillsPage extends StatefulWidget {
 }
 
 class _BillsPageState extends State<BillsPage> {
-  DateTime _selectedMonth = DateTime.now();
-
   @override
   void initState() {
     super.initState();
@@ -31,9 +27,7 @@ class _BillsPageState extends State<BillsPage> {
   }
 
   void _loadData() {
-    context
-        .read<BillCubit>()
-        .loadBills(month: DateFormatter.monthKey(_selectedMonth));
+    context.read<BillCubit>().loadBills();
   }
 
   Color _statusColor(String status, ThemeData theme) {
@@ -180,13 +174,6 @@ class _BillsPageState extends State<BillsPage> {
                 ),
               ],
             ),
-          ),
-          MonthSelector(
-            selectedMonth: _selectedMonth,
-            onChanged: (date) {
-              setState(() => _selectedMonth = date);
-              _loadData();
-            },
           ),
           const SizedBox(height: 12),
           Expanded(
