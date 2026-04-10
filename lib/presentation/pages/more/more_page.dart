@@ -114,7 +114,7 @@ class MorePage extends StatelessWidget {
           const SizedBox(height: 32),
           Center(
             child: Text(
-              'Financialite v1.0.0',
+              'Financialite v1.2.0',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.outline,
               ),
