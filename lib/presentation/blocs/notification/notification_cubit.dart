@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../../domain/entities/notification.dart';
 import '../../../domain/repositories/notification_repository.dart';
 
@@ -7,10 +8,21 @@ part 'notification_state.dart';
 
 class NotificationCubit extends Cubit<NotificationState> {
   final NotificationRepository _repository;
+  bool _permissionRequested = false;
 
   NotificationCubit(this._repository) : super(const NotificationInitial());
 
+  Future<void> _requestPermissionIfNeeded() async {
+    if (_permissionRequested) return;
+    _permissionRequested = true;
+    final status = await Permission.notification.status;
+    if (!status.isGranted) {
+      await Permission.notification.request();
+    }
+  }
+
   Future<void> loadNotifications() async {
+    _requestPermissionIfNeeded();
     emit(const NotificationLoading());
     try {
       final notifications = await _repository.getNotifications();
