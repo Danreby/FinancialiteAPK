@@ -61,7 +61,8 @@ class PushNotificationService {
       ),
     );
 
-    await _plugin.show(id: id, title: title, body: body, notificationDetails: details);
+    await _plugin.show(
+        id: id, title: title, body: body, notificationDetails: details);
   }
 
   /// Called by WorkManager on every periodic tick.
