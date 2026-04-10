@@ -9,7 +9,6 @@ import '../../widgets/income_form_dialog.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/stat_card.dart';
-import '../../widgets/month_selector.dart';
 import '../../widgets/gradient_card.dart';
 import '../../widgets/section_header.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -23,8 +22,6 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  DateTime _selectedMonth = DateTime.now();
-
   @override
   void initState() {
     super.initState();
@@ -32,7 +29,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void _loadData() {
-    final monthKey = DateFormatter.monthKey(_selectedMonth);
+    final monthKey = DateFormatter.monthKey(DateTime.now());
     context.read<DashboardCubit>().load(month: monthKey);
     context.read<SavingsCubit>().loadGoals();
   }
@@ -43,7 +40,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
-          final monthKey = DateFormatter.monthKey(_selectedMonth);
+          final monthKey = DateFormatter.monthKey(DateTime.now());
           await context.read<DashboardCubit>().refresh(month: monthKey);
         },
         child: CustomScrollView(
@@ -105,19 +102,6 @@ class _DashboardPageState extends State<DashboardPage> {
                       },
                     ),
                   ],
-                ),
-              ),
-            ),
-            // Month Selector
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 16, bottom: 8),
-                child: MonthSelector(
-                  selectedMonth: _selectedMonth,
-                  onChanged: (date) {
-                    setState(() => _selectedMonth = date);
-                    _loadData();
-                  },
                 ),
               ),
             ),
