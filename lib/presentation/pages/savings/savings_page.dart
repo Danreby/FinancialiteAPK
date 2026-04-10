@@ -299,8 +299,10 @@ class _SavingsPageState extends State<SavingsPage> {
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                                 child: Center(
-                                  child: goal.icon != null && goal.icon!.isNotEmpty
-                                      ? Text(goal.icon!, style: const TextStyle(fontSize: 22))
+                                  child: goal.icon != null &&
+                                          goal.icon!.isNotEmpty
+                                      ? Text(goal.icon!,
+                                          style: const TextStyle(fontSize: 22))
                                       : Icon(Icons.savings,
                                           color: progressColor, size: 22),
                                 ),

@@ -47,7 +47,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     GestureDetector(
-                      onTap: () => context.read<NotificationCubit>().markAllAsRead(),
+                      onTap: () =>
+                          context.read<NotificationCubit>().markAllAsRead(),
                       child: Text(
                         'Ler tudo',
                         style: theme.textTheme.bodyMedium?.copyWith(
@@ -63,7 +64,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           context: context,
                           builder: (ctx) => AlertDialog(
                             title: const Text('Limpar notificações'),
-                            content: const Text('Deseja remover todas as notificações?'),
+                            content: const Text(
+                                'Deseja remover todas as notificações?'),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx, false),
@@ -97,12 +99,14 @@ class _NotificationsPageState extends State<NotificationsPage> {
             child: BlocBuilder<NotificationCubit, NotificationState>(
               builder: (context, state) {
                 if (state is NotificationLoading) {
-                  return const AppLoadingIndicator(useShimmer: true, shimmerLines: 5);
+                  return const AppLoadingIndicator(
+                      useShimmer: true, shimmerLines: 5);
                 }
                 if (state is NotificationError) {
                   return AppErrorWidget(
                     message: state.message,
-                    onRetry: () => context.read<NotificationCubit>().loadNotifications(),
+                    onRetry: () =>
+                        context.read<NotificationCubit>().loadNotifications(),
                   );
                 }
                 if (state is NotificationLoaded) {
@@ -114,7 +118,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     );
                   }
                   return RefreshIndicator(
-                    onRefresh: () async => context.read<NotificationCubit>().loadNotifications(),
+                    onRefresh: () async =>
+                        context.read<NotificationCubit>().loadNotifications(),
                     child: ListView.builder(
                       padding: const EdgeInsets.only(top: 8),
                       itemCount: state.notifications.length,
@@ -123,7 +128,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         final isUnread = !n.isRead;
                         final typeColor = _notifColor(n.type);
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 6),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(16),
                             child: Dismissible(
@@ -133,23 +139,32 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                 alignment: Alignment.centerRight,
                                 padding: const EdgeInsets.only(right: 20),
                                 color: theme.colorScheme.error,
-                                child: const Icon(Icons.delete, color: Colors.white),
+                                child: const Icon(Icons.delete,
+                                    color: Colors.white),
                               ),
-                              onDismissed: (_) => context.read<NotificationCubit>().deleteNotification(n.id!),
+                              onDismissed: (_) => context
+                                  .read<NotificationCubit>()
+                                  .deleteNotification(n.id!),
                               child: GestureDetector(
-                                onTap: isUnread ? () => context.read<NotificationCubit>().markAsRead(n.id!) : null,
+                                onTap: isUnread
+                                    ? () => context
+                                        .read<NotificationCubit>()
+                                        .markAsRead(n.id!)
+                                    : null,
                                 child: Container(
                                   padding: const EdgeInsets.all(14),
                                   decoration: BoxDecoration(
                                     color: isUnread
                                         ? Color.alphaBlend(
-                                            theme.colorScheme.primary.withValues(alpha: 0.03),
+                                            theme.colorScheme.primary
+                                                .withValues(alpha: 0.03),
                                             theme.colorScheme.surface,
                                           )
                                         : theme.colorScheme.surface,
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                                      color: theme.colorScheme.outlineVariant
+                                          .withValues(alpha: 0.5),
                                     ),
                                   ),
                                   child: Row(
@@ -158,20 +173,27 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                         width: 44,
                                         height: 44,
                                         decoration: BoxDecoration(
-                                          color: typeColor.withValues(alpha: 0.08),
-                                          borderRadius: BorderRadius.circular(14),
+                                          color:
+                                              typeColor.withValues(alpha: 0.08),
+                                          borderRadius:
+                                              BorderRadius.circular(14),
                                         ),
-                                        child: Icon(_notifIcon(n.type), color: typeColor, size: 22),
+                                        child: Icon(_notifIcon(n.type),
+                                            color: typeColor, size: 22),
                                       ),
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               n.title,
-                                              style: theme.textTheme.bodyLarge?.copyWith(
-                                                fontWeight: isUnread ? FontWeight.w600 : FontWeight.w400,
+                                              style: theme.textTheme.bodyLarge
+                                                  ?.copyWith(
+                                                fontWeight: isUnread
+                                                    ? FontWeight.w600
+                                                    : FontWeight.w400,
                                               ),
                                             ),
                                             if (n.message != null) ...[
@@ -180,17 +202,23 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                                 n.message!,
                                                 maxLines: 2,
                                                 overflow: TextOverflow.ellipsis,
-                                                style: theme.textTheme.bodyMedium?.copyWith(
-                                                  color: theme.colorScheme.onSurfaceVariant,
+                                                style: theme
+                                                    .textTheme.bodyMedium
+                                                    ?.copyWith(
+                                                  color: theme.colorScheme
+                                                      .onSurfaceVariant,
                                                 ),
                                               ),
                                             ],
                                             if (n.createdAt != null) ...[
                                               const SizedBox(height: 4),
                                               Text(
-                                                DateFormatter.relativeTime(n.createdAt!),
-                                                style: theme.textTheme.bodySmall?.copyWith(
-                                                  color: theme.colorScheme.outline,
+                                                DateFormatter.relativeTime(
+                                                    n.createdAt!),
+                                                style: theme.textTheme.bodySmall
+                                                    ?.copyWith(
+                                                  color:
+                                                      theme.colorScheme.outline,
                                                 ),
                                               ),
                                             ],
@@ -201,7 +229,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                         Container(
                                           width: 8,
                                           height: 8,
-                                          margin: const EdgeInsets.only(left: 8),
+                                          margin:
+                                              const EdgeInsets.only(left: 8),
                                           decoration: BoxDecoration(
                                             color: theme.colorScheme.primary,
                                             shape: BoxShape.circle,

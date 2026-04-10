@@ -75,7 +75,9 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     BlocBuilder<NotificationCubit, NotificationState>(
                       builder: (context, notifState) {
-                        final unread = notifState is NotificationLoaded ? notifState.unreadCount : 0;
+                        final unread = notifState is NotificationLoaded
+                            ? notifState.unreadCount
+                            : 0;
                         return GestureDetector(
                           onTap: () => context.push('/notifications'),
                           child: Container(
@@ -89,7 +91,8 @@ class _DashboardPageState extends State<DashboardPage> {
                               isLabelVisible: unread > 0,
                               label: Text(
                                 '$unread',
-                                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700),
+                                style: const TextStyle(
+                                    fontSize: 9, fontWeight: FontWeight.w700),
                               ),
                               child: Icon(
                                 Icons.notifications_outlined,

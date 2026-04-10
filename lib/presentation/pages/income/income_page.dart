@@ -144,8 +144,7 @@ class _IncomePageState extends State<IncomePage> {
                                 confirmDismiss: (_) => ConfirmDialog.show(
                                   context,
                                   title: 'Excluir receita',
-                                  message:
-                                      'Deseja excluir "${income.title}"?',
+                                  message: 'Deseja excluir "${income.title}"?',
                                   confirmText: 'Excluir',
                                   confirmColor: theme.colorScheme.error,
                                 ),
@@ -211,11 +210,10 @@ class _IncomePageState extends State<IncomePage> {
                                                 if (income.isRecurring) ...[
                                                   const SizedBox(width: 6),
                                                   Container(
-                                                    padding:
-                                                        const EdgeInsets
-                                                            .symmetric(
-                                                            horizontal: 6,
-                                                            vertical: 1),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 1),
                                                     decoration: BoxDecoration(
                                                       color: const Color(
                                                               0xFF3B82F6)
@@ -295,8 +293,9 @@ class _IncomePageState extends State<IncomePage> {
                                             size: 18,
                                             color: theme
                                                 .colorScheme.onSurfaceVariant),
-                                        onPressed: () =>
-                                            showIncomeFormDialog(context, editing: income),
+                                        onPressed: () => showIncomeFormDialog(
+                                            context,
+                                            editing: income),
                                         constraints: const BoxConstraints(
                                             maxWidth: 32, maxHeight: 32),
                                         padding: EdgeInsets.zero,

@@ -126,7 +126,8 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                           duration: const Duration(milliseconds: 200),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                                ? theme.colorScheme.primary
+                                    .withValues(alpha: 0.1)
                                 : theme.colorScheme.surfaceContainerHighest
                                     .withValues(alpha: 0.5),
                             borderRadius: BorderRadius.circular(14),
@@ -155,8 +156,9 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                                   color: isSelected
                                       ? theme.colorScheme.primary
                                       : theme.colorScheme.onSurfaceVariant,
-                                  fontWeight:
-                                      isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
                                 ),
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
@@ -290,8 +292,9 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                   const SizedBox(height: 12),
                   BlocBuilder<BankCubit, BankState>(
                     builder: (context, state) {
-                      final accounts =
-                          state is BankLoaded ? state.accounts : <BankAccount>[];
+                      final accounts = state is BankLoaded
+                          ? state.accounts
+                          : <BankAccount>[];
                       return DropdownButtonFormField<int>(
                         value: bankAccountId,
                         decoration: const InputDecoration(
@@ -335,7 +338,8 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                         if (!formKey.currentState!.validate()) return;
                         final data = <String, dynamic>{
                           'title': titleCtrl.text.trim(),
-                          'amount': CurrencyTextField.parseValue(amountCtrl.text),
+                          'amount':
+                              CurrencyTextField.parseValue(amountCtrl.text),
                           'type': incomeType,
                           'is_recurring': isRecurring,
                           'is_active': isActive,

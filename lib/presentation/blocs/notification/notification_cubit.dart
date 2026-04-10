@@ -15,8 +15,11 @@ class NotificationCubit extends Cubit<NotificationState> {
     try {
       final notifications = await _repository.getNotifications();
       int unreadCount = 0;
-      try { unreadCount = await _repository.getUnreadCount(); } catch (_) {}
-      emit(NotificationLoaded(notifications: notifications, unreadCount: unreadCount));
+      try {
+        unreadCount = await _repository.getUnreadCount();
+      } catch (_) {}
+      emit(NotificationLoaded(
+          notifications: notifications, unreadCount: unreadCount));
     } catch (e) {
       emit(NotificationError(e.toString()));
     }
@@ -81,8 +84,10 @@ class NotificationCubit extends Cubit<NotificationState> {
         final current = state as NotificationLoaded;
         final removed = current.notifications.firstWhere((n) => n.id == id);
         emit(NotificationLoaded(
-          notifications: current.notifications.where((n) => n.id != id).toList(),
-          unreadCount: !removed.isRead ? current.unreadCount - 1 : current.unreadCount,
+          notifications:
+              current.notifications.where((n) => n.id != id).toList(),
+          unreadCount:
+              !removed.isRead ? current.unreadCount - 1 : current.unreadCount,
         ));
       }
     } catch (e) {

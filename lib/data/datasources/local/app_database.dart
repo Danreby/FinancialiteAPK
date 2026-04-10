@@ -303,23 +303,33 @@ class AppDatabase {
       )
     ''');
 
-    await db.execute('CREATE INDEX idx_transactions_user ON transactions(user_id)');
-    await db.execute('CREATE INDEX idx_transactions_date ON transactions(date)');
-    await db.execute('CREATE INDEX idx_transactions_type ON transactions(type)');
+    await db
+        .execute('CREATE INDEX idx_transactions_user ON transactions(user_id)');
+    await db
+        .execute('CREATE INDEX idx_transactions_date ON transactions(date)');
+    await db
+        .execute('CREATE INDEX idx_transactions_type ON transactions(type)');
     await db.execute('CREATE INDEX idx_bills_user ON bills(user_id)');
     await db.execute('CREATE INDEX idx_incomes_user ON incomes(user_id)');
-    await db.execute('CREATE INDEX idx_budgets_user_month ON budgets(user_id, month_year)');
+    await db.execute(
+        'CREATE INDEX idx_budgets_user_month ON budgets(user_id, month_year)');
     await db.execute('CREATE INDEX idx_savings_user ON savings_goals(user_id)');
-    await db.execute('CREATE INDEX idx_notifications_user ON notifications(user_id)');
-    await db.execute('CREATE INDEX idx_sync_queue_table ON sync_queue(table_name, processed_at)');
+    await db.execute(
+        'CREATE INDEX idx_notifications_user ON notifications(user_id)');
+    await db.execute(
+        'CREATE INDEX idx_sync_queue_table ON sync_queue(table_name, processed_at)');
   }
 
-  static Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+  static Future<void> _onUpgrade(
+      Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      await db.execute('ALTER TABLE incomes ADD COLUMN is_recurring INTEGER DEFAULT 1');
+      await db.execute(
+          'ALTER TABLE incomes ADD COLUMN is_recurring INTEGER DEFAULT 1');
       await db.execute('ALTER TABLE incomes ADD COLUMN payment_day_type TEXT');
-      await db.execute('ALTER TABLE incomes ADD COLUMN payment_day_value INTEGER');
-      await db.execute('ALTER TABLE incomes ADD COLUMN bank_account_id INTEGER');
+      await db
+          .execute('ALTER TABLE incomes ADD COLUMN payment_day_value INTEGER');
+      await db
+          .execute('ALTER TABLE incomes ADD COLUMN bank_account_id INTEGER');
       await db.execute('ALTER TABLE incomes ADD COLUMN received_at TEXT');
     }
   }
@@ -327,10 +337,23 @@ class AppDatabase {
   static Future<void> clearAll() async {
     final db = await database;
     final tables = [
-      'sync_queue', 'notifications', 'bank_transfers', 'savings_goals',
-      'budget_categories', 'budgets', 'incomes', 'bill_payments', 'bills',
-      'transaction_parcelas', 'transactions', 'card_users', 'cards',
-      'bank_users', 'banks', 'categories', 'users',
+      'sync_queue',
+      'notifications',
+      'bank_transfers',
+      'savings_goals',
+      'budget_categories',
+      'budgets',
+      'incomes',
+      'bill_payments',
+      'bills',
+      'transaction_parcelas',
+      'transactions',
+      'card_users',
+      'cards',
+      'bank_users',
+      'banks',
+      'categories',
+      'users',
     ];
     for (final table in tables) {
       await db.delete(table);
