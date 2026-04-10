@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import '../../blocs/bill/bill_cubit.dart';
+import '../../../domain/entities/bill.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
@@ -30,29 +30,69 @@ class _BillsPageState extends State<BillsPage> {
     context.read<BillCubit>().loadBills();
   }
 
-  Color _statusColor(String status, ThemeData theme) {
-    switch (status) {
-      case 'paid':
-        return Colors.green;
-      case 'overdue':
-        return theme.colorScheme.error;
-      case 'partial':
-        return Colors.orange;
-      default:
-        return theme.colorScheme.primary;
+  /// Computes the next due date based on [dueDay].
+  DateTime _nextDueDate(int dueDay) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
+    final clampedDay = dueDay > daysInMonth ? daysInMonth : dueDay;
+    final thisMonth = DateTime(now.year, now.month, clampedDay);
+    if (thisMonth.isAfter(today) || thisMonth.isAtSameMomentAs(today)) {
+      return thisMonth;
     }
+    final nextMonth = DateTime(now.year, now.month + 1, 1);
+    final daysInNextMonth =
+        DateTime(nextMonth.year, nextMonth.month + 1, 0).day;
+    final clampedNext = dueDay > daysInNextMonth ? daysInNextMonth : dueDay;
+    return DateTime(nextMonth.year, nextMonth.month, clampedNext);
   }
 
-  String _statusLabel(String status) {
-    switch (status) {
-      case 'paid':
-        return 'Pago';
-      case 'overdue':
-        return 'Vencido';
-      case 'partial':
-        return 'Parcial';
-      default:
-        return 'Pendente';
+  /// Whether lastPayment already covers the current cycle.
+  bool _isPaidThisCycle(Bill bill) {
+    final lp = bill.lastPayment;
+    if (lp == null || lp.status != 'paid') return false;
+    final now = DateTime.now();
+    final dueDate = lp.dueDate;
+    if (dueDate == null) return false;
+    return dueDate.year == now.year && dueDate.month == now.month;
+  }
+
+  /// Returns display info: (label, color) for the bill's due status.
+  (String, Color) _dueInfo(Bill bill, ThemeData theme) {
+    if (_isPaidThisCycle(bill)) {
+      final next = _nextDueDate(bill.dueDay);
+      final now = DateTime.now();
+      final nextCycle = DateTime(
+        next.month == 12 ? next.year + 1 : next.year,
+        next.month == 12 ? 1 : next.month + 1,
+        1,
+      );
+      final daysInNextCycleMonth =
+          DateTime(nextCycle.year, nextCycle.month + 1, 0).day;
+      final clampedDay = bill.dueDay > daysInNextCycleMonth
+          ? daysInNextCycleMonth
+          : bill.dueDay;
+      final nextDue = DateTime(nextCycle.year, nextCycle.month, clampedDay);
+      final diff =
+          nextDue.difference(DateTime(now.year, now.month, now.day)).inDays;
+      return ('Pago · próx. ${diff}d', Colors.green);
+    }
+
+    final nextDue = _nextDueDate(bill.dueDay);
+    final today =
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final diff = nextDue.difference(today).inDays;
+
+    if (diff < 0) {
+      return ('Vencido há ${-diff}d', theme.colorScheme.error);
+    } else if (diff == 0) {
+      return ('Vence hoje', theme.colorScheme.error);
+    } else if (diff == 1) {
+      return ('Vence amanhã', Colors.orange);
+    } else if (diff <= 7) {
+      return ('Vence em ${diff}d', Colors.orange);
+    } else {
+      return ('Vence em ${diff}d', theme.colorScheme.primary);
     }
   }
 
@@ -212,8 +252,8 @@ class _BillsPageState extends State<BillsPage> {
                           );
                         }
                         final bill = state.bills[index - 1];
-                        final status = bill.lastPayment?.status ?? 'pending';
-                        final color = _statusColor(status, theme);
+                        final (dueLabel, color) = _dueInfo(bill, theme);
+                        final isPaid = _isPaidThisCycle(bill);
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
                           child: Dismissible(
@@ -240,7 +280,7 @@ class _BillsPageState extends State<BillsPage> {
                                 context.read<BillCubit>().deleteBill(bill.id!),
                             child: GestureDetector(
                               onTap: () {
-                                if (status != 'paid') {
+                                if (!isPaid) {
                                   _showPayDialog(bill.id!, bill.amount);
                                 }
                               },
@@ -316,7 +356,7 @@ class _BillsPageState extends State<BillsPage> {
                                                 BorderRadius.circular(10),
                                           ),
                                           child: Text(
-                                            _statusLabel(status),
+                                            dueLabel,
                                             style: theme.textTheme.labelSmall
                                                 ?.copyWith(
                                               color: color,
