@@ -340,7 +340,7 @@ class SettingsPage extends StatelessWidget {
               const SizedBox(height: 32),
               Center(
                 child: Text(
-                  'Financialite v1.0.0',
+                  'Financialite v1.2.0',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.outline,
                   ),
@@ -356,12 +356,12 @@ class SettingsPage extends StatelessWidget {
 
   String _themeLabel(String name) {
     const labels = {
-      'rose': 'Rose',
-      'forest': 'Forest',
-      'black': 'Black',
-      'gold': 'Gold',
-      'lavender': 'Lavender',
-      'midnight': 'Midnight',
+      'rose': 'Rosé',
+      'forest': 'Floresta',
+      'black': 'Preto',
+      'gold': 'Ouro',
+      'lavender': 'Lavanda',
+      'midnight': 'Meia-noite',
     };
     return labels[name] ?? name;
   }
@@ -369,12 +369,12 @@ class SettingsPage extends StatelessWidget {
   void _showColorSchemeSheet(BuildContext context, String current) {
     final theme = Theme.of(context);
     final schemes = [
-      ('rose', 'Rose', const Color(0xFFE11D48)),
-      ('forest', 'Forest', const Color(0xFF059669)),
-      ('black', 'Black', const Color(0xFF1F2937)),
-      ('gold', 'Gold', const Color(0xFFD97706)),
-      ('lavender', 'Lavender', const Color(0xFF7C3AED)),
-      ('midnight', 'Midnight', const Color(0xFF1E40AF)),
+      ('rose', '🌹 Rosé', const Color(0xFFE11D48)),
+      ('forest', '🌿 Floresta', const Color(0xFF059669)),
+      ('black', '🖤 Preto', const Color(0xFF1F2937)),
+      ('gold', '✨ Ouro', const Color(0xFFD97706)),
+      ('lavender', '💜 Lavanda', const Color(0xFF7C3AED)),
+      ('midnight', '🌙 Meia-noite', const Color(0xFF1E40AF)),
     ];
     showModalBottomSheet(
       context: context,
