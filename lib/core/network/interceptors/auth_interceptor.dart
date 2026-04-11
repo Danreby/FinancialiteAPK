@@ -6,14 +6,28 @@ class AuthInterceptor extends Interceptor {
   final SecureStorage _secureStorage;
   bool _isRefreshing = false;
 
+  /// Public endpoints that should never carry an Authorization header.
+  static const _publicPaths = [
+    ApiConstants.login,
+    ApiConstants.register,
+    ApiConstants.googleLogin,
+  ];
+
   AuthInterceptor(this._secureStorage);
 
   @override
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
-    final token = await _secureStorage.getAccessToken();
-    if (token != null && token.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $token';
+    try {
+      // Skip auth header for public endpoints
+      if (!_publicPaths.contains(options.path)) {
+        final token = await _secureStorage.getAccessToken();
+        if (token != null && token.isNotEmpty) {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
+      }
+    } catch (_) {
+      // If secure storage fails, proceed without auth header
     }
     handler.next(options);
   }

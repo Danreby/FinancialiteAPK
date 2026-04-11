@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/user.dart';
 import '../../../domain/repositories/auth_repository.dart';
@@ -26,15 +27,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       AuthCheckRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     try {
-      final hasToken = await _secureStorage.hasToken();
+      debugPrint('[AuthBloc] checking token...');
+      final hasToken = await _secureStorage
+          .hasToken()
+          .timeout(const Duration(seconds: 5));
+      debugPrint('[AuthBloc] hasToken=$hasToken');
       if (!hasToken) {
         emit(const AuthUnauthenticated());
         return;
       }
+      debugPrint('[AuthBloc] fetching user...');
       final user =
           await _authRepository.getUser().timeout(const Duration(seconds: 8));
+      debugPrint('[AuthBloc] authenticated: ${user.email}');
       emit(AuthAuthenticated(user));
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[AuthBloc] check failed: $e');
       emit(const AuthUnauthenticated());
     }
   }
@@ -43,11 +51,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       AuthLoginRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     try {
+      debugPrint('[AuthBloc] login start: ${event.email}');
       final user = await _authRepository
           .login(email: event.email, password: event.password)
           .timeout(const Duration(seconds: 15));
+      debugPrint('[AuthBloc] login success: ${user.email}');
       emit(AuthAuthenticated(user));
     } catch (e) {
+      debugPrint('[AuthBloc] login error: $e');
       emit(AuthError(extractErrorMessage(e)));
     }
   }

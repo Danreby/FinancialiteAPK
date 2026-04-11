@@ -9,16 +9,20 @@ class ConnectivityInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    final isConnected = await _networkInfo.isConnected;
-    if (!isConnected) {
-      handler.reject(
-        DioException(
-          requestOptions: options,
-          error: const NetworkException(),
-          type: DioExceptionType.connectionError,
-        ),
-      );
-      return;
+    try {
+      final isConnected = await _networkInfo.isConnected;
+      if (!isConnected) {
+        handler.reject(
+          DioException(
+            requestOptions: options,
+            error: const NetworkException(),
+            type: DioExceptionType.connectionError,
+          ),
+        );
+        return;
+      }
+    } catch (_) {
+      // If connectivity check itself fails, assume connected and let Dio handle errors
     }
     handler.next(options);
   }
