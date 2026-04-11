@@ -40,8 +40,8 @@ class AuthInterceptor extends Interceptor {
 
       final dio = Dio(BaseOptions(
         baseUrl: ApiConstants.apiUrl,
-        connectTimeout: ApiConstants.connectTimeout,
-        receiveTimeout: ApiConstants.receiveTimeout,
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 10),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
