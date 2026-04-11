@@ -31,9 +31,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(const AuthUnauthenticated());
         return;
       }
-      final user = await _authRepository
-          .getUser()
-          .timeout(const Duration(seconds: 8));
+      final user =
+          await _authRepository.getUser().timeout(const Duration(seconds: 8));
       emit(AuthAuthenticated(user));
     } catch (_) {
       emit(const AuthUnauthenticated());
