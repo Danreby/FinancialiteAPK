@@ -1,4 +1,3 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +13,8 @@ import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/icon_utils.dart';
 import '../../../domain/repositories/transaction_repository.dart';
 import '../../widgets/page_header.dart';
+import 'widgets/extract_stat_card.dart';
+import 'widgets/credit_debit_chart.dart';
 
 class ExtractPage extends StatelessWidget {
   const ExtractPage({super.key});
@@ -132,48 +133,44 @@ class _ExtractViewState extends State<_ExtractView> {
 
                   return Column(
                     children: [
-                      // Stats cards
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 4),
                         child: Row(
                           children: [
                             Expanded(
-                                child: _statCard(
-                                    'Crédito',
-                                    totalIn,
-                                    theme.colorScheme.error,
-                                    Icons.credit_card,
-                                    theme)),
+                                child: ExtractStatCard(
+                                    label: 'Crédito',
+                                    value: totalIn,
+                                    color: theme.colorScheme.error,
+                                    icon: Icons.credit_card)),
                             const SizedBox(width: 10),
                             Expanded(
-                                child: _statCard(
-                                    'Débito',
-                                    totalOut,
-                                    theme.colorScheme.error,
-                                    Icons.account_balance,
-                                    theme)),
+                                child: ExtractStatCard(
+                                    label: 'Débito',
+                                    value: totalOut,
+                                    color: theme.colorScheme.error,
+                                    icon: Icons.account_balance)),
                             const SizedBox(width: 10),
                             Expanded(
-                                child: _statCard(
-                                    'Saldo',
-                                    balance,
-                                    balance >= 0
+                                child: ExtractStatCard(
+                                    label: 'Saldo',
+                                    value: balance,
+                                    color: balance >= 0
                                         ? const Color(0xFF10B981)
                                         : theme.colorScheme.error,
-                                    Icons.account_balance_wallet,
-                                    theme)),
+                                    icon: Icons.account_balance_wallet)),
                           ],
                         ),
                       ),
-                      // Mini pie chart if showing all
                       if (_typeFilter == 'all' &&
                           totalIn > 0 &&
                           totalOut > 0) ...[
                         const SizedBox(height: 8),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: _buildMiniChart(totalIn, totalOut, theme),
+                          child: CreditDebitChart(
+                              totalIn: totalIn, totalOut: totalOut),
                         ),
                       ],
                       const SizedBox(height: 4),
@@ -252,113 +249,6 @@ class _ExtractViewState extends State<_ExtractView> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _statCard(
-      String label, double value, Color color, IconData icon, ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 14, color: color),
-              const SizedBox(width: 4),
-              Text(label,
-                  style: TextStyle(
-                      fontSize: 11, color: color, fontWeight: FontWeight.w600)),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            CurrencyFormatter.formatCompact(value),
-            style: theme.textTheme.titleSmall
-                ?.copyWith(fontWeight: FontWeight.w700, color: color),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMiniChart(double totalIn, double totalOut, ThemeData theme) {
-    final total = totalIn + totalOut;
-    final pctIn = totalIn / total;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 64,
-            height: 64,
-            child: PieChart(
-              PieChartData(
-                sectionsSpace: 2,
-                centerSpaceRadius: 20,
-                sections: [
-                  PieChartSectionData(
-                    value: totalIn,
-                    color: const Color(0xFF7C3AED),
-                    radius: 12,
-                    title: '',
-                  ),
-                  PieChartSectionData(
-                    value: totalOut,
-                    color: theme.colorScheme.error,
-                    radius: 12,
-                    title: '',
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _chartLegend(
-                    'Crédito', pctIn * 100, const Color(0xFF7C3AED), theme),
-                const SizedBox(height: 6),
-                _chartLegend('Débito', (1 - pctIn) * 100,
-                    theme.colorScheme.error, theme),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _chartLegend(String label, double pct, Color color, ThemeData theme) {
-    return Row(
-      children: [
-        Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-        const SizedBox(width: 6),
-        Text(label, style: theme.textTheme.bodySmall),
-        const Spacer(),
-        Text(
-          '${pct.toStringAsFixed(1)}%',
-          style: theme.textTheme.bodySmall
-              ?.copyWith(fontWeight: FontWeight.w600, color: color),
-        ),
-      ],
     );
   }
 }

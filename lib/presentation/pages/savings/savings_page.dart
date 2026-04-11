@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/savings/savings_cubit.dart';
-import '../../../domain/entities/savings_goal.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/confirm_dialog.dart';
-import '../../widgets/app_text_field.dart';
-import '../../widgets/currency_text_field.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/section_header.dart';
 import '../../../core/utils/currency_formatter.dart';
-import '../../../core/utils/date_formatter.dart';
-import '../../../core/utils/validators.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/shadowed_fab.dart';
+import 'widgets/savings_goal_card.dart';
+import 'widgets/savings_dialogs.dart';
 
 class SavingsPage extends StatefulWidget {
   const SavingsPage({super.key});
@@ -32,109 +29,12 @@ class _SavingsPageState extends State<SavingsPage> {
 
   void _loadData() => context.read<SavingsCubit>().loadGoals();
 
-  void _showGoalDialog({SavingsGoal? editing}) {
-    final nameCtrl = TextEditingController(text: editing?.title ?? '');
-    final targetCtrl = TextEditingController(
-      text: editing != null ? editing.targetAmount.toStringAsFixed(2) : '',
-    );
-    final formKey = GlobalKey<FormState>();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(
-            16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                editing != null ? 'Editar Meta' : 'Nova Meta',
-                style: Theme.of(ctx).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 16),
-              AppTextField(
-                controller: nameCtrl,
-                label: 'Nome da meta',
-                prefixIcon: Icons.flag,
-                validator: Validators.required,
-              ),
-              const SizedBox(height: 12),
-              CurrencyTextField(
-                  controller: targetCtrl,
-                  label: 'Valor alvo',
-                  validator: Validators.currency),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: () {
-                  if (!formKey.currentState!.validate()) return;
-                  final data = {
-                    'title': nameCtrl.text.trim(),
-                    'target_amount':
-                        double.tryParse(targetCtrl.text.replaceAll(',', '.')) ??
-                            0,
-                  };
-                  if (editing != null) {
-                    context.read<SavingsCubit>().updateGoal(editing.id!, data);
-                  } else {
-                    context.read<SavingsCubit>().createGoal(data);
-                  }
-                  Navigator.pop(ctx);
-                },
-                child: const Text('Salvar'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showCreateDialog() => _showGoalDialog();
-
-  void _showDepositDialog(int goalId) {
-    final amountCtrl = TextEditingController();
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(
-            16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text('Adicionar Depósito',
-                style: Theme.of(ctx).textTheme.titleLarge),
-            const SizedBox(height: 16),
-            CurrencyTextField(
-                controller: amountCtrl, validator: Validators.currency),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () {
-                context.read<SavingsCubit>().addDeposit(goalId, {
-                  'amount':
-                      double.tryParse(amountCtrl.text.replaceAll(',', '.')) ??
-                          0,
-                });
-                Navigator.pop(ctx);
-              },
-              child: const Text('Depositar'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
-      floatingActionButton: ShadowedFab(onPressed: _showCreateDialog),
+      floatingActionButton:
+          ShadowedFab(onPressed: () => showGoalDialog(context)),
       body: BlocBuilder<SavingsCubit, SavingsState>(
         builder: (context, state) {
           return Column(
@@ -197,17 +97,9 @@ class _SavingsPageState extends State<SavingsPage> {
                 subtitle: 'Crie sua primeira meta de economia',
               )
             else
-              ...state.goals.map((goal) {
-                final progress = goal.targetAmount > 0
-                    ? (goal.currentAmount / goal.targetAmount).clamp(0.0, 1.0)
-                    : 0.0;
-                final progressColor =
-                    progress >= 1.0 ? Colors.green : theme.colorScheme.primary;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: () => _showDepositDialog(goal.id!),
+              ...state.goals.map((goal) => SavingsGoalCard(
+                    goal: goal,
+                    onTap: () => showDepositDialog(context, goal.id!),
                     onLongPress: () async {
                       final confirmed = await ConfirmDialog.show(
                         context,
@@ -220,126 +112,8 @@ class _SavingsPageState extends State<SavingsPage> {
                         context.read<SavingsCubit>().deleteGoal(goal.id!);
                       }
                     },
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: theme.colorScheme.outlineVariant
-                              .withValues(alpha: 0.5),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 48,
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  color: progressColor.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: Center(
-                                  child: goal.icon != null &&
-                                          goal.icon!.isNotEmpty
-                                      ? Text(goal.icon!,
-                                          style: const TextStyle(fontSize: 22))
-                                      : Icon(Icons.savings,
-                                          color: progressColor, size: 22),
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      goal.title,
-                                      style:
-                                          theme.textTheme.titleSmall?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    if (goal.deadline != null)
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 2),
-                                        child: Text(
-                                          'Prazo: ${DateFormatter.shortDate(goal.deadline!)}',
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                            color: theme
-                                                .colorScheme.onSurfaceVariant,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: progressColor.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  '${(progress * 100).toStringAsFixed(0)}%',
-                                  style: theme.textTheme.labelMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: progressColor,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              IconButton(
-                                icon: Icon(Icons.edit_outlined,
-                                    size: 18, color: Colors.white54),
-                                onPressed: () => _showGoalDialog(editing: goal),
-                                constraints: const BoxConstraints(
-                                    maxWidth: 32, maxHeight: 32),
-                                padding: EdgeInsets.zero,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(6),
-                            child: LinearProgressIndicator(
-                              value: progress,
-                              minHeight: 10,
-                              backgroundColor: theme.colorScheme.primary
-                                  .withValues(alpha: 0.1),
-                              color: progressColor,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                CurrencyFormatter.format(goal.currentAmount),
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color: progressColor,
-                                ),
-                              ),
-                              Text(
-                                CurrencyFormatter.format(goal.targetAmount),
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }),
+                    onEdit: () => showGoalDialog(context, editing: goal),
+                  )),
           ],
         ),
       );

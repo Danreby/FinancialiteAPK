@@ -1,14 +1,13 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import '../../blocs/projections/projections_cubit.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../../core/utils/currency_formatter.dart';
-import '../../../core/utils/date_formatter.dart';
-import '../../../core/utils/icon_utils.dart';
 import '../../widgets/page_header.dart';
+import 'widgets/summary_card.dart';
+import 'widgets/monthly_projection_chart.dart';
+import 'widgets/transaction_projection_card.dart';
 
 class ProjectionsPage extends StatefulWidget {
   const ProjectionsPage({super.key});
@@ -32,9 +31,7 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
       body: Column(
         children: [
           const PageHeader(
-              title: 'Proje\u00e7\u00f5es',
-              showBackButton: true,
-              bottomPadding: 16),
+              title: 'Projeções', showBackButton: true, bottomPadding: 16),
           Expanded(
             child: BlocBuilder<ProjectionsCubit, ProjectionsState>(
               builder: (context, state) {
@@ -75,11 +72,11 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                 color:
                     theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
             const SizedBox(height: 12),
-            Text('Nenhuma proje\u00e7\u00e3o dispon\u00edvel',
+            Text('Nenhuma projeção disponível',
                 style: theme.textTheme.bodyLarge
                     ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
             const SizedBox(height: 6),
-            Text('Adicione transa\u00e7\u00f5es com parcelas ou recorrentes',
+            Text('Adicione transações com parcelas ou recorrentes',
                 style: theme.textTheme.bodySmall
                     ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
           ],
@@ -108,8 +105,8 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
           Row(
             children: [
               Expanded(
-                child: _SummaryCard(
-                  label: 'Gasto Este M\u00eas',
+                child: SummaryCard(
+                  label: 'Gasto Este Mês',
                   value: CurrencyFormatter.format(state.currentMonthDebit),
                   icon: Icons.arrow_upward,
                   color: theme.colorScheme.error,
@@ -117,7 +114,7 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _SummaryCard(
+                child: SummaryCard(
                   label: 'Renda Mensal',
                   value: CurrencyFormatter.format(state.monthlyRecurringIncome),
                   icon: Icons.arrow_downward,
@@ -128,11 +125,7 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
           ),
           const SizedBox(height: 16),
           if (months.isNotEmpty)
-            _MonthlyProjectionChart(
-              months: months,
-              chartMax: chartMax,
-              theme: theme,
-            ),
+            MonthlyProjectionChart(months: months, chartMax: chartMax),
           const SizedBox(height: 16),
           if (transactions.isNotEmpty) ...[
             Padding(
@@ -143,333 +136,10 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
                     ?.copyWith(fontWeight: FontWeight.w700),
               ),
             ),
-            ...transactions.map((tx) => _TransactionProjectionCard(
-                  tx: tx,
-                  theme: theme,
-                )),
+            ...transactions.map((tx) => TransactionProjectionCard(tx: tx)),
           ],
           const SizedBox(height: 32),
         ],
-      ),
-    );
-  }
-}
-
-class _SummaryCard extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
-  final Color color;
-
-  const _SummaryCard({
-    required this.label,
-    required this.value,
-    required this.icon,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 13, color: color),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                      fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: theme.textTheme.titleSmall
-                ?.copyWith(fontWeight: FontWeight.w700, color: color),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MonthlyProjectionChart extends StatelessWidget {
-  final List<Map<String, dynamic>> months;
-  final double chartMax;
-  final ThemeData theme;
-
-  const _MonthlyProjectionChart({
-    required this.months,
-    required this.chartMax,
-    required this.theme,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Proje\u00e7\u00e3o Mensal \u2014 6 meses',
-            style: theme.textTheme.titleSmall
-                ?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              _Legend(
-                  color: const Color(0xFF10B981), label: 'Renda (recorrente)'),
-              const SizedBox(width: 12),
-              _Legend(
-                  color: theme.colorScheme.error,
-                  label: 'D\u00e9bito projetado'),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 180,
-            child: BarChart(
-              BarChartData(
-                maxY: chartMax > 0 ? chartMax : 1000,
-                minY: 0,
-                groupsSpace: 8,
-                barTouchData: BarTouchData(
-                  enabled: true,
-                  touchTooltipData: BarTouchTooltipData(
-                    getTooltipItem: (group, _, rod, __) {
-                      final isIncome = rod.color ==
-                          const Color(0xFF10B981).withValues(alpha: 0.85);
-                      final label = isIncome ? 'Renda' : 'D\u00e9bito';
-                      return BarTooltipItem(
-                        '$label\n${CurrencyFormatter.format(rod.toY)}',
-                        const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 11,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                titlesData: FlTitlesData(
-                  topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false)),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 52,
-                      getTitlesWidget: (value, meta) => Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: Text(
-                          CurrencyFormatter.formatCompact(value),
-                          style: TextStyle(
-                              fontSize: 9,
-                              color: theme.colorScheme.onSurfaceVariant),
-                        ),
-                      ),
-                    ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        final idx = value.toInt();
-                        if (idx < 0 || idx >= months.length) {
-                          return const SizedBox.shrink();
-                        }
-                        final monthKey = months[idx]['month'] as String;
-                        final abbr = DateFormatter.shortMonthFromKey(monthKey);
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Text(
-                            abbr,
-                            style: TextStyle(
-                                fontSize: 10,
-                                color: theme.colorScheme.onSurfaceVariant),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  getDrawingHorizontalLine: (_) => FlLine(
-                    color:
-                        theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                    strokeWidth: 1,
-                  ),
-                ),
-                borderData: FlBorderData(show: false),
-                barGroups: months.asMap().entries.map((e) {
-                  final idx = e.key;
-                  final m = e.value;
-                  final income = (m['projected_income'] as num).toDouble();
-                  final debit = (m['projected_debit'] as num).toDouble();
-                  return BarChartGroupData(
-                    x: idx,
-                    barRods: [
-                      BarChartRodData(
-                        toY: income,
-                        color: const Color(0xFF10B981).withValues(alpha: 0.85),
-                        width: 10,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      BarChartRodData(
-                        toY: debit,
-                        color: theme.colorScheme.error.withValues(alpha: 0.85),
-                        width: 10,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Legend extends StatelessWidget {
-  final Color color;
-  final String label;
-  const _Legend({required this.color, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-              color: color, borderRadius: BorderRadius.circular(3)),
-        ),
-        const SizedBox(width: 4),
-        Text(label,
-            style: TextStyle(
-                fontSize: 10,
-                color: Theme.of(context).colorScheme.onSurfaceVariant)),
-      ],
-    );
-  }
-}
-
-class _TransactionProjectionCard extends StatelessWidget {
-  final Map<String, dynamic> tx;
-  final ThemeData theme;
-
-  const _TransactionProjectionCard({required this.tx, required this.theme});
-
-  @override
-  Widget build(BuildContext context) {
-    final isRecurring = tx['is_recurring'] as bool;
-    final remaining = tx['remaining_installments'] as int?;
-    final total = tx['total_installments'] as int;
-    final amountPerMonth = (tx['amount_per_month'] as num).toDouble();
-    final catColor = tx['category_color'] != null
-        ? colorFromHex(tx['category_color'] as String)
-        : theme.colorScheme.primary;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: catColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                isRecurring ? Icons.autorenew : Icons.credit_card,
-                color: catColor,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    tx['title'] as String,
-                    style: theme.textTheme.bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.w600),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    isRecurring
-                        ? 'Recorrente \u00b7 ${tx['bank_name']}'
-                        : remaining != null
-                            ? '$remaining de $total parcelas restantes \u00b7 ${tx['bank_name']}'
-                            : '$total parcelas \u00b7 ${tx['bank_name']}',
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  CurrencyFormatter.format(amountPerMonth),
-                  style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: theme.colorScheme.error),
-                ),
-                Text(
-                  'por m\u00eas',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant, fontSize: 10),
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }
