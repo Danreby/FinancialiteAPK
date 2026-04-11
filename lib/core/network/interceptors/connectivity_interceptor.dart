@@ -8,7 +8,8 @@ class ConnectivityInterceptor extends Interceptor {
   ConnectivityInterceptor(this._networkInfo);
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  void onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
     try {
       final isConnected = await _networkInfo.isConnected;
       if (!isConnected) {

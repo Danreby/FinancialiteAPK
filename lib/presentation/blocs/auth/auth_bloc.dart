@@ -28,9 +28,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(const AuthLoading());
     try {
       debugPrint('[AuthBloc] checking token...');
-      final hasToken = await _secureStorage
-          .hasToken()
-          .timeout(const Duration(seconds: 5));
+      final hasToken =
+          await _secureStorage.hasToken().timeout(const Duration(seconds: 5));
       debugPrint('[AuthBloc] hasToken=$hasToken');
       if (!hasToken) {
         emit(const AuthUnauthenticated());
