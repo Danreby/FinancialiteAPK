@@ -26,7 +26,6 @@ class ConnectivityBanner extends StatelessWidget {
                 color: Colors.white.withValues(alpha: 0.95),
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'Inter',
               ),
             ),
           ],

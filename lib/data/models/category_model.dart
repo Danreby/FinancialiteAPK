@@ -1,3 +1,4 @@
+import '../../core/utils/json_helpers.dart';
 import '../../domain/entities/category.dart';
 
 class CategoryModel extends Category {
@@ -19,7 +20,7 @@ class CategoryModel extends Category {
       icon: json['icon'] as String?,
       color: json['color'] as String?,
       userId: json['user_id'] as int,
-      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) : null,
+      createdAt: json.dateTime('created_at'),
     );
   }
 
@@ -49,7 +50,7 @@ class CategoryModel extends Category {
       icon: map['icon'] as String?,
       color: map['color'] as String?,
       userId: map['user_id'] as int,
-      createdAt: map['created_at'] != null ? DateTime.tryParse(map['created_at'].toString()) : null,
+      createdAt: map.dateTime('created_at'),
     );
   }
 }

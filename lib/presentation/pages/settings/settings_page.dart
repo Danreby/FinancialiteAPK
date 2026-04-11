@@ -5,6 +5,7 @@ import '../../blocs/auth/auth_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/section_header.dart';
+import '../../widgets/page_header.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -19,43 +20,7 @@ class SettingsPage extends StatelessWidget {
             padding: EdgeInsets.zero,
             children: [
               // Custom header
-              Container(
-                padding: EdgeInsets.fromLTRB(
-                  20,
-                  MediaQuery.of(context).padding.top + 16,
-                  20,
-                  20,
-                ),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => context.pop(),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest
-                              .withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.arrow_back_ios_new,
-                          size: 18,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Text(
-                      'Configurações',
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const PageHeader(title: 'Configurações', showBackButton: true, bottomPadding: 20),
 
               const SizedBox(height: 8),
 

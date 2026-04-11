@@ -5,6 +5,7 @@ import '../../blocs/bank/bank_cubit.dart';
 import '../../widgets/currency_text_field.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/bank_account.dart';
+import '../../widgets/page_header.dart';
 
 class BankTransferPage extends StatefulWidget {
   const BankTransferPage({super.key});
@@ -57,38 +58,7 @@ class _BankTransferPageState extends State<BankTransferPage> {
           final accounts = state is BankLoaded ? state.accounts : <BankAccount>[];
           return Column(
             children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 16),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-                        ),
-                      ),
-                      child: IconButton(
-                        icon: Icon(Icons.arrow_back, size: 20, color: theme.colorScheme.onSurface),
-                        onPressed: () => context.pop(),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        'Transferência',
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const PageHeader(title: 'Transferência', showBackButton: true, bottomPadding: 16),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 20),

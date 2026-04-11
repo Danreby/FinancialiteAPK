@@ -24,6 +24,26 @@ class AppNotification extends Equatable {
   bool get isError => type == 'error';
   bool get isInfo => type == 'info';
 
+  AppNotification copyWith({
+    int? id,
+    String? title,
+    String? message,
+    String? type,
+    bool? isRead,
+    int? userId,
+    DateTime? createdAt,
+  }) {
+    return AppNotification(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      message: message ?? this.message,
+      type: type ?? this.type,
+      isRead: isRead ?? this.isRead,
+      userId: userId ?? this.userId,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   @override
   List<Object?> get props => [id, title, userId];
 }

@@ -7,6 +7,7 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/app_loading_indicator.dart';
+import '../../widgets/page_header.dart';
 
 class ReportEvolutionPage extends StatefulWidget {
   const ReportEvolutionPage({super.key});
@@ -22,29 +23,6 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
     context.read<DashboardCubit>().load();
   }
 
-  String _shortMonth(String monthKey) {
-    try {
-      final date = DateTime.parse('$monthKey-01');
-      final months = [
-        'Jan',
-        'Fev',
-        'Mar',
-        'Abr',
-        'Mai',
-        'Jun',
-        'Jul',
-        'Ago',
-        'Set',
-        'Out',
-        'Nov',
-        'Dez'
-      ];
-      return months[date.month - 1];
-    } catch (_) {
-      return monthKey;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -52,38 +30,7 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 20,
-              right: 20,
-              bottom: 16,
-            ),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest
-                          .withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(Icons.arrow_back_ios_new,
-                        size: 18, color: theme.colorScheme.onSurface),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  'Evolução Patrimonial',
-                  style: theme.textTheme.titleLarge
-                      ?.copyWith(fontWeight: FontWeight.w700),
-                ),
-              ],
-            ),
-          ),
+          const PageHeader(title: 'Evolução Patrimonial', showBackButton: true, bottomPadding: 16),
           Expanded(
             child: BlocBuilder<DashboardCubit, DashboardState>(
               builder: (context, state) {
@@ -223,7 +170,7 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                                     final idx = spot.x.toInt();
                                     final monthLabel =
                                         idx >= 0 && idx < chart.length
-                                            ? _shortMonth(chart[idx].month)
+                                            ? DateFormatter.shortMonthFromKey(chart[idx].month)
                                             : '';
                                     return LineTooltipItem(
                                       '$monthLabel\n${CurrencyFormatter.format(spot.y)}',
@@ -254,7 +201,7 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                                       return Padding(
                                         padding: const EdgeInsets.only(top: 4),
                                         child: Text(
-                                          _shortMonth(chart[idx].month),
+                                          DateFormatter.shortMonthFromKey(chart[idx].month),
                                           style: TextStyle(
                                               fontSize: 10,
                                               color: theme.colorScheme
@@ -395,7 +342,7 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: Text(
-                                            _monthYearLabel(d.month),
+                                            DateFormatter.monthYearFromKey(d.month),
                                             style: theme.textTheme.titleSmall
                                                 ?.copyWith(
                                                     fontWeight:
@@ -432,14 +379,5 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
         ],
       ),
     );
-  }
-
-  String _monthYearLabel(String monthKey) {
-    try {
-      final date = DateTime.parse('$monthKey-01');
-      return DateFormatter.formatMonthYear(date);
-    } catch (_) {
-      return monthKey;
-    }
   }
 }

@@ -130,7 +130,6 @@ class _NavItem extends StatelessWidget {
   final IconData selectedIcon;
   final String label;
   final bool isSelected;
-  final int badgeCount;
   final VoidCallback onTap;
 
   const _NavItem({
@@ -138,7 +137,6 @@ class _NavItem extends StatelessWidget {
     required this.selectedIcon,
     required this.label,
     required this.isSelected,
-    this.badgeCount = 0,
     required this.onTap,
   });
 
@@ -167,18 +165,10 @@ class _NavItem extends StatelessWidget {
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Badge(
-                isLabelVisible: badgeCount > 0,
-                label: Text(
-                  '$badgeCount',
-                  style:
-                      const TextStyle(fontSize: 9, fontWeight: FontWeight.w700),
-                ),
-                child: Icon(
-                  isSelected ? selectedIcon : icon,
-                  size: 24,
-                  color: color,
-                ),
+              child: Icon(
+                isSelected ? selectedIcon : icon,
+                size: 24,
+                color: color,
               ),
             ),
             const SizedBox(height: 4),

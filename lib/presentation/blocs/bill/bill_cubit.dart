@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/repositories/bill_repository.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'bill_state.dart';
 
@@ -19,7 +20,7 @@ class BillCubit extends Cubit<BillState> {
       final bills = await _repository.getBills(filters: filters.isNotEmpty ? filters : null);
       emit(BillLoaded(bills: bills));
     } catch (e) {
-      emit(BillError(e.toString()));
+      emit(BillError(extractErrorMessage(e)));
     }
   }
 
@@ -28,7 +29,7 @@ class BillCubit extends Cubit<BillState> {
       await _repository.createBill(data);
       loadBills();
     } catch (e) {
-      emit(BillError(e.toString()));
+      emit(BillError(extractErrorMessage(e)));
     }
   }
 
@@ -37,7 +38,7 @@ class BillCubit extends Cubit<BillState> {
       await _repository.updateBill(id, data);
       loadBills();
     } catch (e) {
-      emit(BillError(e.toString()));
+      emit(BillError(extractErrorMessage(e)));
     }
   }
 
@@ -51,16 +52,16 @@ class BillCubit extends Cubit<BillState> {
         ));
       }
     } catch (e) {
-      emit(BillError(e.toString()));
+      emit(BillError(extractErrorMessage(e)));
     }
   }
 
   Future<void> payBill(int id, Map<String, dynamic> data) async {
     try {
-      await _repository.markAsPaid(id);
+      await _repository.markAsPaid(id, data: data);
       loadBills();
     } catch (e) {
-      emit(BillError(e.toString()));
+      emit(BillError(extractErrorMessage(e)));
     }
   }
 }

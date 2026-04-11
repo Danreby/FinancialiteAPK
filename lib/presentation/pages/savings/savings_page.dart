@@ -13,6 +13,8 @@ import '../../widgets/section_header.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/validators.dart';
+import '../../widgets/page_header.dart';
+import '../../widgets/shadowed_fab.dart';
 
 class SavingsPage extends StatefulWidget {
   const SavingsPage({super.key});
@@ -132,42 +134,12 @@ class _SavingsPageState extends State<SavingsPage> {
     final theme = Theme.of(context);
     final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.primary.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: FloatingActionButton(
-          onPressed: _showCreateDialog,
-          child: const Icon(Icons.add),
-        ),
-      ),
+      floatingActionButton: ShadowedFab(onPressed: _showCreateDialog),
       body: BlocBuilder<SavingsCubit, SavingsState>(
         builder: (context, state) {
           return Column(
             children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Metas de Economia',
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const PageHeader(title: 'Metas de Economia', bottomPadding: 16),
               Expanded(child: _buildBody(context, state, theme)),
             ],
           );
@@ -219,38 +191,10 @@ class _SavingsPageState extends State<SavingsPage> {
               const SizedBox(height: 12),
             ],
             if (state.goals.isEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 40),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color:
-                              theme.colorScheme.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: Icon(Icons.savings,
-                            size: 40, color: theme.colorScheme.primary),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Nenhuma meta',
-                        style: theme.textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Crie sua primeira meta de economia',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              const EmptyStateWidget(
+                icon: Icons.savings,
+                title: 'Nenhuma meta',
+                subtitle: 'Crie sua primeira meta de economia',
               )
             else
               ...state.goals.map((goal) {

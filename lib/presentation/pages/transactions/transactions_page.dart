@@ -10,6 +10,8 @@ import '../../widgets/confirm_dialog.dart';
 import '../../widgets/transaction_tile.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../widgets/page_header.dart';
+import '../../widgets/shadowed_fab.dart';
 
 class TransactionsPage extends StatefulWidget {
   const TransactionsPage({super.key});
@@ -56,25 +58,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
       body: Column(
         children: [
           // Custom Header
-          Container(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 20,
-              right: 20,
-              bottom: 8,
-            ),
-            child: Row(
-              children: [
-                Text(
-                  'Transações',
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const PageHeader(title: 'Transações'),
           Padding(
             padding: const EdgeInsets.only(top: 8, bottom: 4),
             child: MonthSelector(
@@ -188,21 +172,9 @@ class _TransactionsPageState extends State<TransactionsPage> {
           ),
         ],
       ),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.primary.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: FloatingActionButton(
-          onPressed: () => context.push('/transactions/new'),
-          child: const Icon(Icons.add_rounded),
-        ),
+      floatingActionButton: ShadowedFab(
+        onPressed: () => context.push('/transactions/new'),
+        child: const Icon(Icons.add_rounded),
       ),
     );
   }

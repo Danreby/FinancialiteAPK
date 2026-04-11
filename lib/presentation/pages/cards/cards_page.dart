@@ -11,6 +11,8 @@ import '../../widgets/section_header.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/card_entity.dart';
+import '../../widgets/page_header.dart';
+import '../../widgets/shadowed_fab.dart';
 
 class CardsPage extends StatefulWidget {
   const CardsPage({super.key});
@@ -209,42 +211,12 @@ class _CardsPageState extends State<CardsPage> {
     final theme = Theme.of(context);
     final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.primary.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: FloatingActionButton(
-          onPressed: _showCreateDialog,
-          child: const Icon(Icons.add),
-        ),
-      ),
+      floatingActionButton: ShadowedFab(onPressed: _showCreateDialog),
       body: BlocBuilder<CardCubit, CardState>(
         builder: (context, state) {
           return Column(
             children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Cartões',
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const PageHeader(title: 'Cartões', bottomPadding: 16),
               Expanded(child: _buildBody(context, state, theme)),
             ],
           );
@@ -262,40 +234,12 @@ class _CardsPageState extends State<CardsPage> {
     }
     if (state is CardLoaded) {
       if (state.cards.isEmpty) {
-        return Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Icon(Icons.credit_card,
-                    size: 40, color: theme.colorScheme.primary),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Nenhum cartão',
-                style: theme.textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Adicione seu primeiro cartão',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 20),
-              FilledButton.tonal(
-                onPressed: _showCreateDialog,
-                child: const Text('Novo cartão'),
-              ),
-            ],
-          ),
+        return EmptyStateWidget(
+          icon: Icons.credit_card,
+          title: 'Nenhum cartão',
+          subtitle: 'Adicione seu primeiro cartão',
+          actionLabel: 'Novo cartão',
+          onAction: _showCreateDialog,
         );
       }
       return RefreshIndicator(

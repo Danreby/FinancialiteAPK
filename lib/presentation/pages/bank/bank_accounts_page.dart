@@ -12,6 +12,8 @@ import '../../widgets/stat_card.dart';
 import '../../widgets/section_header.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
+import '../../widgets/page_header.dart';
+import '../../widgets/shadowed_fab.dart';
 
 class BankAccountsPage extends StatefulWidget {
   const BankAccountsPage({super.key});
@@ -153,58 +155,31 @@ class _BankAccountsPageState extends State<BankAccountsPage> {
     final theme = Theme.of(context);
     final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.primary.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: FloatingActionButton(
-          onPressed: _showCreateDialog,
-          child: const Icon(Icons.add),
-        ),
-      ),
+      floatingActionButton: ShadowedFab(onPressed: _showCreateDialog),
       body: BlocBuilder<BankCubit, BankState>(
         builder: (context, state) {
           return Column(
             children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Contas Bancárias',
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
+              PageHeader(
+                title: 'Contas Bancárias',
+                bottomPadding: 16,
+                trailing: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: theme.colorScheme.outlineVariant
+                          .withValues(alpha: 0.5),
                     ),
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: theme.colorScheme.outlineVariant
-                              .withValues(alpha: 0.5),
-                        ),
-                      ),
-                      child: IconButton(
-                        icon: Icon(Icons.swap_horiz,
-                            color: theme.colorScheme.primary, size: 20),
-                        tooltip: 'Transferir',
-                        onPressed: () => context.push('/bank-transfer'),
-                      ),
-                    ),
-                  ],
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.swap_horiz,
+                        color: theme.colorScheme.primary, size: 20),
+                    tooltip: 'Transferir',
+                    onPressed: () => context.push('/bank-transfer'),
+                  ),
                 ),
               ),
               Expanded(child: _buildBody(context, state, theme)),
@@ -242,38 +217,10 @@ class _BankAccountsPageState extends State<BankAccountsPage> {
               const SizedBox(height: 12),
             ],
             if (state.accounts.isEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 40),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color:
-                              theme.colorScheme.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: Icon(Icons.account_balance,
-                            size: 40, color: theme.colorScheme.primary),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Nenhuma conta',
-                        style: theme.textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Adicione sua conta bancária',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              const EmptyStateWidget(
+                icon: Icons.account_balance,
+                title: 'Nenhuma conta',
+                subtitle: 'Adicione sua conta bancária',
               )
             else
               ...state.accounts.map((account) => Padding(

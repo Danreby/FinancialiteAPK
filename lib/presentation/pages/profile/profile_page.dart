@@ -8,6 +8,7 @@ import '../../widgets/app_error_widget.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../../core/utils/validators.dart';
+import '../../widgets/page_header.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -62,43 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: EdgeInsets.zero,
               child: Column(
                 children: [
-                  // Custom header
-                  Container(
-                    padding: EdgeInsets.fromLTRB(
-                      20,
-                      MediaQuery.of(context).padding.top + 16,
-                      20,
-                      20,
-                    ),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => context.pop(),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              Icons.arrow_back_ios_new,
-                              size: 18,
-                              color: theme.colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Text(
-                          'Perfil',
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  const PageHeader(title: 'Perfil', showBackButton: true, bottomPadding: 20),
 
                   const SizedBox(height: 8),
 

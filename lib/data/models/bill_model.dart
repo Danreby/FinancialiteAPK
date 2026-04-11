@@ -1,3 +1,4 @@
+import '../../core/utils/json_helpers.dart';
 import '../../domain/entities/bill.dart';
 
 class BillModel extends Bill {
@@ -27,10 +28,10 @@ class BillModel extends Bill {
     return BillModel(
       id: json['id'] as int?,
       title: json['title'] as String,
-      amount: double.tryParse(json['amount'].toString()) ?? 0.0,
+      amount: json.toDouble('amount'),
       dueDay: json['due_day'] as int,
       recurrenceType: json['recurrence_type'] as String? ?? 'monthly',
-      isActive: json['is_active'] == true || json['is_active'] == 1,
+      isActive: json.toBool('is_active'),
       categoryId: json['category_id'] as int?,
       userId: json['user_id'] as int,
       description: json['description'] as String?,
@@ -38,12 +39,8 @@ class BillModel extends Bill {
       categoryIcon: json['category']?['icon'] as String?,
       categoryColor: json['category']?['color'] as String?,
       lastPayment: lastPayment,
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'].toString())
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.tryParse(json['updated_at'].toString())
-          : null,
+      createdAt: json.dateTime('created_at'),
+      updatedAt: json.dateTime('updated_at'),
     );
   }
 
@@ -76,19 +73,15 @@ class BillModel extends Bill {
     return BillModel(
       id: map['id'] as int?,
       title: map['title'] as String,
-      amount: (map['amount'] as num).toDouble(),
+      amount: map.toDouble('amount'),
       dueDay: map['due_day'] as int,
       recurrenceType: map['recurrence_type'] as String? ?? 'monthly',
       isActive: map['is_active'] == 1,
       categoryId: map['category_id'] as int?,
       userId: map['user_id'] as int,
       description: map['description'] as String?,
-      createdAt: map['created_at'] != null
-          ? DateTime.tryParse(map['created_at'].toString())
-          : null,
-      updatedAt: map['updated_at'] != null
-          ? DateTime.tryParse(map['updated_at'].toString())
-          : null,
+      createdAt: map.dateTime('created_at'),
+      updatedAt: map.dateTime('updated_at'),
     );
   }
 }
@@ -107,13 +100,9 @@ class BillPaymentModel extends BillPayment {
     return BillPaymentModel(
       id: json['id'] as int?,
       billId: json['bill_id'] as int,
-      amount: double.tryParse(json['amount'].toString()) ?? 0.0,
-      dueDate: json['due_date'] != null
-          ? DateTime.tryParse(json['due_date'].toString())
-          : null,
-      paidDate: json['paid_date'] != null
-          ? DateTime.tryParse(json['paid_date'].toString())
-          : null,
+      amount: json.toDouble('amount'),
+      dueDate: json.dateTime('due_date'),
+      paidDate: json.dateTime('paid_date'),
       status: json['status'] as String? ?? 'pending',
     );
   }

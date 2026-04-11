@@ -6,6 +6,9 @@ import '../../blocs/projections/projections_cubit.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../../core/utils/date_formatter.dart';
+import '../../../core/utils/icon_utils.dart';
+import '../../widgets/page_header.dart';
 
 class ProjectionsPage extends StatefulWidget {
   const ProjectionsPage({super.key});
@@ -28,48 +31,7 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 20,
-              right: 20,
-              bottom: 16,
-            ),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest
-                          .withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(Icons.arrow_back_ios_new,
-                        size: 18, color: theme.colorScheme.onSurface),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Proje\u00e7\u00f5es',
-                      style: theme.textTheme.titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                    Text(
-                      'Previs\u00e3o de gastos futuros',
-                      style: theme.textTheme.bodySmall
-                          ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          const PageHeader(title: 'Proje\u00e7\u00f5es', showBackButton: true, bottomPadding: 16),
           Expanded(
             child: BlocBuilder<ProjectionsCubit, ProjectionsState>(
               builder: (context, state) {
@@ -254,24 +216,6 @@ class _MonthlyProjectionChart extends StatelessWidget {
     required this.theme,
   });
 
-  String _monthAbbr(int month) {
-    const abbrs = [
-      'Jan',
-      'Fev',
-      'Mar',
-      'Abr',
-      'Mai',
-      'Jun',
-      'Jul',
-      'Ago',
-      'Set',
-      'Out',
-      'Nov',
-      'Dez'
-    ];
-    return abbrs[(month - 1).clamp(0, 11)];
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -356,8 +300,7 @@ class _MonthlyProjectionChart extends StatelessWidget {
                           return const SizedBox.shrink();
                         }
                         final monthKey = months[idx]['month'] as String;
-                        final parts = monthKey.split('-');
-                        final abbr = _monthAbbr(int.tryParse(parts[1]) ?? 1);
+                        final abbr = DateFormatter.shortMonthFromKey(monthKey);
                         return Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
@@ -445,14 +388,6 @@ class _TransactionProjectionCard extends StatelessWidget {
 
   const _TransactionProjectionCard({required this.tx, required this.theme});
 
-  Color _colorFromHex(String hex) {
-    try {
-      return Color(int.parse(hex.replaceAll('#', '0xFF')));
-    } catch (_) {
-      return Colors.grey;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isRecurring = tx['is_recurring'] as bool;
@@ -460,7 +395,7 @@ class _TransactionProjectionCard extends StatelessWidget {
     final total = tx['total_installments'] as int;
     final amountPerMonth = (tx['amount_per_month'] as num).toDouble();
     final catColor = tx['category_color'] != null
-        ? _colorFromHex(tx['category_color'] as String)
+        ? colorFromHex(tx['category_color'] as String)
         : theme.colorScheme.primary;
 
     return Padding(

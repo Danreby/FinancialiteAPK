@@ -52,6 +52,9 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
   int? bankAccountId = editing?.bankAccountId;
   bool isActive = editing?.isActive ?? true;
   final formKey = GlobalKey<FormState>();
+  final dateCtrl = TextEditingController(
+    text: DateFormatter.shortDate(receivedAt),
+  );
 
   context.read<CardCubit>().loadCards();
   context.read<BankCubit>().loadAccounts();
@@ -241,9 +244,7 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                       label: 'Data de recebimento',
                       prefixIcon: Icons.calendar_today,
                       readOnly: true,
-                      controller: TextEditingController(
-                        text: DateFormatter.shortDate(receivedAt),
-                      ),
+                      controller: dateCtrl,
                       onTap: () async {
                         final picked = await showDatePicker(
                           context: context,
@@ -252,7 +253,10 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                           lastDate: DateTime(2030),
                         );
                         if (picked != null) {
-                          setLocalState(() => receivedAt = picked);
+                          setLocalState(() {
+                            receivedAt = picked;
+                            dateCtrl.text = DateFormatter.shortDate(picked);
+                          });
                         }
                       },
                     ),

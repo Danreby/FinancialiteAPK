@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/category.dart';
 import '../../../domain/repositories/category_repository.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'category_state.dart';
 
@@ -16,7 +17,7 @@ class CategoryCubit extends Cubit<CategoryState> {
       final categories = await _repository.getCategories(type: type);
       emit(CategoryLoaded(categories: categories));
     } catch (e) {
-      emit(CategoryError(e.toString()));
+      emit(CategoryError(extractErrorMessage(e)));
     }
   }
 
@@ -25,7 +26,7 @@ class CategoryCubit extends Cubit<CategoryState> {
       await _repository.createCategory(data);
       loadCategories();
     } catch (e) {
-      emit(CategoryError(e.toString()));
+      emit(CategoryError(extractErrorMessage(e)));
     }
   }
 
@@ -34,7 +35,7 @@ class CategoryCubit extends Cubit<CategoryState> {
       await _repository.updateCategory(id, data);
       loadCategories();
     } catch (e) {
-      emit(CategoryError(e.toString()));
+      emit(CategoryError(extractErrorMessage(e)));
     }
   }
 
@@ -48,7 +49,7 @@ class CategoryCubit extends Cubit<CategoryState> {
         ));
       }
     } catch (e) {
-      emit(CategoryError(e.toString()));
+      emit(CategoryError(extractErrorMessage(e)));
     }
   }
 }

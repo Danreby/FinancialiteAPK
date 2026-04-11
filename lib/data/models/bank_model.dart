@@ -1,3 +1,4 @@
+import '../../core/utils/json_helpers.dart';
 import '../../domain/entities/bank_account.dart';
 
 class BankAccountModel extends BankAccount {
@@ -22,22 +23,14 @@ class BankAccountModel extends BankAccount {
       userId: json['user_id'] as int,
       bankId: json['bank_id'] as int,
       accountType: json['account_type'] as String? ?? 'checking',
-      balance: double.tryParse((json['balance'] ?? 0).toString()) ?? 0.0,
+      balance: json.toDouble('balance'),
       nickname: json['nickname'] as String?,
-      bankName:
-          json['bank']?['name'] as String? ?? json['bank_name'] as String?,
-      bankCode:
-          json['bank']?['code'] as String? ?? json['bank_code'] as String?,
-      bankColor:
-          json['bank']?['color'] as String? ?? json['bank_color'] as String?,
-      bankLogo:
-          json['bank']?['logo'] as String? ?? json['bank_logo'] as String?,
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'].toString())
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.tryParse(json['updated_at'].toString())
-          : null,
+      bankName: json.nestedOr(['bank', 'name'], 'bank_name'),
+      bankCode: json.nestedOr(['bank', 'code'], 'bank_code'),
+      bankColor: json.nestedOr(['bank', 'color'], 'bank_color'),
+      bankLogo: json.nestedOr(['bank', 'logo'], 'bank_logo'),
+      createdAt: json.dateTime('created_at'),
+      updatedAt: json.dateTime('updated_at'),
     );
   }
 
@@ -66,14 +59,10 @@ class BankAccountModel extends BankAccount {
       userId: map['user_id'] as int,
       bankId: map['bank_id'] as int,
       accountType: map['account_type'] as String?,
-      balance: (map['balance'] as num? ?? 0).toDouble(),
+      balance: map.toDouble('balance'),
       nickname: map['nickname'] as String?,
-      createdAt: map['created_at'] != null
-          ? DateTime.tryParse(map['created_at'].toString())
-          : null,
-      updatedAt: map['updated_at'] != null
-          ? DateTime.tryParse(map['updated_at'].toString())
-          : null,
+      createdAt: map.dateTime('created_at'),
+      updatedAt: map.dateTime('updated_at'),
     );
   }
 }
@@ -115,14 +104,12 @@ class BankTransferModel extends BankTransfer {
       id: json['id'] as int?,
       fromBankUserId: json['from_bank_user_id'] as int,
       toBankUserId: json['to_bank_user_id'] as int,
-      amount: double.tryParse(json['amount'].toString()) ?? 0.0,
+      amount: json.toDouble('amount'),
       description: json['description'] as String?,
       userId: json['user_id'] as int,
-      fromBankName: json['from_account']?['bank']?['name'] as String?,
-      toBankName: json['to_account']?['bank']?['name'] as String?,
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'].toString())
-          : null,
+      fromBankName: json.nested(['from_account', 'bank', 'name']),
+      toBankName: json.nested(['to_account', 'bank', 'name']),
+      createdAt: json.dateTime('created_at'),
     );
   }
 

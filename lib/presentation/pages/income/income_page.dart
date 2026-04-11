@@ -10,6 +10,8 @@ import '../../widgets/stat_card.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/income_form_dialog.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../widgets/page_header.dart';
+import '../../widgets/shadowed_fab.dart';
 
 class IncomePage extends StatefulWidget {
   const IncomePage({super.key});
@@ -34,41 +36,10 @@ class _IncomePageState extends State<IncomePage> {
     final theme = Theme.of(context);
     final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.primary.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-          shape: BoxShape.circle,
-        ),
-        child: FloatingActionButton(
-          onPressed: () => showIncomeFormDialog(context),
-          elevation: 0,
-          child: const Icon(Icons.add),
-        ),
-      ),
+      floatingActionButton: ShadowedFab(onPressed: () => showIncomeFormDialog(context)),
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Receitas',
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const PageHeader(title: 'Receitas', bottomPadding: 16),
           const SizedBox(height: 12),
           Expanded(
             child: BlocBuilder<IncomeCubit, IncomeState>(

@@ -8,6 +8,7 @@ import '../../../core/utils/date_formatter.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/month_selector.dart';
+import '../../widgets/page_header.dart';
 
 class ReportCategoryPage extends StatefulWidget {
   const ReportCategoryPage({super.key});
@@ -38,38 +39,7 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 20,
-              right: 20,
-              bottom: 16,
-            ),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest
-                          .withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(Icons.arrow_back_ios_new,
-                        size: 18, color: theme.colorScheme.onSurface),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  'Gastos por Categoria',
-                  style: theme.textTheme.titleLarge
-                      ?.copyWith(fontWeight: FontWeight.w700),
-                ),
-              ],
-            ),
-          ),
+          const PageHeader(title: 'Gastos por Categoria', showBackButton: true, bottomPadding: 16),
           MonthSelector(
             selectedMonth: _selectedMonth,
             onChanged: (d) {

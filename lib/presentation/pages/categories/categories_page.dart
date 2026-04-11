@@ -8,59 +8,9 @@ import '../../widgets/empty_state_widget.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/app_text_field.dart';
 import '../../../core/utils/validators.dart';
-
-IconData _iconFromName(String? name) {
-  const map = <String, IconData>{
-    'shopping_cart': Icons.shopping_cart,
-    'restaurant': Icons.restaurant,
-    'home': Icons.home,
-    'directions_car': Icons.directions_car,
-    'local_gas_station': Icons.local_gas_station,
-    'credit_card': Icons.credit_card,
-    'health_and_safety': Icons.health_and_safety,
-    'sports_esports': Icons.sports_esports,
-    'school': Icons.school,
-    'commute': Icons.commute,
-    'lightbulb': Icons.lightbulb,
-    'phone': Icons.phone,
-    'smartphone': Icons.smartphone,
-    'wifi': Icons.wifi,
-    'local_hospital': Icons.local_hospital,
-    'fitness_center': Icons.fitness_center,
-    'movie': Icons.movie,
-    'work': Icons.work,
-    'business': Icons.business,
-    'travel_explore': Icons.travel_explore,
-    'savings': Icons.savings,
-    'money': Icons.money,
-    'account_balance': Icons.account_balance,
-    'fastfood': Icons.fastfood,
-    'coffee': Icons.coffee,
-    'flight': Icons.flight,
-    'hotel': Icons.hotel,
-    'pets': Icons.pets,
-    'child_care': Icons.child_care,
-    'subscriptions': Icons.subscriptions,
-    'music_note': Icons.music_note,
-    'book': Icons.book,
-    'sports': Icons.sports,
-    'local_pharmacy': Icons.local_pharmacy,
-    'local_laundry_service': Icons.local_laundry_service,
-    'cleaning_services': Icons.cleaning_services,
-    'construction': Icons.construction,
-    'attach_money': Icons.attach_money,
-  };
-  return map[name] ?? Icons.category;
-}
-
-Color _colorFromHex(String? hex) {
-  if (hex == null || hex.isEmpty) return Colors.grey;
-  try {
-    return Color(int.parse(hex.replaceAll('#', '0xFF')));
-  } catch (_) {
-    return Colors.grey;
-  }
-}
+import '../../widgets/page_header.dart';
+import '../../widgets/shadowed_fab.dart';
+import '../../../core/utils/icon_utils.dart';
 
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
@@ -224,20 +174,20 @@ class _CategoriesPageState extends State<CategoriesPage>
                             margin: const EdgeInsets.only(right: 8),
                             decoration: BoxDecoration(
                               color: sel
-                                  ? _colorFromHex(selectedColor)
+                                  ? colorFromHex(selectedColor)
                                       .withValues(alpha: 0.15)
                                   : Colors.grey.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(12),
                               border: sel
                                   ? Border.all(
-                                      color: _colorFromHex(selectedColor),
+                                      color: colorFromHex(selectedColor),
                                       width: 2)
                                   : null,
                             ),
-                            child: Icon(_iconFromName(ic),
+                            child: Icon(iconFromName(ic),
                                 size: 22,
                                 color: sel
-                                    ? _colorFromHex(selectedColor)
+                                    ? colorFromHex(selectedColor)
                                     : Colors.grey),
                           ),
                         );
@@ -266,7 +216,7 @@ class _CategoriesPageState extends State<CategoriesPage>
                             height: 36,
                             margin: const EdgeInsets.only(right: 8),
                             decoration: BoxDecoration(
-                              color: _colorFromHex(col),
+                              color: colorFromHex(col),
                               shape: BoxShape.circle,
                               border: sel
                                   ? Border.all(color: Colors.white, width: 2)
@@ -274,7 +224,7 @@ class _CategoriesPageState extends State<CategoriesPage>
                               boxShadow: sel
                                   ? [
                                       BoxShadow(
-                                          color: _colorFromHex(col)
+                                          color: colorFromHex(col)
                                               .withValues(alpha: 0.5),
                                           blurRadius: 8)
                                     ]
@@ -334,42 +284,10 @@ class _CategoriesPageState extends State<CategoriesPage>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.primary.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: FloatingActionButton(
-          onPressed: _showCreateDialog,
-          child: const Icon(Icons.add),
-        ),
-      ),
+      floatingActionButton: ShadowedFab(onPressed: _showCreateDialog),
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 20,
-              right: 20,
-              bottom: 16,
-            ),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Categorias',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                ),
-              ),
-            ),
-          ),
+          const PageHeader(title: 'Categorias', bottomPadding: 16),
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             padding: const EdgeInsets.all(4),
@@ -506,12 +424,12 @@ class _CategoriesPageState extends State<CategoriesPage>
                         height: 44,
                         decoration: BoxDecoration(
                           color:
-                              _colorFromHex(cat.color).withValues(alpha: 0.12),
+                              colorFromHex(cat.color).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Icon(
-                          _iconFromName(cat.icon),
-                          color: _colorFromHex(cat.color),
+                          iconFromName(cat.icon),
+                          color: colorFromHex(cat.color),
                           size: 22,
                         ),
                       ),

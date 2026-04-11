@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/budget.dart';
 import '../../../domain/repositories/budget_repository.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'budget_state.dart';
 
@@ -19,7 +20,7 @@ class BudgetCubit extends Cubit<BudgetState> {
           : budgets;
       emit(BudgetLoaded(budgets: filtered));
     } catch (e) {
-      emit(BudgetError(e.toString()));
+      emit(BudgetError(extractErrorMessage(e)));
     }
   }
 
@@ -28,7 +29,7 @@ class BudgetCubit extends Cubit<BudgetState> {
       await _repository.createBudget(data);
       loadBudgets();
     } catch (e) {
-      emit(BudgetError(e.toString()));
+      emit(BudgetError(extractErrorMessage(e)));
     }
   }
 
@@ -37,7 +38,7 @@ class BudgetCubit extends Cubit<BudgetState> {
       await _repository.updateBudget(id, data);
       loadBudgets();
     } catch (e) {
-      emit(BudgetError(e.toString()));
+      emit(BudgetError(extractErrorMessage(e)));
     }
   }
 
@@ -51,7 +52,7 @@ class BudgetCubit extends Cubit<BudgetState> {
         ));
       }
     } catch (e) {
-      emit(BudgetError(e.toString()));
+      emit(BudgetError(extractErrorMessage(e)));
     }
   }
 }

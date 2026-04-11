@@ -11,6 +11,8 @@ import '../../widgets/currency_text_field.dart';
 import '../../widgets/section_header.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
+import '../../widgets/page_header.dart';
+import '../../widgets/shadowed_fab.dart';
 
 class BillsPage extends StatefulWidget {
   const BillsPage({super.key});
@@ -30,7 +32,6 @@ class _BillsPageState extends State<BillsPage> {
     context.read<BillCubit>().loadBills();
   }
 
-  /// Computes the next due date based on [dueDay].
   DateTime _nextDueDate(int dueDay) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -47,7 +48,6 @@ class _BillsPageState extends State<BillsPage> {
     return DateTime(nextMonth.year, nextMonth.month, clampedNext);
   }
 
-  /// Whether lastPayment already covers the current cycle.
   bool _isPaidThisCycle(Bill bill) {
     final lp = bill.lastPayment;
     if (lp == null || lp.status != 'paid') return false;
@@ -57,7 +57,6 @@ class _BillsPageState extends State<BillsPage> {
     return dueDate.year == now.year && dueDate.month == now.month;
   }
 
-  /// Returns display info: (label, color) for the bill's due status.
   (String, Color) _dueInfo(Bill bill, ThemeData theme) {
     if (_isPaidThisCycle(bill)) {
       final next = _nextDueDate(bill.dueDay);
@@ -180,41 +179,10 @@ class _BillsPageState extends State<BillsPage> {
     final theme = Theme.of(context);
     final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.primary.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-          shape: BoxShape.circle,
-        ),
-        child: FloatingActionButton(
-          onPressed: _showCreateDialog,
-          elevation: 0,
-          child: const Icon(Icons.add),
-        ),
-      ),
+      floatingActionButton: ShadowedFab(onPressed: _showCreateDialog),
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Contas a Pagar',
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const PageHeader(title: 'Contas a Pagar', bottomPadding: 16),
           const SizedBox(height: 12),
           Expanded(
             child: BlocBuilder<BillCubit, BillState>(

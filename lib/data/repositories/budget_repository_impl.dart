@@ -5,6 +5,7 @@ import '../../core/network/network_info.dart';
 import '../../domain/entities/budget.dart';
 import '../../domain/repositories/budget_repository.dart';
 import '../models/budget_model.dart';
+import '../../core/security/input_sanitizer.dart';
 import 'base_offline_repository.dart';
 
 class BudgetRepositoryImpl extends BaseOfflineRepository
@@ -37,13 +38,15 @@ class BudgetRepositoryImpl extends BaseOfflineRepository
 
   @override
   Future<Budget> createBudget(Map<String, dynamic> data) async {
-    final response = await api.post(ApiConstants.budgets, data: data);
+    final sanitized = InputSanitizer.sanitizeMap(data);
+    final response = await api.post(ApiConstants.budgets, data: sanitized);
     return BudgetModel.fromJson(response.data['data'] ?? response.data);
   }
 
   @override
   Future<Budget> updateBudget(int id, Map<String, dynamic> data) async {
-    final response = await api.put('${ApiConstants.budgets}/$id', data: data);
+    final sanitized = InputSanitizer.sanitizeMap(data);
+    final response = await api.put('${ApiConstants.budgets}/$id', data: sanitized);
     return BudgetModel.fromJson(response.data['data'] ?? response.data);
   }
 

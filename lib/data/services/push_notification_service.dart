@@ -7,9 +7,6 @@ import 'package:dio/dio.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/constants/storage_constants.dart';
 
-/// Handles local push notifications triggered by polling the server for new
-/// unread notifications. Works independently of any BLoC so it can run from
-/// the WorkManager background isolate.
 class PushNotificationService {
   static const _channelId = 'financialite_notifications';
   static const _channelName = 'Notificações';
@@ -20,8 +17,8 @@ class PushNotificationService {
       FlutterLocalNotificationsPlugin();
 
   static bool _initialized = false;
+  static Dio? _dio;
 
-  /// Initialise the local notification plugin (call once in main).
   static Future<void> init() async {
     if (_initialized) return;
 
@@ -32,7 +29,6 @@ class PushNotificationService {
     _initialized = true;
   }
 
-  /// Show a single local notification.
   static Future<void> show({
     required int id,
     required String title,
@@ -65,8 +61,6 @@ class PushNotificationService {
         id: id, title: title, body: body, notificationDetails: details);
   }
 
-  /// Called by WorkManager on every periodic tick.
-  /// Fetches unread notifications from the API and shows new ones.
   static Future<void> checkForNewNotifications() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -75,22 +69,25 @@ class PushNotificationService {
         aOptions: AndroidOptions(encryptedSharedPreferences: true),
       );
       final token = await storage.read(key: StorageConstants.accessToken);
-      if (token == null || token.isEmpty) return;
+      if (token == null || token.isEmpty) {
+        _dio = null;
+        return;
+      }
 
       final lastSeenId = prefs.getInt(_lastSeenIdKey) ?? 0;
 
-      final dio = Dio(BaseOptions(
+      _dio ??= Dio(BaseOptions(
         baseUrl: ApiConstants.apiUrl,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
       ));
+      _dio!.options.headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
 
-      final response = await dio.get(ApiConstants.notifications);
+      final response = await _dio!.get(ApiConstants.notifications);
       final rawData = response.data;
       final List items;
       if (rawData is Map && rawData.containsKey('data')) {

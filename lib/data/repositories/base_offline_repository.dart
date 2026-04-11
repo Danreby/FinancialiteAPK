@@ -27,11 +27,32 @@ abstract class BaseOfflineRepository {
 
   Future<bool> get isOnline => networkInfo.isConnected;
 
-  /// Extracts a list from an API response that may be either a plain JSON
-  /// array `[...]` or a paginated object `{"data": [...], "total": ...}`.
   List<dynamic> safeList(dynamic data) {
     if (data is List) return data;
     if (data is Map) return (data['data'] as List?) ?? const [];
     return const [];
+  }
+
+  Map<String, dynamic> extractData(dynamic responseData) {
+    if (responseData is Map && responseData.containsKey('data')) {
+      return responseData['data'] as Map<String, dynamic>;
+    }
+    return responseData as Map<String, dynamic>;
+  }
+
+  Future<void> batchCache(
+    String table,
+    List<dynamic> items,
+    Map<String, dynamic> Function(dynamic) toDbMap,
+  ) async {
+    try {
+      final database = await db;
+      final batch = database.batch();
+      for (final item in items) {
+        batch.insert(table, toDbMap(item),
+            conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+      await batch.commit(noResult: true);
+    } catch (_) {}
   }
 }

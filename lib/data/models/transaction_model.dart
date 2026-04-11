@@ -1,3 +1,4 @@
+import '../../core/utils/json_helpers.dart';
 import '../../domain/entities/transaction.dart';
 
 class TransactionModel extends Transaction {
@@ -30,23 +31,19 @@ class TransactionModel extends Transaction {
     List<TransactionParcela>? parcelas;
     if (json['parcelas'] != null) {
       parcelas = (json['parcelas'] as List)
-          .map((p) => TransactionParcelaModel.fromJson(p))
+          .map((p) => TransactionParcelaModel.fromJson(p as Map<String, dynamic>))
           .toList();
     }
 
     return TransactionModel(
       id: json['id'] as int?,
       title: json['title'] as String,
-      amount: double.tryParse(json['amount'].toString()) ?? 0.0,
+      amount: json.toDouble('amount'),
       type: json['type'] as String,
       status: json['status'] as String? ?? 'pending',
-      date: json['paid_date'] != null
-          ? DateTime.tryParse(json['paid_date'].toString())
-          : (json['created_at'] != null
-              ? DateTime.tryParse(json['created_at'].toString())
-              : null),
+      date: json.dateTime('paid_date') ?? json.dateTime('created_at'),
       description: json['description'] as String?,
-      isRecurring: json['is_recurring'] == true || json['is_recurring'] == 1,
+      isRecurring: json.toBool('is_recurring'),
       installments: json['total_installments'] as int? ??
           json['installments'] as int? ??
           1,
@@ -54,26 +51,15 @@ class TransactionModel extends Transaction {
       categoryId: json['category_id'] as int?,
       cardUserId: json['card_user_id'] as int?,
       bankUserId: json['bank_user_id'] as int?,
-      categoryName: json['category']?['name'] as String? ??
-          json['category_name'] as String?,
-      categoryIcon: json['category']?['icon'] as String? ??
-          json['category_icon'] as String?,
-      categoryColor: json['category']?['color'] as String? ??
-          json['category_color'] as String?,
-      cardName: json['bank_user']?['card']?['name'] as String? ??
-          json['card_name'] as String?,
-      bankName: json['bank_user']?['card']?['name'] as String? ??
-          json['bank_name'] as String?,
+      categoryName: json.nestedOr(['category', 'name'], 'category_name'),
+      categoryIcon: json.nestedOr(['category', 'icon'], 'category_icon'),
+      categoryColor: json.nestedOr(['category', 'color'], 'category_color'),
+      cardName: json.nestedOr(['bank_user', 'card', 'name'], 'card_name'),
+      bankName: json.nestedOr(['bank_user', 'card', 'name'], 'bank_name'),
       parcelas: parcelas,
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'].toString())
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.tryParse(json['updated_at'].toString())
-          : null,
-      deletedAt: json['deleted_at'] != null
-          ? DateTime.tryParse(json['deleted_at'].toString())
-          : null,
+      createdAt: json.dateTime('created_at'),
+      updatedAt: json.dateTime('updated_at'),
+      deletedAt: json.dateTime('deleted_at'),
     );
   }
 
@@ -115,12 +101,10 @@ class TransactionModel extends Transaction {
     return TransactionModel(
       id: map['id'] as int?,
       title: map['title'] as String,
-      amount: (map['amount'] as num).toDouble(),
+      amount: map.toDouble('amount'),
       type: map['type'] as String,
       status: map['status'] as String? ?? 'pending',
-      date: map['date'] != null
-          ? DateTime.tryParse(map['date'].toString())
-          : null,
+      date: map.dateTime('date'),
       description: map['description'] as String?,
       isRecurring: map['is_recurring'] == 1,
       installments: map['installments'] as int? ?? 1,
@@ -133,15 +117,9 @@ class TransactionModel extends Transaction {
       categoryColor: map['category_color'] as String?,
       cardName: map['card_name'] as String?,
       bankName: map['bank_name'] as String?,
-      createdAt: map['created_at'] != null
-          ? DateTime.tryParse(map['created_at'].toString())
-          : null,
-      updatedAt: map['updated_at'] != null
-          ? DateTime.tryParse(map['updated_at'].toString())
-          : null,
-      deletedAt: map['deleted_at'] != null
-          ? DateTime.tryParse(map['deleted_at'].toString())
-          : null,
+      createdAt: map.dateTime('created_at'),
+      updatedAt: map.dateTime('updated_at'),
+      deletedAt: map.dateTime('deleted_at'),
     );
   }
 }
@@ -168,17 +146,10 @@ class TransactionParcelaModel extends TransactionParcela {
           json['numero'] as int? ??
           1,
       monthKey: json['month_key'] as String? ?? '',
-      dueDate: json['due_date'] != null
-          ? DateTime.tryParse(json['due_date'].toString())
-          : null,
-      amount: double.tryParse(json['amount']?.toString() ?? '') ??
-          (json['valor'] as num? ?? 0).toDouble(),
+      dueDate: json.dateTime('due_date'),
+      amount: json.toDouble('amount', (json['valor'] as num? ?? 0).toDouble()),
       status: json['status'] as String? ?? 'pending',
-      paidAt: json['paid_date'] != null
-          ? DateTime.tryParse(json['paid_date'].toString())
-          : (json['paid_at'] != null
-              ? DateTime.tryParse(json['paid_at'].toString())
-              : null),
+      paidAt: json.dateTime('paid_date') ?? json.dateTime('paid_at'),
     );
   }
 

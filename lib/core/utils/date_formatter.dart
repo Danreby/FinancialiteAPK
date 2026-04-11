@@ -54,4 +54,27 @@ class DateFormatter {
   // Aliases for convenience
   static String shortDate(DateTime date) => formatShort(date);
   static String monthKey(DateTime date) => formatMonthKey(date);
+
+  static const _monthAbbreviations = [
+    'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+    'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez',
+  ];
+
+  static String shortMonthFromKey(String monthKey) {
+    try {
+      final date = DateTime.parse('$monthKey-01');
+      return _monthAbbreviations[date.month - 1];
+    } catch (_) {
+      return monthKey;
+    }
+  }
+
+  static String monthYearFromKey(String monthKey) {
+    try {
+      final date = DateTime.parse('$monthKey-01');
+      return formatMonthYear(date);
+    } catch (_) {
+      return monthKey;
+    }
+  }
 }

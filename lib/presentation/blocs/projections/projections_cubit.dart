@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/repositories/projections_repository.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'projections_state.dart';
 
@@ -24,7 +25,7 @@ class ProjectionsCubit extends Cubit<ProjectionsState> {
             List<Map<String, dynamic>>.from(data['transactions'] ?? []),
       ));
     } catch (e) {
-      emit(ProjectionsError(e.toString()));
+      emit(ProjectionsError(extractErrorMessage(e)));
     }
   }
 }

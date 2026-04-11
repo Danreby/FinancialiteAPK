@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/transaction.dart';
 import '../../../domain/repositories/transaction_repository.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'transaction_event.dart';
 part 'transaction_state.dart';
@@ -43,16 +44,21 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
           transactions: transactions,
           hasMore: _hasMore,
         ));
-      } else {
+      } else if (state is TransactionLoaded) {
         final current = state as TransactionLoaded;
         emit(TransactionLoaded(
           transactions: [...current.transactions, ...transactions],
           hasMore: _hasMore,
         ));
+      } else {
+        emit(TransactionLoaded(
+          transactions: transactions,
+          hasMore: _hasMore,
+        ));
       }
       _currentPage++;
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(TransactionError(extractErrorMessage(e)));
     }
   }
 
@@ -61,7 +67,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       await _repository.createTransaction(event.data);
       add(TransactionsFetched(reset: true, filters: _filters));
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(TransactionError(extractErrorMessage(e)));
     }
   }
 
@@ -70,7 +76,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       await _repository.updateTransaction(event.id, event.data);
       add(TransactionsFetched(reset: true, filters: _filters));
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(TransactionError(extractErrorMessage(e)));
     }
   }
 
@@ -85,7 +91,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
         ));
       }
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(TransactionError(extractErrorMessage(e)));
     }
   }
 

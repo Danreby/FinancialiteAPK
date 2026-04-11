@@ -1,3 +1,4 @@
+import '../../core/utils/json_helpers.dart';
 import '../../domain/entities/dashboard.dart';
 
 class DashboardDataModel extends DashboardData {
@@ -32,14 +33,12 @@ class DashboardDataModel extends DashboardData {
       return m['is_overdue'] == true || m['status'] == 'overdue';
     }).length;
 
-    final pendingBill =
-        (stats['current_month_pending_bill'] as num? ?? 0).toDouble();
-    final debitTotal =
-        (stats['current_month_debit_total'] as num? ?? 0).toDouble();
+    final pendingBill = stats.toDouble('current_month_pending_bill');
+    final debitTotal = stats.toDouble('current_month_debit_total');
 
     return DashboardDataModel(
-      totalBalance: (stats['remaining_money'] as num? ?? 0).toDouble(),
-      totalIncome: (stats['total_monthly_income'] as num? ?? 0).toDouble(),
+      totalBalance: stats.toDouble('remaining_money'),
+      totalIncome: stats.toDouble('total_monthly_income'),
       totalExpense: (pendingBill + debitTotal),
       pendingBillAmount: pendingBill,
       monthDebitTotal: debitTotal,
@@ -48,13 +47,13 @@ class DashboardDataModel extends DashboardData {
       budgetPercentage: 0,
       savingsTotal: 0,
       pendingBills: pendingBillCount,
-      healthScore: (financialHealth['score'] as num? ?? 0).toDouble(),
+      healthScore: financialHealth.toDouble('score'),
       monthlyChart: monthlySummary.map((item) {
         final m = item as Map<String, dynamic>;
         return MonthlyChartDataModel(
           month: m['month_key'] as String? ?? '',
-          income: (m['credit_total'] as num? ?? 0).toDouble(),
-          expense: (m['debit_total'] as num? ?? 0).toDouble(),
+          income: m.toDouble('credit_total'),
+          expense: m.toDouble('debit_total'),
         );
       }).toList(),
       topCategories: topCategoriesList.map((item) {
@@ -63,17 +62,17 @@ class DashboardDataModel extends DashboardData {
           name: m['category_name'] as String? ?? 'Sem categoria',
           icon: m['category_icon'] as String?,
           color: m['category_color'] as String?,
-          amount: (m['total'] as num? ?? 0).toDouble(),
+          amount: m.toDouble('total'),
           percentage: 0,
         );
       }).toList(),
       upcomingBills: upcomingBillsList.map((item) {
         final m = item as Map<String, dynamic>;
         return UpcomingBillModel(
-          id: (m['id'] as num).toInt(),
+          id: m.toInt('id'),
           title: m['title'] as String,
-          amount: (m['amount'] as num? ?? 0).toDouble(),
-          dueDay: m['due_day'] as int? ?? 0,
+          amount: m.toDouble('amount'),
+          dueDay: m.toInt('due_day'),
           categoryName: null,
         );
       }).toList(),
@@ -88,8 +87,8 @@ class MonthlyChartDataModel extends MonthlyChartData {
   factory MonthlyChartDataModel.fromJson(Map<String, dynamic> json) {
     return MonthlyChartDataModel(
       month: json['month'] as String,
-      income: (json['income'] as num? ?? 0).toDouble(),
-      expense: (json['expense'] as num? ?? 0).toDouble(),
+      income: json.toDouble('income'),
+      expense: json.toDouble('expense'),
     );
   }
 }
@@ -107,8 +106,8 @@ class CategorySpendingModel extends CategorySpending {
       name: json['name'] as String,
       icon: json['icon'] as String?,
       color: json['color'] as String?,
-      amount: (json['amount'] as num? ?? 0).toDouble(),
-      percentage: (json['percentage'] as num? ?? 0).toDouble(),
+      amount: json.toDouble('amount'),
+      percentage: json.toDouble('percentage'),
     );
   }
 }
@@ -125,7 +124,7 @@ class UpcomingBillModel extends UpcomingBill {
     return UpcomingBillModel(
       id: json['id'] as int,
       title: json['title'] as String,
-      amount: (json['amount'] as num).toDouble(),
+      amount: json.toDouble('amount'),
       dueDay: json['due_day'] as int,
       categoryName: json['category_name'] as String?,
     );

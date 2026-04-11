@@ -87,7 +87,8 @@ class BankRepositoryImpl extends BaseOfflineRepository
 
   @override
   Future<BankTransfer> createTransfer(Map<String, dynamic> data) async {
-    final response = await api.post(ApiConstants.bankTransfers, data: data);
+    final sanitized = InputSanitizer.sanitizeMap(data);
+    final response = await api.post(ApiConstants.bankTransfers, data: sanitized);
     return BankTransferModel.fromJson(response.data['data'] ?? response.data);
   }
 }

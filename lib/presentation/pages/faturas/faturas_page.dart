@@ -9,6 +9,7 @@ import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/month_selector.dart';
+import '../../widgets/page_header.dart';
 
 class FaturasPage extends StatefulWidget {
   const FaturasPage({super.key});
@@ -74,40 +75,7 @@ class _FaturasPageState extends State<FaturasPage> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 20,
-              right: 20,
-              bottom: 8,
-            ),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest
-                          .withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(Icons.arrow_back_ios_new,
-                        size: 18, color: theme.colorScheme.onSurface),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  'Faturas',
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const PageHeader(title: 'Faturas', showBackButton: true),
           Padding(
             padding: const EdgeInsets.only(top: 8, bottom: 4),
             child: MonthSelector(

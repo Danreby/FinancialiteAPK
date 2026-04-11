@@ -11,6 +11,7 @@ import '../../widgets/app_error_widget.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/gradient_card.dart';
 import '../../widgets/section_header.dart';
+import '../../widgets/page_header.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 
@@ -48,60 +49,39 @@ class _DashboardPageState extends State<DashboardPage> {
           slivers: [
             // Custom Header
             SliverToBoxAdapter(
-              child: Container(
-                padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).padding.top + 16,
-                  left: 20,
-                  right: 20,
-                  bottom: 4,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Visão Geral',
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.5,
+              child: PageHeader(
+                title: 'Visão Geral',
+                bottomPadding: 4,
+                trailing: BlocBuilder<NotificationCubit, NotificationState>(
+                  builder: (context, notifState) {
+                    final unread = notifState is NotificationLoaded
+                        ? notifState.unreadCount
+                        : 0;
+                    return GestureDetector(
+                      onTap: () => context.push('/notifications'),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Badge(
+                          isLabelVisible: unread > 0,
+                          label: Text(
+                            '$unread',
+                            style: const TextStyle(
+                                fontSize: 9, fontWeight: FontWeight.w700),
+                          ),
+                          child: Icon(
+                            Icons.notifications_outlined,
+                            color: theme.colorScheme.onSurface,
+                            size: 22,
                           ),
                         ),
-                      ],
-                    ),
-                    BlocBuilder<NotificationCubit, NotificationState>(
-                      builder: (context, notifState) {
-                        final unread = notifState is NotificationLoaded
-                            ? notifState.unreadCount
-                            : 0;
-                        return GestureDetector(
-                          onTap: () => context.push('/notifications'),
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.surfaceContainerHighest
-                                  .withValues(alpha: 0.5),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: Badge(
-                              isLabelVisible: unread > 0,
-                              label: Text(
-                                '$unread',
-                                style: const TextStyle(
-                                    fontSize: 9, fontWeight: FontWeight.w700),
-                              ),
-                              child: Icon(
-                                Icons.notifications_outlined,
-                                color: theme.colorScheme.onSurface,
-                                size: 22,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                      ),
+                    );
+                  },
                 ),
               ),
             ),

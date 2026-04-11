@@ -75,33 +75,3 @@ class AppLoadingIndicator extends StatelessWidget {
     );
   }
 }
-
-class ShimmerCard extends StatelessWidget {
-  final double height;
-  final double? width;
-  final BorderRadius? borderRadius;
-
-  const ShimmerCard({
-    super.key,
-    this.height = 120,
-    this.width,
-    this.borderRadius,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Shimmer.fromColors(
-      baseColor: isDark ? const Color(0xFF222640) : const Color(0xFFE5E7EB),
-      highlightColor: isDark ? const Color(0xFF2A2D42) : const Color(0xFFF9FAFB),
-      child: Container(
-        height: height,
-        width: width,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: borderRadius ?? BorderRadius.circular(20),
-        ),
-      ),
-    );
-  }
-}

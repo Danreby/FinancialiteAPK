@@ -1,3 +1,4 @@
+import '../../core/utils/json_helpers.dart';
 import '../../domain/entities/card_entity.dart';
 
 class CardEntityModel extends CardEntity {
@@ -44,26 +45,17 @@ class CardUserModel extends CardUser {
       cardId: json['card_id'] as int,
       dueDay: json['due_day'] as int? ?? 10,
       closingDay: json['closing_day'] as int? ?? 3,
-      creditLimit:
-          double.tryParse((json['credit_limit'] ?? 0).toString()) ?? 0.0,
+      creditLimit: json.toDouble('credit_limit'),
       nickname: json['nickname'] as String?,
-      cardName: json['card']?['name'] as String? ??
-          json['card_name'] as String? ??
+      cardName: json.nestedOr(['card', 'name'], 'card_name') ??
           json['name'] as String?,
-      cardBrand: json['card']?['brand'] as String? ??
-          json['card_brand'] as String? ??
+      cardBrand: json.nestedOr(['card', 'brand'], 'card_brand') ??
           json['brand'] as String?,
-      cardColor:
-          json['card']?['color'] as String? ?? json['card_color'] as String?,
-      cardLogo:
-          json['card']?['logo'] as String? ?? json['card_logo'] as String?,
+      cardColor: json.nestedOr(['card', 'color'], 'card_color'),
+      cardLogo: json.nestedOr(['card', 'logo'], 'card_logo'),
       currentSpending: (json['current_spending'] as num?)?.toDouble(),
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'].toString())
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.tryParse(json['updated_at'].toString())
-          : null,
+      createdAt: json.dateTime('created_at'),
+      updatedAt: json.dateTime('updated_at'),
     );
   }
 

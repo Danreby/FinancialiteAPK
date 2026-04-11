@@ -4,6 +4,7 @@ import '../../../domain/entities/user.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../core/security/secure_storage.dart';
 import '../../../core/error/exceptions.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -41,7 +42,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = await _authRepository.login(email: event.email, password: event.password);
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError(_extractMessage(e)));
+      emit(AuthError(extractErrorMessage(e)));
     }
   }
 
@@ -56,7 +57,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError(_extractMessage(e)));
+      emit(AuthError(extractErrorMessage(e)));
     }
   }
 
@@ -66,7 +67,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = await _authRepository.googleLogin(idToken: event.idToken);
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError(_extractMessage(e)));
+      emit(AuthError(extractErrorMessage(e)));
     }
   }
 
@@ -74,18 +75,5 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(const AuthLoading());
     await _authRepository.logout();
     emit(const AuthUnauthenticated());
-  }
-
-  String _extractMessage(Object e) {
-    if (e is ValidationException) {
-      if (e.fieldErrors != null && e.fieldErrors!.isNotEmpty) {
-        return e.fieldErrors!.values.expand((v) => v).join('\n');
-      }
-      return e.message;
-    }
-    if (e is NetworkException) return e.message;
-    if (e is AuthException) return e.message;
-    if (e is ServerException) return e.message;
-    return e.toString().replaceAll(RegExp(r'^\w+Exception:\s*'), '');
   }
 }

@@ -1,3 +1,4 @@
+import '../../core/utils/json_helpers.dart';
 import '../../domain/entities/user.dart';
 
 class UserModel extends User {
@@ -21,7 +22,7 @@ class UserModel extends User {
       theme: json['theme'] as String?,
       avatar: json['avatar'] as String?,
       googleId: json['google_id'] as String?,
-      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) : null,
+      createdAt: json.dateTime('created_at'),
     );
   }
 
@@ -55,7 +56,7 @@ class UserModel extends User {
       theme: map['theme'] as String?,
       avatar: map['avatar'] as String?,
       googleId: map['google_id'] as String?,
-      createdAt: map['created_at'] != null ? DateTime.tryParse(map['created_at'].toString()) : null,
+      createdAt: map.dateTime('created_at'),
     );
   }
 }

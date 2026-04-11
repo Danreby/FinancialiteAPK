@@ -100,8 +100,8 @@ class BillRepositoryImpl extends BaseOfflineRepository
   }
 
   @override
-  Future<void> markAsPaid(int id) async {
-    await api.post('${ApiConstants.bills}/$id/pay');
+  Future<void> markAsPaid(int id, {Map<String, dynamic>? data}) async {
+    await api.post('${ApiConstants.bills}/$id/pay', data: data);
   }
 
   @override

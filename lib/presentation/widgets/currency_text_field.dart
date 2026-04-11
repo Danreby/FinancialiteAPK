@@ -54,7 +54,6 @@ class CurrencyTextField extends StatelessWidget {
     this.onChanged,
   });
 
-  /// Returns the double value from the formatted string (e.g. "1.234,56" → 1234.56)
   static double parseValue(String text) {
     final cleaned = text.replaceAll('.', '').replaceAll(',', '.');
     return double.tryParse(cleaned) ?? 0.0;

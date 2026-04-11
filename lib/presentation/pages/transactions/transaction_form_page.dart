@@ -11,6 +11,7 @@ import '../../../core/di/injection_container.dart';
 import '../../../domain/entities/category.dart';
 import '../../../domain/entities/card_entity.dart';
 import '../../../domain/repositories/transaction_repository.dart';
+import '../../widgets/page_header.dart';
 
 class TransactionFormPage extends StatefulWidget {
   final int? transactionId;
@@ -114,38 +115,7 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 20,
-              right: 20,
-              bottom: 16,
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back, size: 20),
-                    onPressed: () => context.pop(),
-                    padding: EdgeInsets.zero,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  _isEditing ? 'Editar Transação' : 'Nova Transação',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          PageHeader(title: _isEditing ? 'Editar Transação' : 'Nova Transação', showBackButton: true, bottomPadding: 16),
           Expanded(
             child: _isLoadingTransaction
                 ? const Center(child: CircularProgressIndicator())

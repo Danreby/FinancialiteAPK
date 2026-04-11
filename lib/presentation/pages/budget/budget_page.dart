@@ -11,6 +11,8 @@ import '../../widgets/section_header.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/validators.dart';
+import '../../widgets/page_header.dart';
+import '../../widgets/shadowed_fab.dart';
 
 class BudgetPage extends StatefulWidget {
   const BudgetPage({super.key});
@@ -81,41 +83,10 @@ class _BudgetPageState extends State<BudgetPage> {
     final theme = Theme.of(context);
     final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.primary.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-          shape: BoxShape.circle,
-        ),
-        child: FloatingActionButton(
-          onPressed: _showCreateDialog,
-          elevation: 0,
-          child: const Icon(Icons.add),
-        ),
-      ),
+      floatingActionButton: ShadowedFab(onPressed: _showCreateDialog),
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Orçamento',
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const PageHeader(title: 'Orçamento', bottomPadding: 16),
           MonthSelector(
             selectedMonth: _selectedMonth,
             onChanged: (date) {

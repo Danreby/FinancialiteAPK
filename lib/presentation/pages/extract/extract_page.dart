@@ -13,6 +13,7 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/icon_utils.dart';
 import '../../../domain/repositories/transaction_repository.dart';
+import '../../widgets/page_header.dart';
 
 class ExtractPage extends StatelessWidget {
   const ExtractPage({super.key});
@@ -77,40 +78,7 @@ class _ExtractViewState extends State<_ExtractView> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 20,
-              right: 20,
-              bottom: 8,
-            ),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest
-                          .withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(Icons.arrow_back_ios_new,
-                        size: 18, color: theme.colorScheme.onSurface),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  'Extrato',
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const PageHeader(title: 'Extrato', showBackButton: true),
           MonthSelector(
             selectedMonth: _selectedMonth,
             onChanged: (date) {
