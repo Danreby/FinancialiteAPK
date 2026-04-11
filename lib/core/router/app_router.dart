@@ -83,131 +83,131 @@ class AppRouter {
         if (isAuth && isAuthRoute) return '/dashboard';
         return null;
       },
-    routes: [
-      GoRoute(
-        path: '/splash',
-        builder: (context, state) => const SplashPage(),
-      ),
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginPage(),
-      ),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => const RegisterPage(),
-      ),
-      ShellRoute(
-        navigatorKey: _shellNavigatorKey,
-        builder: (context, state, child) => AppShell(child: child),
-        routes: [
-          GoRoute(
-            path: '/dashboard',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: DashboardPage()),
-          ),
-          GoRoute(
-            path: '/transactions',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: TransactionsPage()),
-          ),
-          GoRoute(
-            path: '/transactions/new',
-            builder: (context, state) => const TransactionFormPage(),
-          ),
-          GoRoute(
-            path: '/transactions/:id',
-            builder: (context, state) => TransactionFormPage(
-              transactionId: int.tryParse(state.pathParameters['id'] ?? ''),
+      routes: [
+        GoRoute(
+          path: '/splash',
+          builder: (context, state) => const SplashPage(),
+        ),
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => const LoginPage(),
+        ),
+        GoRoute(
+          path: '/register',
+          builder: (context, state) => const RegisterPage(),
+        ),
+        ShellRoute(
+          navigatorKey: _shellNavigatorKey,
+          builder: (context, state, child) => AppShell(child: child),
+          routes: [
+            GoRoute(
+              path: '/dashboard',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: DashboardPage()),
             ),
-          ),
-          GoRoute(
-            path: '/bills',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: BillsPage()),
-          ),
-          GoRoute(
-            path: '/income',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: IncomePage()),
-          ),
-          GoRoute(
-            path: '/budget',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: BudgetPage()),
-          ),
-          GoRoute(
-            path: '/savings',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: SavingsPage()),
-          ),
-          GoRoute(
-            path: '/bank-accounts',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: BankAccountsPage()),
-          ),
-          GoRoute(
-            path: '/bank-transfer',
-            builder: (context, state) => const BankTransferPage(),
-          ),
-          GoRoute(
-            path: '/more',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: MorePage()),
-          ),
-          GoRoute(
-            path: '/cards',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: CardsPage()),
-          ),
-          GoRoute(
-            path: '/categories',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: CategoriesPage()),
-          ),
-          GoRoute(
-            path: '/notifications',
-            builder: (context, state) => const NotificationsPage(),
-          ),
-          GoRoute(
-            path: '/profile',
-            builder: (context, state) => const ProfilePage(),
-          ),
-          GoRoute(
-            path: '/settings',
-            builder: (context, state) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/reports',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: ReportsPage()),
-          ),
-          GoRoute(
-            path: '/reports/categories',
-            builder: (context, state) => const ReportCategoryPage(),
-          ),
-          GoRoute(
-            path: '/reports/monthly',
-            builder: (context, state) => const ReportMonthlyPage(),
-          ),
-          GoRoute(
-            path: '/reports/evolution',
-            builder: (context, state) => const ReportEvolutionPage(),
-          ),
-          GoRoute(
-            path: '/faturas',
-            builder: (context, state) => const FaturasPage(),
-          ),
-          GoRoute(
-            path: '/extract',
-            builder: (context, state) => const ExtractPage(),
-          ),
-          GoRoute(
-            path: '/projections',
-            builder: (context, state) => const ProjectionsPage(),
-          ),
-        ],
-      ),
-    ],
+            GoRoute(
+              path: '/transactions',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: TransactionsPage()),
+            ),
+            GoRoute(
+              path: '/transactions/new',
+              builder: (context, state) => const TransactionFormPage(),
+            ),
+            GoRoute(
+              path: '/transactions/:id',
+              builder: (context, state) => TransactionFormPage(
+                transactionId: int.tryParse(state.pathParameters['id'] ?? ''),
+              ),
+            ),
+            GoRoute(
+              path: '/bills',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: BillsPage()),
+            ),
+            GoRoute(
+              path: '/income',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: IncomePage()),
+            ),
+            GoRoute(
+              path: '/budget',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: BudgetPage()),
+            ),
+            GoRoute(
+              path: '/savings',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: SavingsPage()),
+            ),
+            GoRoute(
+              path: '/bank-accounts',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: BankAccountsPage()),
+            ),
+            GoRoute(
+              path: '/bank-transfer',
+              builder: (context, state) => const BankTransferPage(),
+            ),
+            GoRoute(
+              path: '/more',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: MorePage()),
+            ),
+            GoRoute(
+              path: '/cards',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: CardsPage()),
+            ),
+            GoRoute(
+              path: '/categories',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: CategoriesPage()),
+            ),
+            GoRoute(
+              path: '/notifications',
+              builder: (context, state) => const NotificationsPage(),
+            ),
+            GoRoute(
+              path: '/profile',
+              builder: (context, state) => const ProfilePage(),
+            ),
+            GoRoute(
+              path: '/settings',
+              builder: (context, state) => const SettingsPage(),
+            ),
+            GoRoute(
+              path: '/reports',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: ReportsPage()),
+            ),
+            GoRoute(
+              path: '/reports/categories',
+              builder: (context, state) => const ReportCategoryPage(),
+            ),
+            GoRoute(
+              path: '/reports/monthly',
+              builder: (context, state) => const ReportMonthlyPage(),
+            ),
+            GoRoute(
+              path: '/reports/evolution',
+              builder: (context, state) => const ReportEvolutionPage(),
+            ),
+            GoRoute(
+              path: '/faturas',
+              builder: (context, state) => const FaturasPage(),
+            ),
+            GoRoute(
+              path: '/extract',
+              builder: (context, state) => const ExtractPage(),
+            ),
+            GoRoute(
+              path: '/projections',
+              builder: (context, state) => const ProjectionsPage(),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
