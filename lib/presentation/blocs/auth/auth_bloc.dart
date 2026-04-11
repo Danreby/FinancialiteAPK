@@ -4,6 +4,7 @@ import '../../../domain/entities/user.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../core/security/secure_storage.dart';
 import '../../../core/error/exceptions.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -12,7 +13,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
   final SecureStorage _secureStorage;
 
-  AuthBloc(this._authRepository, this._secureStorage) : super(const AuthInitial()) {
+  AuthBloc(this._authRepository, this._secureStorage)
+      : super(const AuthInitial()) {
     on<AuthCheckRequested>(_onCheckRequested);
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
@@ -20,7 +22,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLogoutRequested>(_onLogoutRequested);
   }
 
-  Future<void> _onCheckRequested(AuthCheckRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onCheckRequested(
+      AuthCheckRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     try {
       final hasToken = await _secureStorage.hasToken();
@@ -35,17 +38,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onLoginRequested(AuthLoginRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onLoginRequested(
+      AuthLoginRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     try {
-      final user = await _authRepository.login(email: event.email, password: event.password);
+      final user = await _authRepository.login(
+          email: event.email, password: event.password);
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError(_extractMessage(e)));
+      emit(AuthError(extractErrorMessage(e)));
     }
   }
 
-  Future<void> _onRegisterRequested(AuthRegisterRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onRegisterRequested(
+      AuthRegisterRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     try {
       final user = await _authRepository.register(
@@ -56,36 +62,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError(_extractMessage(e)));
+      emit(AuthError(extractErrorMessage(e)));
     }
   }
 
-  Future<void> _onGoogleLoginRequested(AuthGoogleLoginRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onGoogleLoginRequested(
+      AuthGoogleLoginRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     try {
       final user = await _authRepository.googleLogin(idToken: event.idToken);
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError(_extractMessage(e)));
+      emit(AuthError(extractErrorMessage(e)));
     }
   }
 
-  Future<void> _onLogoutRequested(AuthLogoutRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onLogoutRequested(
+      AuthLogoutRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     await _authRepository.logout();
     emit(const AuthUnauthenticated());
-  }
-
-  String _extractMessage(Object e) {
-    if (e is ValidationException) {
-      if (e.fieldErrors != null && e.fieldErrors!.isNotEmpty) {
-        return e.fieldErrors!.values.expand((v) => v).join('\n');
-      }
-      return e.message;
-    }
-    if (e is NetworkException) return e.message;
-    if (e is AuthException) return e.message;
-    if (e is ServerException) return e.message;
-    return e.toString().replaceAll(RegExp(r'^\w+Exception:\s*'), '');
   }
 }

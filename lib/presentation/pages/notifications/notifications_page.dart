@@ -5,6 +5,7 @@ import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../widgets/page_header.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -26,71 +27,55 @@ class _NotificationsPageState extends State<NotificationsPage> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 20,
-              right: 20,
-              bottom: 16,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          PageHeader(
+            title: 'Notificações',
+            bottomPadding: 16,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Notificações',
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
+                GestureDetector(
+                  onTap: () =>
+                      context.read<NotificationCubit>().markAllAsRead(),
+                  child: Text(
+                    'Ler tudo',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: () =>
-                          context.read<NotificationCubit>().markAllAsRead(),
-                      child: Text(
-                        'Ler tudo',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    GestureDetector(
-                      onTap: () async {
-                        final confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: const Text('Limpar notificações'),
-                            content: const Text(
-                                'Deseja remover todas as notificações?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx, false),
-                                child: const Text('Cancelar'),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx, true),
-                                child: const Text('Limpar'),
-                              ),
-                            ],
+                const SizedBox(width: 16),
+                GestureDetector(
+                  onTap: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('Limpar notificações'),
+                        content:
+                            const Text('Deseja remover todas as notificações?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: const Text('Cancelar'),
                           ),
-                        );
-                        if (confirm == true && context.mounted) {
-                          context.read<NotificationCubit>().clearAll();
-                        }
-                      },
-                      child: Text(
-                        'Limpar tudo',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.error,
-                          fontWeight: FontWeight.w600,
-                        ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, true),
+                            child: const Text('Limpar'),
+                          ),
+                        ],
                       ),
+                    );
+                    if (confirm == true && context.mounted) {
+                      context.read<NotificationCubit>().clearAll();
+                    }
+                  },
+                  child: Text(
+                    'Limpar tudo',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.error,
+                      fontWeight: FontWeight.w600,
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),

@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/user.dart';
 import '../../../domain/repositories/profile_repository.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'profile_state.dart';
 
@@ -16,7 +17,7 @@ class ProfileCubit extends Cubit<ProfileState> {
       final user = await _repository.getProfile();
       emit(ProfileLoaded(user: user));
     } catch (e) {
-      emit(ProfileError(e.toString()));
+      emit(ProfileError(extractErrorMessage(e)));
     }
   }
 
@@ -25,7 +26,7 @@ class ProfileCubit extends Cubit<ProfileState> {
       final user = await _repository.updateProfile(data);
       emit(ProfileLoaded(user: user));
     } catch (e) {
-      emit(ProfileError(e.toString()));
+      emit(ProfileError(extractErrorMessage(e)));
     }
   }
 
@@ -44,16 +45,16 @@ class ProfileCubit extends Cubit<ProfileState> {
         emit(ProfilePasswordChanged((state as ProfileLoaded).user));
       }
     } catch (e) {
-      emit(ProfileError(e.toString()));
+      emit(ProfileError(extractErrorMessage(e)));
     }
   }
 
   Future<void> deleteAccount(String password) async {
     try {
-      await _repository.deleteAccount();
+      await _repository.deleteAccount(password: password);
       emit(const ProfileDeleted());
     } catch (e) {
-      emit(ProfileError(e.toString()));
+      emit(ProfileError(extractErrorMessage(e)));
     }
   }
 }

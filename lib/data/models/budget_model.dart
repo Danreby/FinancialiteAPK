@@ -1,3 +1,4 @@
+import '../../core/utils/json_helpers.dart';
 import '../../domain/entities/budget.dart';
 
 class BudgetModel extends Budget {
@@ -19,24 +20,20 @@ class BudgetModel extends Budget {
     final rawCategories = json['budget_categories'] ?? json['categories'];
     if (rawCategories != null) {
       categories = (rawCategories as List)
-          .map((c) => BudgetCategoryModel.fromJson(c))
+          .map((c) => BudgetCategoryModel.fromJson(c as Map<String, dynamic>))
           .toList();
     }
     return BudgetModel(
       id: json['id'] as int?,
-      monthlyLimit: double.tryParse(json['monthly_limit'].toString()) ?? 0.0,
+      monthlyLimit: json.toDouble('monthly_limit'),
       monthYear: json['month_year'] as String,
       userId: json['user_id'] as int,
       totalSpent: (json['total_spent'] as num?)?.toDouble(),
       remaining: (json['remaining'] as num?)?.toDouble(),
       percentage: (json['percentage'] as num?)?.toDouble(),
       categories: categories,
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'].toString())
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.tryParse(json['updated_at'].toString())
-          : null,
+      createdAt: json.dateTime('created_at'),
+      updatedAt: json.dateTime('updated_at'),
     );
   }
 
@@ -58,15 +55,11 @@ class BudgetModel extends Budget {
   factory BudgetModel.fromDb(Map<String, dynamic> map) {
     return BudgetModel(
       id: map['id'] as int?,
-      monthlyLimit: (map['monthly_limit'] as num).toDouble(),
+      monthlyLimit: map.toDouble('monthly_limit'),
       monthYear: map['month_year'] as String,
       userId: map['user_id'] as int,
-      createdAt: map['created_at'] != null
-          ? DateTime.tryParse(map['created_at'].toString())
-          : null,
-      updatedAt: map['updated_at'] != null
-          ? DateTime.tryParse(map['updated_at'].toString())
-          : null,
+      createdAt: map.dateTime('created_at'),
+      updatedAt: map.dateTime('updated_at'),
     );
   }
 }
@@ -88,10 +81,8 @@ class BudgetCategoryModel extends BudgetCategory {
       id: json['id'] as int?,
       budgetId: json['budget_id'] as int,
       categoryId: json['category_id'] as int,
-      limitAmount: double.tryParse(
-              (json['limit'] ?? json['limit_amount'] ?? 0).toString()) ??
-          0.0,
-      spent: double.tryParse((json['spent'] ?? 0).toString()),
+      limitAmount: json.toDouble('limit', json.toDouble('limit_amount')),
+      spent: (json['spent'] as num?)?.toDouble(),
       categoryName: json['category']?['name'] as String?,
       categoryIcon: json['category']?['icon'] as String?,
       categoryColor: json['category']?['color'] as String?,

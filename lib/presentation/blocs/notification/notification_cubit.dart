@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../domain/entities/notification.dart';
 import '../../../domain/repositories/notification_repository.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'notification_state.dart';
 
@@ -33,7 +34,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       emit(NotificationLoaded(
           notifications: notifications, unreadCount: unreadCount));
     } catch (e) {
-      emit(NotificationError(e.toString()));
+      emit(NotificationError(extractErrorMessage(e)));
     }
   }
 
@@ -44,15 +45,7 @@ class NotificationCubit extends Cubit<NotificationState> {
         final current = state as NotificationLoaded;
         final updated = current.notifications.map((n) {
           if (n.id == id) {
-            return AppNotification(
-              id: n.id,
-              type: n.type,
-              title: n.title,
-              message: n.message,
-              isRead: true,
-              userId: n.userId,
-              createdAt: n.createdAt,
-            );
+            return n.copyWith(isRead: true);
           }
           return n;
         }).toList();
@@ -62,7 +55,7 @@ class NotificationCubit extends Cubit<NotificationState> {
         ));
       }
     } catch (e) {
-      emit(NotificationError(e.toString()));
+      emit(NotificationError(extractErrorMessage(e)));
     }
   }
 
@@ -71,21 +64,12 @@ class NotificationCubit extends Cubit<NotificationState> {
       await _repository.markAllAsRead();
       if (state is NotificationLoaded) {
         final current = state as NotificationLoaded;
-        final updated = current.notifications.map((n) {
-          return AppNotification(
-            id: n.id,
-            type: n.type,
-            title: n.title,
-            message: n.message,
-            isRead: true,
-            userId: n.userId,
-            createdAt: n.createdAt,
-          );
-        }).toList();
+        final updated =
+            current.notifications.map((n) => n.copyWith(isRead: true)).toList();
         emit(NotificationLoaded(notifications: updated, unreadCount: 0));
       }
     } catch (e) {
-      emit(NotificationError(e.toString()));
+      emit(NotificationError(extractErrorMessage(e)));
     }
   }
 
@@ -103,7 +87,7 @@ class NotificationCubit extends Cubit<NotificationState> {
         ));
       }
     } catch (e) {
-      emit(NotificationError(e.toString()));
+      emit(NotificationError(extractErrorMessage(e)));
     }
   }
 
@@ -112,7 +96,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       await _repository.clearAll();
       emit(const NotificationLoaded(notifications: [], unreadCount: 0));
     } catch (e) {
-      emit(NotificationError(e.toString()));
+      emit(NotificationError(extractErrorMessage(e)));
     }
   }
 }

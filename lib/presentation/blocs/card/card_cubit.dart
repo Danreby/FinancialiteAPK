@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/card_entity.dart';
 import '../../../domain/repositories/card_repository.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'card_state.dart';
 
@@ -19,7 +20,7 @@ class CardCubit extends Cubit<CardState> {
           .catchError((_) => <CardEntity>[]);
       emit(CardLoaded(cards: cards, availableCards: available));
     } catch (e) {
-      emit(CardError(e.toString()));
+      emit(CardError(extractErrorMessage(e)));
     }
   }
 
@@ -35,7 +36,7 @@ class CardCubit extends Cubit<CardState> {
         ));
       }
     } catch (e) {
-      emit(CardError(e.toString()));
+      emit(CardError(extractErrorMessage(e)));
     }
   }
 
@@ -44,7 +45,7 @@ class CardCubit extends Cubit<CardState> {
       await _repository.createCard(data);
       loadCards();
     } catch (e) {
-      emit(CardError(e.toString()));
+      emit(CardError(extractErrorMessage(e)));
     }
   }
 
@@ -53,7 +54,7 @@ class CardCubit extends Cubit<CardState> {
       await _repository.updateCard(id, data);
       loadCards();
     } catch (e) {
-      emit(CardError(e.toString()));
+      emit(CardError(extractErrorMessage(e)));
     }
   }
 
@@ -68,7 +69,7 @@ class CardCubit extends Cubit<CardState> {
         ));
       }
     } catch (e) {
-      emit(CardError(e.toString()));
+      emit(CardError(extractErrorMessage(e)));
     }
   }
 
@@ -77,7 +78,7 @@ class CardCubit extends Cubit<CardState> {
       await _repository.payInvoice(cardId, data);
       loadCards();
     } catch (e) {
-      emit(CardError(e.toString()));
+      emit(CardError(extractErrorMessage(e)));
     }
   }
 }

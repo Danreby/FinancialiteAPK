@@ -4,6 +4,7 @@ import '../../core/network/network_info.dart';
 import '../../domain/entities/card_entity.dart';
 import '../../domain/repositories/card_repository.dart';
 import '../models/card_model.dart';
+import '../../core/security/input_sanitizer.dart';
 import 'base_offline_repository.dart';
 
 class CardRepositoryImpl extends BaseOfflineRepository
@@ -39,13 +40,16 @@ class CardRepositoryImpl extends BaseOfflineRepository
 
   @override
   Future<CardUser> createCard(Map<String, dynamic> data) async {
-    final response = await api.post(ApiConstants.cards, data: data);
+    final sanitized = InputSanitizer.sanitizeMap(data);
+    final response = await api.post(ApiConstants.cards, data: sanitized);
     return CardUserModel.fromJson(response.data['data'] ?? response.data);
   }
 
   @override
   Future<CardUser> updateCard(int id, Map<String, dynamic> data) async {
-    final response = await api.put('${ApiConstants.cards}/$id', data: data);
+    final sanitized = InputSanitizer.sanitizeMap(data);
+    final response =
+        await api.put('${ApiConstants.cards}/$id', data: sanitized);
     return CardUserModel.fromJson(response.data['data'] ?? response.data);
   }
 
@@ -77,6 +81,8 @@ class CardRepositoryImpl extends BaseOfflineRepository
 
   @override
   Future<void> payInvoice(int cardId, Map<String, dynamic> data) async {
-    await api.post('${ApiConstants.cards}/$cardId/pay-invoice', data: data);
+    final sanitized = InputSanitizer.sanitizeMap(data);
+    await api.post('${ApiConstants.cards}/$cardId/pay-invoice',
+        data: sanitized);
   }
 }

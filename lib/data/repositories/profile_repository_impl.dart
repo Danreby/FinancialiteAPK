@@ -42,7 +42,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   @override
-  Future<void> deleteAccount() async {
-    await _api.delete(ApiConstants.profile);
+  Future<void> deleteAccount({required String password}) async {
+    await _api.delete(ApiConstants.profile, data: {'password': password});
   }
 }

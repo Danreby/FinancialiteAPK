@@ -11,6 +11,8 @@ import '../../../core/di/injection_container.dart';
 import '../../../domain/entities/category.dart';
 import '../../../domain/entities/card_entity.dart';
 import '../../../domain/repositories/transaction_repository.dart';
+import '../../widgets/page_header.dart';
+import 'widgets/transaction_type_selector.dart';
 
 class TransactionFormPage extends StatefulWidget {
   final int? transactionId;
@@ -114,38 +116,10 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 20,
-              right: 20,
-              bottom: 16,
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back, size: 20),
-                    onPressed: () => context.pop(),
-                    padding: EdgeInsets.zero,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  _isEditing ? 'Editar Transação' : 'Nova Transação',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          PageHeader(
+              title: _isEditing ? 'Editar Transação' : 'Nova Transação',
+              showBackButton: true,
+              bottomPadding: 16),
           Expanded(
             child: _isLoadingTransaction
                 ? const Center(child: CircularProgressIndicator())
@@ -156,94 +130,9 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => setState(() => _type = 'debit'),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    height: 56,
-                                    decoration: BoxDecoration(
-                                      color: _type == 'debit'
-                                          ? theme.colorScheme.error
-                                          : theme.colorScheme
-                                              .surfaceContainerHighest,
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.arrow_downward,
-                                          color: _type == 'debit'
-                                              ? Colors.white
-                                              : theme
-                                                  .colorScheme.onSurfaceVariant,
-                                          size: 20,
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          'Débito',
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                            color: _type == 'debit'
-                                                ? Colors.white
-                                                : theme.colorScheme
-                                                    .onSurfaceVariant,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => setState(() => _type = 'credit'),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    height: 56,
-                                    decoration: BoxDecoration(
-                                      color: _type == 'credit'
-                                          ? const Color(0xFF10B981)
-                                          : theme.colorScheme
-                                              .surfaceContainerHighest,
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.arrow_upward,
-                                          color: _type == 'credit'
-                                              ? Colors.white
-                                              : theme
-                                                  .colorScheme.onSurfaceVariant,
-                                          size: 20,
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          'Crédito',
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                            color: _type == 'credit'
-                                                ? Colors.white
-                                                : theme.colorScheme
-                                                    .onSurfaceVariant,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                          TransactionTypeSelector(
+                            type: _type,
+                            onChanged: (t) => setState(() => _type = t),
                           ),
                           const SizedBox(height: 20),
                           Container(

@@ -18,7 +18,8 @@ class ConnectivityBanner extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.wifi_off_rounded, size: 14, color: Colors.white.withValues(alpha: 0.9)),
+            Icon(Icons.wifi_off_rounded,
+                size: 14, color: Colors.white.withValues(alpha: 0.9)),
             const SizedBox(width: 8),
             Text(
               'Sem conexão com a internet',
@@ -26,7 +27,6 @@ class ConnectivityBanner extends StatelessWidget {
                 color: Colors.white.withValues(alpha: 0.95),
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'Inter',
               ),
             ),
           ],

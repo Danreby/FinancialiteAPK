@@ -1,13 +1,16 @@
 import 'package:dio/dio.dart';
+import '../../constants/api_constants.dart';
 import '../../security/secure_storage.dart';
 
 class AuthInterceptor extends Interceptor {
   final SecureStorage _secureStorage;
+  bool _isRefreshing = false;
 
   AuthInterceptor(this._secureStorage);
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  void onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
     final token = await _secureStorage.getAccessToken();
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
@@ -17,7 +20,7 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    if (err.response?.statusCode == 401) {
+    if (err.response?.statusCode == 401 && !_isRefreshing) {
       final refreshed = await _tryRefreshToken(err.requestOptions);
       if (refreshed != null) {
         handler.resolve(refreshed);
@@ -29,15 +32,23 @@ class AuthInterceptor extends Interceptor {
   }
 
   Future<Response?> _tryRefreshToken(RequestOptions requestOptions) async {
+    if (_isRefreshing) return null;
+    _isRefreshing = true;
     try {
       final currentToken = await _secureStorage.getAccessToken();
       if (currentToken == null) return null;
 
-      final dio = Dio(BaseOptions(baseUrl: requestOptions.baseUrl));
-      final response = await dio.post(
-        '/auth/refresh-token',
-        options: Options(headers: {'Authorization': 'Bearer $currentToken'}),
-      );
+      final dio = Dio(BaseOptions(
+        baseUrl: ApiConstants.apiUrl,
+        connectTimeout: ApiConstants.connectTimeout,
+        receiveTimeout: ApiConstants.receiveTimeout,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $currentToken',
+        },
+      ));
+      final response = await dio.post(ApiConstants.refreshToken);
 
       if (response.statusCode == 200) {
         final newToken = response.data['token'] as String?;
@@ -47,7 +58,10 @@ class AuthInterceptor extends Interceptor {
           return await dio.fetch(requestOptions);
         }
       }
-    } catch (_) {}
+    } catch (_) {
+    } finally {
+      _isRefreshing = false;
+    }
     return null;
   }
 }

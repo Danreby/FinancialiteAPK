@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/transaction.dart';
 import '../../../domain/repositories/transaction_repository.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'transaction_event.dart';
 part 'transaction_state.dart';
@@ -21,7 +22,8 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   bool _hasMore = true;
   Map<String, dynamic> _filters = {};
 
-  Future<void> _onFetched(TransactionsFetched event, Emitter<TransactionState> emit) async {
+  Future<void> _onFetched(
+      TransactionsFetched event, Emitter<TransactionState> emit) async {
     if (event.reset) {
       _currentPage = 1;
       _hasMore = true;
@@ -43,53 +45,63 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
           transactions: transactions,
           hasMore: _hasMore,
         ));
-      } else {
+      } else if (state is TransactionLoaded) {
         final current = state as TransactionLoaded;
         emit(TransactionLoaded(
           transactions: [...current.transactions, ...transactions],
           hasMore: _hasMore,
         ));
+      } else {
+        emit(TransactionLoaded(
+          transactions: transactions,
+          hasMore: _hasMore,
+        ));
       }
       _currentPage++;
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(TransactionError(extractErrorMessage(e)));
     }
   }
 
-  Future<void> _onCreated(TransactionCreated event, Emitter<TransactionState> emit) async {
+  Future<void> _onCreated(
+      TransactionCreated event, Emitter<TransactionState> emit) async {
     try {
       await _repository.createTransaction(event.data);
       add(TransactionsFetched(reset: true, filters: _filters));
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(TransactionError(extractErrorMessage(e)));
     }
   }
 
-  Future<void> _onUpdated(TransactionUpdated event, Emitter<TransactionState> emit) async {
+  Future<void> _onUpdated(
+      TransactionUpdated event, Emitter<TransactionState> emit) async {
     try {
       await _repository.updateTransaction(event.id, event.data);
       add(TransactionsFetched(reset: true, filters: _filters));
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(TransactionError(extractErrorMessage(e)));
     }
   }
 
-  Future<void> _onDeleted(TransactionDeleted event, Emitter<TransactionState> emit) async {
+  Future<void> _onDeleted(
+      TransactionDeleted event, Emitter<TransactionState> emit) async {
     try {
       await _repository.deleteTransaction(event.id);
       if (state is TransactionLoaded) {
         final current = state as TransactionLoaded;
         emit(TransactionLoaded(
-          transactions: current.transactions.where((t) => t.id != event.id).toList(),
+          transactions:
+              current.transactions.where((t) => t.id != event.id).toList(),
           hasMore: current.hasMore,
         ));
       }
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(TransactionError(extractErrorMessage(e)));
     }
   }
 
-  Future<void> _onRefreshed(TransactionRefreshed event, Emitter<TransactionState> emit) async {
+  Future<void> _onRefreshed(
+      TransactionRefreshed event, Emitter<TransactionState> emit) async {
     add(TransactionsFetched(reset: true, filters: _filters));
   }
 }

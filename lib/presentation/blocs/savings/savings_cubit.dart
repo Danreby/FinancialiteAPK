@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/savings_goal.dart';
 import '../../../domain/repositories/savings_repository.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'savings_state.dart';
 
@@ -15,10 +16,12 @@ class SavingsCubit extends Cubit<SavingsState> {
     try {
       final goals = await _repository.getGoals();
       SavingsSummary? summary;
-      try { summary = await _repository.getSummary(); } catch (_) {}
+      try {
+        summary = await _repository.getSummary();
+      } catch (_) {}
       emit(SavingsLoaded(goals: goals, summary: summary));
     } catch (e) {
-      emit(SavingsError(e.toString()));
+      emit(SavingsError(extractErrorMessage(e)));
     }
   }
 
@@ -27,7 +30,7 @@ class SavingsCubit extends Cubit<SavingsState> {
       await _repository.createGoal(data);
       loadGoals();
     } catch (e) {
-      emit(SavingsError(e.toString()));
+      emit(SavingsError(extractErrorMessage(e)));
     }
   }
 
@@ -36,7 +39,7 @@ class SavingsCubit extends Cubit<SavingsState> {
       await _repository.updateGoal(id, data);
       loadGoals();
     } catch (e) {
-      emit(SavingsError(e.toString()));
+      emit(SavingsError(extractErrorMessage(e)));
     }
   }
 
@@ -51,7 +54,7 @@ class SavingsCubit extends Cubit<SavingsState> {
         ));
       }
     } catch (e) {
-      emit(SavingsError(e.toString()));
+      emit(SavingsError(extractErrorMessage(e)));
     }
   }
 
@@ -60,7 +63,7 @@ class SavingsCubit extends Cubit<SavingsState> {
       await _repository.deposit(id, (data['amount'] as num).toDouble());
       loadGoals();
     } catch (e) {
-      emit(SavingsError(e.toString()));
+      emit(SavingsError(extractErrorMessage(e)));
     }
   }
 
@@ -69,7 +72,7 @@ class SavingsCubit extends Cubit<SavingsState> {
       await _repository.withdraw(id, (data['amount'] as num).toDouble());
       loadGoals();
     } catch (e) {
-      emit(SavingsError(e.toString()));
+      emit(SavingsError(extractErrorMessage(e)));
     }
   }
 }

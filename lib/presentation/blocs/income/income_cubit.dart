@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/income.dart';
 import '../../../domain/repositories/income_repository.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'income_state.dart';
 
@@ -13,12 +14,15 @@ class IncomeCubit extends Cubit<IncomeState> {
   Future<void> loadIncomes({String? month}) async {
     emit(const IncomeLoading());
     try {
-      final incomes = await _repository.getIncomes(filters: month != null ? {'month': month} : null);
+      final incomes = await _repository.getIncomes(
+          filters: month != null ? {'month': month} : null);
       IncomeSummary? summary;
-      try { summary = await _repository.getSummary(); } catch (_) {}
+      try {
+        summary = await _repository.getSummary();
+      } catch (_) {}
       emit(IncomeLoaded(incomes: incomes, summary: summary));
     } catch (e) {
-      emit(IncomeError(e.toString()));
+      emit(IncomeError(extractErrorMessage(e)));
     }
   }
 
@@ -27,7 +31,7 @@ class IncomeCubit extends Cubit<IncomeState> {
       await _repository.createIncome(data);
       loadIncomes();
     } catch (e) {
-      emit(IncomeError(e.toString()));
+      emit(IncomeError(extractErrorMessage(e)));
     }
   }
 
@@ -36,7 +40,7 @@ class IncomeCubit extends Cubit<IncomeState> {
       await _repository.updateIncome(id, data);
       loadIncomes();
     } catch (e) {
-      emit(IncomeError(e.toString()));
+      emit(IncomeError(extractErrorMessage(e)));
     }
   }
 
@@ -51,7 +55,7 @@ class IncomeCubit extends Cubit<IncomeState> {
         ));
       }
     } catch (e) {
-      emit(IncomeError(e.toString()));
+      emit(IncomeError(extractErrorMessage(e)));
     }
   }
 
@@ -60,7 +64,7 @@ class IncomeCubit extends Cubit<IncomeState> {
       await _repository.toggleActive(id);
       loadIncomes();
     } catch (e) {
-      emit(IncomeError(e.toString()));
+      emit(IncomeError(extractErrorMessage(e)));
     }
   }
 }

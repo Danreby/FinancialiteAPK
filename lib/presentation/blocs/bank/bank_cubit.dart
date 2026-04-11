@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/bank_account.dart';
 import '../../../domain/repositories/bank_repository.dart';
+import '../../../core/utils/error_message.dart';
 
 part 'bank_state.dart';
 
@@ -15,10 +16,12 @@ class BankCubit extends Cubit<BankState> {
     try {
       final accounts = await _repository.getAccounts();
       BankStats? stats;
-      try { stats = await _repository.getStats(); } catch (_) {}
+      try {
+        stats = await _repository.getStats();
+      } catch (_) {}
       emit(BankLoaded(accounts: accounts, stats: stats));
     } catch (e) {
-      emit(BankError(e.toString()));
+      emit(BankError(extractErrorMessage(e)));
     }
   }
 
@@ -41,7 +44,7 @@ class BankCubit extends Cubit<BankState> {
       await _repository.createAccount(data);
       loadAccounts();
     } catch (e) {
-      emit(BankError(e.toString()));
+      emit(BankError(extractErrorMessage(e)));
     }
   }
 
@@ -50,7 +53,7 @@ class BankCubit extends Cubit<BankState> {
       await _repository.updateAccount(id, data);
       loadAccounts();
     } catch (e) {
-      emit(BankError(e.toString()));
+      emit(BankError(extractErrorMessage(e)));
     }
   }
 
@@ -66,7 +69,7 @@ class BankCubit extends Cubit<BankState> {
         ));
       }
     } catch (e) {
-      emit(BankError(e.toString()));
+      emit(BankError(extractErrorMessage(e)));
     }
   }
 
@@ -75,7 +78,7 @@ class BankCubit extends Cubit<BankState> {
       await _repository.createTransfer(data);
       loadAccounts();
     } catch (e) {
-      emit(BankError(e.toString()));
+      emit(BankError(extractErrorMessage(e)));
     }
   }
 }

@@ -16,7 +16,8 @@ class DateFormatter {
   static String format(DateTime date) => _dateFormat.format(date);
   static String formatShort(DateTime date) => _shortDateFormat.format(date);
   static String formatMonthYear(DateTime date) => _monthYearFormat.format(date);
-  static String formatShortMonthYear(DateTime date) => _shortMonthYearFormat.format(date);
+  static String formatShortMonthYear(DateTime date) =>
+      _shortMonthYearFormat.format(date);
   static String formatApi(DateTime date) => _apiFormat.format(date);
   static String formatMonthKey(DateTime date) => _monthKeyFormat.format(date);
   static String formatDayMonth(DateTime date) => _dayMonthFormat.format(date);
@@ -54,4 +55,37 @@ class DateFormatter {
   // Aliases for convenience
   static String shortDate(DateTime date) => formatShort(date);
   static String monthKey(DateTime date) => formatMonthKey(date);
+
+  static const _monthAbbreviations = [
+    'Jan',
+    'Fev',
+    'Mar',
+    'Abr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Set',
+    'Out',
+    'Nov',
+    'Dez',
+  ];
+
+  static String shortMonthFromKey(String monthKey) {
+    try {
+      final date = DateTime.parse('$monthKey-01');
+      return _monthAbbreviations[date.month - 1];
+    } catch (_) {
+      return monthKey;
+    }
+  }
+
+  static String monthYearFromKey(String monthKey) {
+    try {
+      final date = DateTime.parse('$monthKey-01');
+      return formatMonthYear(date);
+    } catch (_) {
+      return monthKey;
+    }
+  }
 }

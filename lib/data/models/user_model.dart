@@ -1,3 +1,4 @@
+import '../../core/utils/json_helpers.dart';
 import '../../domain/entities/user.dart';
 
 class UserModel extends User {
@@ -21,30 +22,30 @@ class UserModel extends User {
       theme: json['theme'] as String?,
       avatar: json['avatar'] as String?,
       googleId: json['google_id'] as String?,
-      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) : null,
+      createdAt: json.dateTime('created_at'),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'email': email,
-    'phone': phone,
-    'theme': theme,
-    'avatar': avatar,
-    'google_id': googleId,
-  };
+        'id': id,
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'theme': theme,
+        'avatar': avatar,
+        'google_id': googleId,
+      };
 
   Map<String, dynamic> toDbMap() => {
-    'id': id,
-    'name': name,
-    'email': email,
-    'phone': phone,
-    'theme': theme,
-    'avatar': avatar,
-    'google_id': googleId,
-    'created_at': createdAt?.toIso8601String(),
-  };
+        'id': id,
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'theme': theme,
+        'avatar': avatar,
+        'google_id': googleId,
+        'created_at': createdAt?.toIso8601String(),
+      };
 
   factory UserModel.fromDb(Map<String, dynamic> map) {
     return UserModel(
@@ -55,7 +56,7 @@ class UserModel extends User {
       theme: map['theme'] as String?,
       avatar: map['avatar'] as String?,
       googleId: map['google_id'] as String?,
-      createdAt: map['created_at'] != null ? DateTime.tryParse(map['created_at'].toString()) : null,
+      createdAt: map.dateTime('created_at'),
     );
   }
 }

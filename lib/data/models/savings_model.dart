@@ -1,3 +1,4 @@
+import '../../core/utils/json_helpers.dart';
 import '../../domain/entities/savings_goal.dart';
 
 class SavingsGoalModel extends SavingsGoal {
@@ -20,23 +21,16 @@ class SavingsGoalModel extends SavingsGoal {
     return SavingsGoalModel(
       id: json['id'] as int?,
       title: json['title'] as String,
-      targetAmount: double.tryParse(json['target_amount'].toString()) ?? 0.0,
-      currentAmount:
-          double.tryParse((json['current_amount'] ?? 0).toString()) ?? 0.0,
+      targetAmount: json.toDouble('target_amount'),
+      currentAmount: json.toDouble('current_amount'),
       icon: json['icon'] as String?,
       color: json['color'] as String?,
-      deadline: json['deadline'] != null
-          ? DateTime.tryParse(json['deadline'].toString())
-          : null,
-      isCompleted: json['is_completed'] == true || json['is_completed'] == 1,
+      deadline: json.dateTime('deadline'),
+      isCompleted: json.toBool('is_completed'),
       userId: json['user_id'] as int,
       description: json['description'] as String?,
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'].toString())
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.tryParse(json['updated_at'].toString())
-          : null,
+      createdAt: json.dateTime('created_at'),
+      updatedAt: json.dateTime('updated_at'),
     );
   }
 
@@ -69,22 +63,16 @@ class SavingsGoalModel extends SavingsGoal {
     return SavingsGoalModel(
       id: map['id'] as int?,
       title: map['title'] as String,
-      targetAmount: (map['target_amount'] as num).toDouble(),
-      currentAmount: (map['current_amount'] as num? ?? 0).toDouble(),
+      targetAmount: map.toDouble('target_amount'),
+      currentAmount: map.toDouble('current_amount'),
       icon: map['icon'] as String?,
       color: map['color'] as String?,
-      deadline: map['deadline'] != null
-          ? DateTime.tryParse(map['deadline'].toString())
-          : null,
+      deadline: map.dateTime('deadline'),
       isCompleted: map['is_completed'] == 1,
       userId: map['user_id'] as int,
       description: map['description'] as String?,
-      createdAt: map['created_at'] != null
-          ? DateTime.tryParse(map['created_at'].toString())
-          : null,
-      updatedAt: map['updated_at'] != null
-          ? DateTime.tryParse(map['updated_at'].toString())
-          : null,
+      createdAt: map.dateTime('created_at'),
+      updatedAt: map.dateTime('updated_at'),
     );
   }
 }

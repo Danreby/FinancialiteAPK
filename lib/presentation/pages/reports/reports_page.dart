@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/month_selector.dart';
+import '../../widgets/page_header.dart';
 
 class ReportsPage extends StatefulWidget {
   const ReportsPage({super.key});
@@ -18,24 +19,7 @@ class _ReportsPageState extends State<ReportsPage> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 20,
-              right: 20,
-              bottom: 16,
-            ),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Relatórios',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                ),
-              ),
-            ),
-          ),
+          const PageHeader(title: 'Relatórios', bottomPadding: 16),
           MonthSelector(
             selectedMonth: _selectedMonth,
             onChanged: (date) => setState(() => _selectedMonth = date),

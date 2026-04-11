@@ -19,8 +19,6 @@ import '../../data/repositories/notification_repository_impl.dart';
 import '../../data/repositories/profile_repository_impl.dart';
 import '../../data/repositories/dashboard_repository_impl.dart';
 import '../../data/repositories/projections_repository_impl.dart';
-import '../../data/repositories/projections_repository_impl.dart';
-import '../../data/services/sync_service.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/transaction_repository.dart';
 import '../../domain/repositories/bill_repository.dart';
@@ -33,7 +31,6 @@ import '../../domain/repositories/category_repository.dart';
 import '../../domain/repositories/notification_repository.dart';
 import '../../domain/repositories/profile_repository.dart';
 import '../../domain/repositories/dashboard_repository.dart';
-import '../../domain/repositories/projections_repository.dart';
 import '../../domain/repositories/projections_repository.dart';
 import '../../presentation/blocs/auth/auth_bloc.dart';
 import '../../presentation/blocs/theme/theme_cubit.dart';
@@ -49,7 +46,6 @@ import '../../presentation/blocs/card/card_cubit.dart';
 import '../../presentation/blocs/category/category_cubit.dart';
 import '../../presentation/blocs/notification/notification_cubit.dart';
 import '../../presentation/blocs/profile/profile_cubit.dart';
-import '../../presentation/blocs/projections/projections_cubit.dart';
 import '../../presentation/blocs/projections/projections_cubit.dart';
 
 final sl = GetIt.instance;
@@ -97,9 +93,6 @@ Future<void> init() async {
       () => DashboardRepositoryImpl(sl()));
   sl.registerLazySingleton<ProjectionsRepository>(
       () => ProjectionsRepositoryImpl(sl()));
-
-  // Services
-  sl.registerLazySingleton(() => SyncService(sl(), sl()));
 
   // BLoCs / Cubits
   sl.registerFactory(() => AuthBloc(sl(), sl()));
