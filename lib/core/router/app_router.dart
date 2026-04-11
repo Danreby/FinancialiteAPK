@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import '../di/injection_container.dart';
 import '../../presentation/blocs/auth/auth_bloc.dart';
 import '../../presentation/pages/auth/login_page.dart';
 import '../../presentation/pages/auth/register_page.dart';
@@ -29,27 +30,59 @@ import '../../presentation/pages/faturas/faturas_page.dart';
 import '../../presentation/pages/extract/extract_page.dart';
 import '../../presentation/pages/projections/projections_page.dart';
 
+/// Converts the [AuthBloc] stream into a [ChangeNotifier] so GoRouter
+/// re-evaluates its redirect whenever the auth state changes.
+class _AuthRefreshNotifier extends ChangeNotifier {
+  late final StreamSubscription<AuthState> _sub;
+
+  _AuthRefreshNotifier(AuthBloc authBloc) {
+    _sub = authBloc.stream.listen((_) => notifyListeners());
+  }
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+}
+
 class AppRouter {
   AppRouter._();
 
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
   static final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
-  static final router = GoRouter(
-    navigatorKey: _rootNavigatorKey,
-    initialLocation: '/splash',
-    redirect: (context, state) {
-      final authState = context.read<AuthBloc>().state;
-      final isAuth = authState is AuthAuthenticated;
-      final isAuthRoute = state.matchedLocation == '/login' ||
-          state.matchedLocation == '/register';
-      final isSplash = state.matchedLocation == '/splash';
+  static GoRouter? _router;
 
-      if (isSplash) return null;
-      if (!isAuth && !isAuthRoute) return '/login';
-      if (isAuth && isAuthRoute) return '/dashboard';
-      return null;
-    },
+  static GoRouter get router {
+    return _router ??= _createRouter();
+  }
+
+  static GoRouter _createRouter() {
+    final authBloc = sl<AuthBloc>();
+
+    return GoRouter(
+      navigatorKey: _rootNavigatorKey,
+      initialLocation: '/splash',
+      refreshListenable: _AuthRefreshNotifier(authBloc),
+      redirect: (context, state) {
+        final authState = authBloc.state;
+        final isAuth = authState is AuthAuthenticated;
+        final isLoading = authState is AuthInitial || authState is AuthLoading;
+        final isAuthRoute = state.matchedLocation == '/login' ||
+            state.matchedLocation == '/register';
+        final isSplash = state.matchedLocation == '/splash';
+
+        // While checking auth, stay on splash
+        if (isLoading && isSplash) return null;
+        // Auth check done → redirect away from splash
+        if (isSplash && isAuth) return '/dashboard';
+        if (isSplash && !isAuth) return '/login';
+        // Normal guards
+        if (!isAuth && !isAuthRoute) return '/login';
+        if (isAuth && isAuthRoute) return '/dashboard';
+        return null;
+      },
     routes: [
       GoRoute(
         path: '/splash',
@@ -175,5 +208,6 @@ class AppRouter {
         ],
       ),
     ],
-  );
+    );
+  }
 }

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import '../../blocs/auth/auth_bloc.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -34,7 +31,6 @@ class _SplashPageState extends State<SplashPage>
       ),
     );
     _controller.forward();
-    context.read<AuthBloc>().add(const AuthCheckRequested());
   }
 
   @override
@@ -46,15 +42,7 @@ class _SplashPageState extends State<SplashPage>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is AuthAuthenticated) {
-          context.go('/dashboard');
-        } else if (state is AuthUnauthenticated) {
-          context.go('/login');
-        }
-      },
-      child: Scaffold(
+    return Scaffold(
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -131,7 +119,6 @@ class _SplashPageState extends State<SplashPage>
             ),
           ),
         ),
-      ),
     );
   }
 }

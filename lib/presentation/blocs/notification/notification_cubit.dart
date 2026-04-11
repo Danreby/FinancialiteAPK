@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../domain/entities/notification.dart';
@@ -13,17 +14,22 @@ class NotificationCubit extends Cubit<NotificationState> {
 
   NotificationCubit(this._repository) : super(const NotificationInitial());
 
-  Future<void> _requestPermissionIfNeeded() async {
+  Future<void> requestPermissionIfNeeded() async {
     if (_permissionRequested) return;
     _permissionRequested = true;
-    final status = await Permission.notification.status;
-    if (!status.isGranted) {
-      await Permission.notification.request();
+    try {
+      final status = await Permission.notification.status;
+      if (!status.isGranted) {
+        await Permission.notification.request();
+      }
+    } catch (e) {
+      debugPrint('[NotificationCubit] permission error: $e');
     }
   }
 
   Future<void> loadNotifications() async {
-    _requestPermissionIfNeeded();
+    // Request permission in background — don't block loading
+    requestPermissionIfNeeded();
     emit(const NotificationLoading());
     try {
       final notifications = await _repository.getNotifications();

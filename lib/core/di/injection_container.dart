@@ -95,7 +95,7 @@ Future<void> init() async {
       () => ProjectionsRepositoryImpl(sl()));
 
   // BLoCs / Cubits
-  sl.registerFactory(() => AuthBloc(sl(), sl()));
+  sl.registerLazySingleton(() => AuthBloc(sl(), sl()));
   sl.registerLazySingleton(() => ThemeCubit());
   sl.registerLazySingleton(() => ConnectivityCubit(sl()));
   sl.registerLazySingleton(() => DashboardCubit(sl()));
