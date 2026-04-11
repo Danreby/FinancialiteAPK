@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 
 import '../error/exceptions.dart';
 
 String extractErrorMessage(Object error) {
+  if (error is TimeoutException) {
+    return 'Tempo de conexão esgotado. Verifique sua internet.';
+  }
   if (error is ValidationException) {
     if (error.fieldErrors != null && error.fieldErrors!.isNotEmpty) {
       return error.fieldErrors!.values.expand((v) => v).join('\n');

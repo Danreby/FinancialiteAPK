@@ -18,19 +18,14 @@ void callbackDispatcher() {
   });
 }
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await di.init();
-
-  // Start auth check early so splash transitions quickly
-  di.sl<AuthBloc>().add(const AuthCheckRequested());
-
+/// Initialise push-notification channel & WorkManager in background.
+/// Must NOT block [main] — if any step hangs the app still starts.
+Future<void> _initBackgroundServices() async {
   try {
     await PushNotificationService.init();
   } catch (e) {
     debugPrint('[PushNotification] init error: $e');
   }
-
   try {
     await Workmanager().initialize(callbackDispatcher);
     await Workmanager().registerPeriodicTask(
@@ -43,6 +38,17 @@ void main() async {
   } catch (e) {
     debugPrint('[Workmanager] init error: $e');
   }
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await di.init();
+
+  // Start auth check early so splash transitions quickly
+  di.sl<AuthBloc>().add(const AuthCheckRequested());
+
+  // Fire-and-forget: never block runApp
+  _initBackgroundServices();
 
   runApp(const FinancialiteApp());
 }

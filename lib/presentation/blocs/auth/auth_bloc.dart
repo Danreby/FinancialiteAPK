@@ -31,7 +31,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(const AuthUnauthenticated());
         return;
       }
-      final user = await _authRepository.getUser();
+      final user = await _authRepository
+          .getUser()
+          .timeout(const Duration(seconds: 8));
       emit(AuthAuthenticated(user));
     } catch (_) {
       emit(const AuthUnauthenticated());
@@ -42,8 +44,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       AuthLoginRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     try {
-      final user = await _authRepository.login(
-          email: event.email, password: event.password);
+      final user = await _authRepository
+          .login(email: event.email, password: event.password)
+          .timeout(const Duration(seconds: 15));
       emit(AuthAuthenticated(user));
     } catch (e) {
       emit(AuthError(extractErrorMessage(e)));
