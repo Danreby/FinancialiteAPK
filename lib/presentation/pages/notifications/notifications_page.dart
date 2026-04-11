@@ -51,8 +51,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       context: context,
                       builder: (ctx) => AlertDialog(
                         title: const Text('Limpar notificações'),
-                        content: const Text(
-                            'Deseja remover todas as notificações?'),
+                        content:
+                            const Text('Deseja remover todas as notificações?'),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, false),

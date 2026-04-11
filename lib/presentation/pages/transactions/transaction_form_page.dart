@@ -115,7 +115,10 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
     return Scaffold(
       body: Column(
         children: [
-          PageHeader(title: _isEditing ? 'Editar Transação' : 'Nova Transação', showBackButton: true, bottomPadding: 16),
+          PageHeader(
+              title: _isEditing ? 'Editar Transação' : 'Nova Transação',
+              showBackButton: true,
+              bottomPadding: 16),
           Expanded(
             child: _isLoadingTransaction
                 ? const Center(child: CircularProgressIndicator())

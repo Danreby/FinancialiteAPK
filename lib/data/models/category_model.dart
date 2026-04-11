@@ -25,22 +25,22 @@ class CategoryModel extends Category {
   }
 
   Map<String, dynamic> toJson() => {
-    'name': name,
-    'type': type,
-    'icon': icon,
-    'color': color,
-  };
+        'name': name,
+        'type': type,
+        'icon': icon,
+        'color': color,
+      };
 
   Map<String, dynamic> toDbMap() => {
-    if (id != null) 'id': id,
-    'name': name,
-    'type': type,
-    'icon': icon,
-    'color': color,
-    'user_id': userId,
-    'created_at': createdAt?.toIso8601String(),
-    'synced': 0,
-  };
+        if (id != null) 'id': id,
+        'name': name,
+        'type': type,
+        'icon': icon,
+        'color': color,
+        'user_id': userId,
+        'created_at': createdAt?.toIso8601String(),
+        'synced': 0,
+      };
 
   factory CategoryModel.fromDb(Map<String, dynamic> map) {
     return CategoryModel(

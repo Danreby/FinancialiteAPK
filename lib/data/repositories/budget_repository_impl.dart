@@ -46,7 +46,8 @@ class BudgetRepositoryImpl extends BaseOfflineRepository
   @override
   Future<Budget> updateBudget(int id, Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response = await api.put('${ApiConstants.budgets}/$id', data: sanitized);
+    final response =
+        await api.put('${ApiConstants.budgets}/$id', data: sanitized);
     return BudgetModel.fromJson(response.data['data'] ?? response.data);
   }
 

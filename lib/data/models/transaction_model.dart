@@ -31,7 +31,8 @@ class TransactionModel extends Transaction {
     List<TransactionParcela>? parcelas;
     if (json['parcelas'] != null) {
       parcelas = (json['parcelas'] as List)
-          .map((p) => TransactionParcelaModel.fromJson(p as Map<String, dynamic>))
+          .map((p) =>
+              TransactionParcelaModel.fromJson(p as Map<String, dynamic>))
           .toList();
     }
 

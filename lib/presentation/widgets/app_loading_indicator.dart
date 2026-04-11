@@ -53,7 +53,8 @@ class AppLoadingIndicator extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     return Shimmer.fromColors(
       baseColor: isDark ? const Color(0xFF222640) : const Color(0xFFE5E7EB),
-      highlightColor: isDark ? const Color(0xFF2A2D42) : const Color(0xFFF9FAFB),
+      highlightColor:
+          isDark ? const Color(0xFF2A2D42) : const Color(0xFFF9FAFB),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(

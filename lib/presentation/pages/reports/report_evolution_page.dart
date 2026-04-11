@@ -30,7 +30,10 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
     return Scaffold(
       body: Column(
         children: [
-          const PageHeader(title: 'Evolução Patrimonial', showBackButton: true, bottomPadding: 16),
+          const PageHeader(
+              title: 'Evolução Patrimonial',
+              showBackButton: true,
+              bottomPadding: 16),
           Expanded(
             child: BlocBuilder<DashboardCubit, DashboardState>(
               builder: (context, state) {
@@ -170,7 +173,8 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                                     final idx = spot.x.toInt();
                                     final monthLabel =
                                         idx >= 0 && idx < chart.length
-                                            ? DateFormatter.shortMonthFromKey(chart[idx].month)
+                                            ? DateFormatter.shortMonthFromKey(
+                                                chart[idx].month)
                                             : '';
                                     return LineTooltipItem(
                                       '$monthLabel\n${CurrencyFormatter.format(spot.y)}',
@@ -201,7 +205,8 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                                       return Padding(
                                         padding: const EdgeInsets.only(top: 4),
                                         child: Text(
-                                          DateFormatter.shortMonthFromKey(chart[idx].month),
+                                          DateFormatter.shortMonthFromKey(
+                                              chart[idx].month),
                                           style: TextStyle(
                                               fontSize: 10,
                                               color: theme.colorScheme
@@ -342,7 +347,8 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: Text(
-                                            DateFormatter.monthYearFromKey(d.month),
+                                            DateFormatter.monthYearFromKey(
+                                                d.month),
                                             style: theme.textTheme.titleSmall
                                                 ?.copyWith(
                                                     fontWeight:

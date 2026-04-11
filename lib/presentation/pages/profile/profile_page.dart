@@ -41,7 +41,9 @@ class _ProfilePageState extends State<ProfilePage> {
           }
           if (state is ProfileError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: theme.colorScheme.error),
+              SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: theme.colorScheme.error),
             );
           }
         },
@@ -63,7 +65,8 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: EdgeInsets.zero,
               child: Column(
                 children: [
-                  const PageHeader(title: 'Perfil', showBackButton: true, bottomPadding: 20),
+                  const PageHeader(
+                      title: 'Perfil', showBackButton: true, bottomPadding: 20),
 
                   const SizedBox(height: 8),
 
@@ -96,7 +99,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             radius: 56,
                             backgroundColor: theme.colorScheme.primaryContainer,
                             child: Text(
-                              user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
+                              user.name.isNotEmpty
+                                  ? user.name[0].toUpperCase()
+                                  : '?',
                               style: theme.textTheme.headlineLarge?.copyWith(
                                 color: theme.colorScheme.onPrimaryContainer,
                                 fontWeight: FontWeight.w700,
@@ -132,7 +137,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                          color: theme.colorScheme.outlineVariant
+                              .withValues(alpha: 0.5),
                         ),
                       ),
                       child: Column(
@@ -142,12 +148,14 @@ class _ProfilePageState extends State<ProfilePage> {
                             icon: Icons.person_outline,
                             title: 'Editar perfil',
                             color: theme.colorScheme.primary,
-                            onTap: () => _showEditProfileDialog(user.name, user.email),
+                            onTap: () =>
+                                _showEditProfileDialog(user.name, user.email),
                           ),
                           Divider(
                             height: 1,
                             indent: 74,
-                            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                            color: theme.colorScheme.outlineVariant
+                                .withValues(alpha: 0.3),
                           ),
                           _buildMenuItem(
                             context,
@@ -171,7 +179,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                          color: theme.colorScheme.outlineVariant
+                              .withValues(alpha: 0.5),
                         ),
                       ),
                       child: Column(
@@ -189,7 +198,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 confirmText: 'Sair',
                               );
                               if (confirmed == true) {
-                                context.read<AuthBloc>().add(const AuthLogoutRequested());
+                                context
+                                    .read<AuthBloc>()
+                                    .add(const AuthLogoutRequested());
                                 context.go('/login');
                               }
                             },
@@ -197,7 +208,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           Divider(
                             height: 1,
                             indent: 74,
-                            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                            color: theme.colorScheme.outlineVariant
+                                .withValues(alpha: 0.3),
                           ),
                           _buildMenuItem(
                             context,
@@ -261,7 +273,8 @@ class _ProfilePageState extends State<ProfilePage> {
               Icon(
                 Icons.chevron_right,
                 size: 20,
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                color:
+                    theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
             ],
           ),
@@ -281,7 +294,8 @@ class _ProfilePageState extends State<ProfilePage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(24, 12, 24, MediaQuery.of(ctx).viewInsets.bottom + 24),
+        padding: EdgeInsets.fromLTRB(
+            24, 12, 24, MediaQuery.of(ctx).viewInsets.bottom + 24),
         child: Form(
           key: formKey,
           child: Column(
@@ -303,8 +317,8 @@ class _ProfilePageState extends State<ProfilePage> {
               Text(
                 'Editar Perfil',
                 style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                      fontWeight: FontWeight.w700,
+                    ),
               ),
               const SizedBox(height: 16),
               AppTextField(
@@ -317,7 +331,9 @@ class _ProfilePageState extends State<ProfilePage> {
               FilledButton(
                 onPressed: () {
                   if (!formKey.currentState!.validate()) return;
-                  context.read<ProfileCubit>().updateProfile({'name': nameCtrl.text.trim()});
+                  context
+                      .read<ProfileCubit>()
+                      .updateProfile({'name': nameCtrl.text.trim()});
                   Navigator.pop(ctx);
                 },
                 child: const Text('Salvar'),
@@ -342,7 +358,8 @@ class _ProfilePageState extends State<ProfilePage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(24, 12, 24, MediaQuery.of(ctx).viewInsets.bottom + 24),
+        padding: EdgeInsets.fromLTRB(
+            24, 12, 24, MediaQuery.of(ctx).viewInsets.bottom + 24),
         child: Form(
           key: formKey,
           child: Column(
@@ -364,19 +381,28 @@ class _ProfilePageState extends State<ProfilePage> {
               Text(
                 'Alterar Senha',
                 style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                      fontWeight: FontWeight.w700,
+                    ),
               ),
               const SizedBox(height: 16),
-              AppTextField(controller: currentCtrl, label: 'Senha atual', obscureText: true, validator: Validators.required),
+              AppTextField(
+                  controller: currentCtrl,
+                  label: 'Senha atual',
+                  obscureText: true,
+                  validator: Validators.required),
               const SizedBox(height: 12),
-              AppTextField(controller: newCtrl, label: 'Nova senha', obscureText: true, validator: Validators.password),
+              AppTextField(
+                  controller: newCtrl,
+                  label: 'Nova senha',
+                  obscureText: true,
+                  validator: Validators.password),
               const SizedBox(height: 12),
               AppTextField(
                 controller: confirmCtrl,
                 label: 'Confirmar nova senha',
                 obscureText: true,
-                validator: (v) => v != newCtrl.text ? 'As senhas não coincidem' : null,
+                validator: (v) =>
+                    v != newCtrl.text ? 'As senhas não coincidem' : null,
               ),
               const SizedBox(height: 16),
               FilledButton(
@@ -445,9 +471,12 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancelar')),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(ctx).colorScheme.error),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(ctx).colorScheme.error),
             onPressed: () {
               if (!formKey.currentState!.validate()) return;
               context.read<ProfileCubit>().deleteAccount(passwordCtrl.text);

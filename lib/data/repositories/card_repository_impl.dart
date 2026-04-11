@@ -48,7 +48,8 @@ class CardRepositoryImpl extends BaseOfflineRepository
   @override
   Future<CardUser> updateCard(int id, Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response = await api.put('${ApiConstants.cards}/$id', data: sanitized);
+    final response =
+        await api.put('${ApiConstants.cards}/$id', data: sanitized);
     return CardUserModel.fromJson(response.data['data'] ?? response.data);
   }
 
@@ -81,6 +82,7 @@ class CardRepositoryImpl extends BaseOfflineRepository
   @override
   Future<void> payInvoice(int cardId, Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    await api.post('${ApiConstants.cards}/$cardId/pay-invoice', data: sanitized);
+    await api.post('${ApiConstants.cards}/$cardId/pay-invoice',
+        data: sanitized);
   }
 }

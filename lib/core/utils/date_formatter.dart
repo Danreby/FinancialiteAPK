@@ -16,7 +16,8 @@ class DateFormatter {
   static String format(DateTime date) => _dateFormat.format(date);
   static String formatShort(DateTime date) => _shortDateFormat.format(date);
   static String formatMonthYear(DateTime date) => _monthYearFormat.format(date);
-  static String formatShortMonthYear(DateTime date) => _shortMonthYearFormat.format(date);
+  static String formatShortMonthYear(DateTime date) =>
+      _shortMonthYearFormat.format(date);
   static String formatApi(DateTime date) => _apiFormat.format(date);
   static String formatMonthKey(DateTime date) => _monthKeyFormat.format(date);
   static String formatDayMonth(DateTime date) => _dayMonthFormat.format(date);
@@ -56,8 +57,18 @@ class DateFormatter {
   static String monthKey(DateTime date) => formatMonthKey(date);
 
   static const _monthAbbreviations = [
-    'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-    'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez',
+    'Jan',
+    'Fev',
+    'Mar',
+    'Abr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Set',
+    'Out',
+    'Nov',
+    'Dez',
   ];
 
   static String shortMonthFromKey(String monthKey) {

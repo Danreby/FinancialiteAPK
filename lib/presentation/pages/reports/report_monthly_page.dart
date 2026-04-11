@@ -33,7 +33,10 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
     return Scaffold(
       body: Column(
         children: [
-          const PageHeader(title: 'Comparativo Mensal', showBackButton: true, bottomPadding: 16),
+          const PageHeader(
+              title: 'Comparativo Mensal',
+              showBackButton: true,
+              bottomPadding: 16),
           Expanded(
             child: BlocBuilder<DashboardCubit, DashboardState>(
               builder: (context, state) {
@@ -146,7 +149,8 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
                                       return Padding(
                                         padding: const EdgeInsets.only(top: 4),
                                         child: Text(
-                                          DateFormatter.shortMonthFromKey(chart[idx].month),
+                                          DateFormatter.shortMonthFromKey(
+                                              chart[idx].month),
                                           style: TextStyle(
                                             fontSize: 10,
                                             color: theme
@@ -246,7 +250,8 @@ class _ReportMonthlyPageState extends State<ReportMonthlyPage> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                DateFormatter.monthYearFromKey(d.month),
+                                                DateFormatter.monthYearFromKey(
+                                                    d.month),
                                                 style: theme
                                                     .textTheme.titleSmall
                                                     ?.copyWith(

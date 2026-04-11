@@ -13,7 +13,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
   final SecureStorage _secureStorage;
 
-  AuthBloc(this._authRepository, this._secureStorage) : super(const AuthInitial()) {
+  AuthBloc(this._authRepository, this._secureStorage)
+      : super(const AuthInitial()) {
     on<AuthCheckRequested>(_onCheckRequested);
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
@@ -21,7 +22,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLogoutRequested>(_onLogoutRequested);
   }
 
-  Future<void> _onCheckRequested(AuthCheckRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onCheckRequested(
+      AuthCheckRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     try {
       final hasToken = await _secureStorage.hasToken();
@@ -36,17 +38,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onLoginRequested(AuthLoginRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onLoginRequested(
+      AuthLoginRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     try {
-      final user = await _authRepository.login(email: event.email, password: event.password);
+      final user = await _authRepository.login(
+          email: event.email, password: event.password);
       emit(AuthAuthenticated(user));
     } catch (e) {
       emit(AuthError(extractErrorMessage(e)));
     }
   }
 
-  Future<void> _onRegisterRequested(AuthRegisterRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onRegisterRequested(
+      AuthRegisterRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     try {
       final user = await _authRepository.register(
@@ -61,7 +66,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onGoogleLoginRequested(AuthGoogleLoginRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onGoogleLoginRequested(
+      AuthGoogleLoginRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     try {
       final user = await _authRepository.googleLogin(idToken: event.idToken);
@@ -71,7 +77,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onLogoutRequested(AuthLogoutRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onLogoutRequested(
+      AuthLogoutRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     await _authRepository.logout();
     emit(const AuthUnauthenticated());

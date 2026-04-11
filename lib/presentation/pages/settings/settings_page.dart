@@ -20,7 +20,10 @@ class SettingsPage extends StatelessWidget {
             padding: EdgeInsets.zero,
             children: [
               // Custom header
-              const PageHeader(title: 'Configurações', showBackButton: true, bottomPadding: 20),
+              const PageHeader(
+                  title: 'Configurações',
+                  showBackButton: true,
+                  bottomPadding: 20),
 
               const SizedBox(height: 8),
 

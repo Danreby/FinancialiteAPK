@@ -27,25 +27,25 @@ class UserModel extends User {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'email': email,
-    'phone': phone,
-    'theme': theme,
-    'avatar': avatar,
-    'google_id': googleId,
-  };
+        'id': id,
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'theme': theme,
+        'avatar': avatar,
+        'google_id': googleId,
+      };
 
   Map<String, dynamic> toDbMap() => {
-    'id': id,
-    'name': name,
-    'email': email,
-    'phone': phone,
-    'theme': theme,
-    'avatar': avatar,
-    'google_id': googleId,
-    'created_at': createdAt?.toIso8601String(),
-  };
+        'id': id,
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'theme': theme,
+        'avatar': avatar,
+        'google_id': googleId,
+        'created_at': createdAt?.toIso8601String(),
+      };
 
   factory UserModel.fromDb(Map<String, dynamic> map) {
     return UserModel(

@@ -39,7 +39,10 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
     return Scaffold(
       body: Column(
         children: [
-          const PageHeader(title: 'Gastos por Categoria', showBackButton: true, bottomPadding: 16),
+          const PageHeader(
+              title: 'Gastos por Categoria',
+              showBackButton: true,
+              bottomPadding: 16),
           MonthSelector(
             selectedMonth: _selectedMonth,
             onChanged: (d) {

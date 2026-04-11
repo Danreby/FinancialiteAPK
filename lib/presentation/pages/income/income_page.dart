@@ -36,7 +36,8 @@ class _IncomePageState extends State<IncomePage> {
     final theme = Theme.of(context);
     final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
-      floatingActionButton: ShadowedFab(onPressed: () => showIncomeFormDialog(context)),
+      floatingActionButton:
+          ShadowedFab(onPressed: () => showIncomeFormDialog(context)),
       body: Column(
         children: [
           const PageHeader(title: 'Receitas', bottomPadding: 16),

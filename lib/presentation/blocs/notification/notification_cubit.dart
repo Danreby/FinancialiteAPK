@@ -64,9 +64,8 @@ class NotificationCubit extends Cubit<NotificationState> {
       await _repository.markAllAsRead();
       if (state is NotificationLoaded) {
         final current = state as NotificationLoaded;
-        final updated = current.notifications
-            .map((n) => n.copyWith(isRead: true))
-            .toList();
+        final updated =
+            current.notifications.map((n) => n.copyWith(isRead: true)).toList();
         emit(NotificationLoaded(notifications: updated, unreadCount: 0));
       }
     } catch (e) {

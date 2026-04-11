@@ -25,14 +25,14 @@ class NotificationModel extends AppNotification {
   }
 
   Map<String, dynamic> toDbMap() => {
-    if (id != null) 'id': id,
-    'title': title,
-    'message': message,
-    'type': type,
-    'is_read': isRead ? 1 : 0,
-    'user_id': userId,
-    'created_at': createdAt?.toIso8601String(),
-  };
+        if (id != null) 'id': id,
+        'title': title,
+        'message': message,
+        'type': type,
+        'is_read': isRead ? 1 : 0,
+        'user_id': userId,
+        'created_at': createdAt?.toIso8601String(),
+      };
 
   factory NotificationModel.fromDb(Map<String, dynamic> map) {
     return NotificationModel(

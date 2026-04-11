@@ -16,7 +16,9 @@ class SavingsCubit extends Cubit<SavingsState> {
     try {
       final goals = await _repository.getGoals();
       SavingsSummary? summary;
-      try { summary = await _repository.getSummary(); } catch (_) {}
+      try {
+        summary = await _repository.getSummary();
+      } catch (_) {}
       emit(SavingsLoaded(goals: goals, summary: summary));
     } catch (e) {
       emit(SavingsError(extractErrorMessage(e)));

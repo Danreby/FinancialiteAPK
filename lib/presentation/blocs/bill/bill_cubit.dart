@@ -17,7 +17,8 @@ class BillCubit extends Cubit<BillState> {
       final filters = <String, dynamic>{};
       if (month != null) filters['month'] = month;
       if (status != null) filters['status'] = status;
-      final bills = await _repository.getBills(filters: filters.isNotEmpty ? filters : null);
+      final bills = await _repository.getBills(
+          filters: filters.isNotEmpty ? filters : null);
       emit(BillLoaded(bills: bills));
     } catch (e) {
       emit(BillError(extractErrorMessage(e)));

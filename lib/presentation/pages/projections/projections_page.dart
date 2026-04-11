@@ -31,7 +31,10 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
     return Scaffold(
       body: Column(
         children: [
-          const PageHeader(title: 'Proje\u00e7\u00f5es', showBackButton: true, bottomPadding: 16),
+          const PageHeader(
+              title: 'Proje\u00e7\u00f5es',
+              showBackButton: true,
+              bottomPadding: 16),
           Expanded(
             child: BlocBuilder<ProjectionsCubit, ProjectionsState>(
               builder: (context, state) {
