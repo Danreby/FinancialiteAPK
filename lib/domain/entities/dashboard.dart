@@ -85,6 +85,8 @@ class UpcomingBill extends Equatable {
   final String title;
   final double amount;
   final int dueDay;
+  final DateTime? dueDate;
+  final String status;
   final String? categoryName;
 
   const UpcomingBill({
@@ -92,6 +94,8 @@ class UpcomingBill extends Equatable {
     required this.title,
     required this.amount,
     required this.dueDay,
+    this.dueDate,
+    this.status = 'pending',
     this.categoryName,
   });
 

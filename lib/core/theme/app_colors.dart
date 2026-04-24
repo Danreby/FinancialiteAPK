@@ -304,24 +304,24 @@ extension AppColorSchemeExtension on AppColorScheme {
     switch (this) {
       case AppColorScheme.rose:
         return _buildLightTheme(
-          primary: const Color(0xFFE11D48),
-          primaryLight: const Color(0xFFFDA4AF),
-          primaryDark: const Color(0xFFBE123C),
-          secondary: const Color(0xFFFB7185),
-          accent: const Color(0xFFFF6B9D),
-          chipBackground: const Color(0xFFFFF1F2),
+          primary: const Color(0xFF7B1818),
+          primaryLight: const Color(0xFFB44B4B),
+          primaryDark: const Color(0xFF5E1212),
+          secondary: const Color(0xFFA12A2A),
+          accent: const Color(0xFFC23A3A),
+          chipBackground: const Color(0xFFFFF5F5),
           cardGradientColors: const [
-            Color(0xFFE11D48),
-            Color(0xFFF43F5E),
-            Color(0xFFFB7185)
+            Color(0xFF7B1818),
+            Color(0xFF8D2020),
+            Color(0xFFA12A2A)
           ],
           heroGradientColors: const [
-            Color(0xFFE11D48),
-            Color(0xFFBE123C),
-            Color(0xFF9F1239)
+            Color(0xFF7B1818),
+            Color(0xFF5E1212),
+            Color(0xFF3D0B0B)
           ],
           cardShadow: _defaultLightCardShadow(),
-          elevatedShadow: _elevatedShadow(const Color(0xFFE11D48), 0.3),
+          elevatedShadow: _elevatedShadow(const Color(0xFF7B1818), 0.3),
         );
       case AppColorScheme.forest:
         return _buildLightTheme(
@@ -458,24 +458,24 @@ extension AppColorSchemeExtension on AppColorScheme {
     switch (this) {
       case AppColorScheme.rose:
         return _buildDarkTheme(
-          primary: const Color(0xFFFB7185),
-          primaryLight: const Color(0xFFFDA4AF),
-          primaryDark: const Color(0xFFE11D48),
-          secondary: const Color(0xFFF43F5E),
-          accent: const Color(0xFFFF6B9D),
-          chipBackground: const Color(0xFF2A1520),
+          primary: const Color(0xFFC66A6A),
+          primaryLight: const Color(0xFFE7A5A5),
+          primaryDark: const Color(0xFF7B1818),
+          secondary: const Color(0xFFA84D4D),
+          accent: const Color(0xFFD37A7A),
+          chipBackground: const Color(0xFF2A1616),
           cardGradientColors: const [
-            Color(0xFF2A1528),
-            Color(0xFF1E1A35),
+            Color(0xFF2A1616),
+            Color(0xFF221818),
             Color(0xFF1A1D2E)
           ],
           heroGradientColors: const [
-            Color(0xFF2A1528),
-            Color(0xFF1A0F20),
+            Color(0xFF2A1616),
+            Color(0xFF1D1010),
             Color(0xFF0F1119)
           ],
           cardShadow: _cardShadow(Colors.black, 0.25),
-          elevatedShadow: _elevatedShadow(const Color(0xFFFB7185), 0.2),
+          elevatedShadow: _elevatedShadow(const Color(0xFFC66A6A), 0.2),
         );
       case AppColorScheme.forest:
         return _buildDarkTheme(

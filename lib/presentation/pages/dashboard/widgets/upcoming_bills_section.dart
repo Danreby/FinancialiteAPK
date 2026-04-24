@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/date_formatter.dart';
 import '../../../../domain/entities/dashboard.dart';
 
 class UpcomingBillsSection extends StatelessWidget {
@@ -58,8 +59,11 @@ class UpcomingBillsSection extends StatelessWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Vence dia ${bill.dueDay}',
-                                style: theme.textTheme.bodySmall,
+                                _dueLabel(bill),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: _dueColor(theme, bill),
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ],
                           ),
@@ -78,5 +82,18 @@ class UpcomingBillsSection extends StatelessWidget {
               ))
           .toList(),
     );
+  }
+
+  String _dueLabel(UpcomingBill bill) {
+    if (bill.dueDate != null) {
+      return 'Vence ${DateFormatter.shortDate(bill.dueDate!)}';
+    }
+    return 'Vence dia ${bill.dueDay}';
+  }
+
+  Color _dueColor(ThemeData theme, UpcomingBill bill) {
+    if (bill.status == 'overdue') return theme.colorScheme.error;
+    if (bill.status == 'paid') return theme.colorScheme.primary;
+    return theme.colorScheme.onSurfaceVariant;
   }
 }

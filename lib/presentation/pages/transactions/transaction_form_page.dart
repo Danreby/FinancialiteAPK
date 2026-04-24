@@ -12,6 +12,8 @@ import '../../../domain/entities/category.dart';
 import '../../../domain/entities/card_entity.dart';
 import '../../../domain/repositories/transaction_repository.dart';
 import '../../widgets/page_header.dart';
+import '../../widgets/responsive_content.dart';
+import '../../widgets/form_section_card.dart';
 import 'widgets/transaction_type_selector.dart';
 
 class TransactionFormPage extends StatefulWidget {
@@ -124,28 +126,19 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
             child: _isLoadingTransaction
                 ? const Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          TransactionTypeSelector(
-                            type: _type,
-                            onChanged: (t) => setState(() => _type = t),
-                          ),
-                          const SizedBox(height: 20),
-                          Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.surface,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: theme.colorScheme.outlineVariant
-                                    .withValues(alpha: 0.5),
-                              ),
+                    child: ResponsiveContent(
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            TransactionTypeSelector(
+                              type: _type,
+                              onChanged: (t) => setState(() => _type = t),
                             ),
-                            child: Column(
+                            const SizedBox(height: 20),
+                            FormSectionCard(
+                              child: Column(
                               children: [
                                 AppTextField(
                                   controller: _descriptionController,
@@ -309,42 +302,43 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                 ),
                               ],
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: theme.colorScheme.primary
-                                      .withValues(alpha: 0.3),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
                             ),
-                            child: SizedBox(
-                              height: 56,
-                              width: double.infinity,
-                              child: FilledButton(
-                                onPressed: _submit,
-                                style: FilledButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
+                            const SizedBox(height: 24),
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: theme.colorScheme.primary
+                                        .withValues(alpha: 0.3),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 8),
                                   ),
-                                ),
-                                child: Text(
-                                  _isEditing ? 'Atualizar' : 'Salvar',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 16,
+                                ],
+                              ),
+                              child: SizedBox(
+                                height: 56,
+                                width: double.infinity,
+                                child: FilledButton(
+                                  onPressed: _submit,
+                                  style: FilledButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    _isEditing ? 'Atualizar' : 'Salvar',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 32),
-                        ],
+                            const SizedBox(height: 32),
+                          ],
+                        ),
                       ),
                     ),
                   ),

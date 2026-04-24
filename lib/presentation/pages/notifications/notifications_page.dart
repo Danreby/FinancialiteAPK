@@ -6,6 +6,7 @@ import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../widgets/page_header.dart';
+import '../../widgets/responsive_content.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -81,40 +82,40 @@ class _NotificationsPageState extends State<NotificationsPage> {
             ),
           ),
           Expanded(
-            child: BlocBuilder<NotificationCubit, NotificationState>(
-              builder: (context, state) {
-                if (state is NotificationLoading) {
-                  return const AppLoadingIndicator(
-                      useShimmer: true, shimmerLines: 5);
-                }
-                if (state is NotificationError) {
-                  return AppErrorWidget(
-                    message: state.message,
-                    onRetry: () =>
-                        context.read<NotificationCubit>().loadNotifications(),
-                  );
-                }
-                if (state is NotificationLoaded) {
-                  if (state.notifications.isEmpty) {
-                    return const EmptyStateWidget(
-                      icon: Icons.notifications_none,
-                      title: 'Sem notificações',
-                      subtitle: 'Você ainda não tem notificações',
+            child: ResponsiveContent(
+              child: BlocBuilder<NotificationCubit, NotificationState>(
+                builder: (context, state) {
+                  if (state is NotificationLoading) {
+                    return const AppLoadingIndicator(
+                        useShimmer: true, shimmerLines: 5);
+                  }
+                  if (state is NotificationError) {
+                    return AppErrorWidget(
+                      message: state.message,
+                      onRetry: () =>
+                          context.read<NotificationCubit>().loadNotifications(),
                     );
                   }
-                  return RefreshIndicator(
-                    onRefresh: () async =>
-                        context.read<NotificationCubit>().loadNotifications(),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(top: 8),
-                      itemCount: state.notifications.length,
-                      itemBuilder: (context, index) {
-                        final n = state.notifications[index];
-                        final isUnread = !n.isRead;
-                        final typeColor = _notifColor(n.type);
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 6),
+                  if (state is NotificationLoaded) {
+                    if (state.notifications.isEmpty) {
+                      return const EmptyStateWidget(
+                        icon: Icons.notifications_none,
+                        title: 'Sem notificações',
+                        subtitle: 'Você ainda não tem notificações',
+                      );
+                    }
+                    return RefreshIndicator(
+                      onRefresh: () async =>
+                          context.read<NotificationCubit>().loadNotifications(),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.only(top: 8, bottom: 90),
+                        itemCount: state.notifications.length,
+                        itemBuilder: (context, index) {
+                          final n = state.notifications[index];
+                          final isUnread = !n.isRead;
+                          final typeColor = _notifColor(n.type);
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(16),
                             child: Dismissible(
@@ -227,13 +228,14 @@ class _NotificationsPageState extends State<NotificationsPage> {
                               ),
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  );
-                }
-                return const SizedBox.shrink();
-              },
+                          );
+                        },
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
             ),
           ),
         ],
@@ -243,14 +245,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   Color _notifColor(String type) {
     switch (type) {
-      case 'bill_due':
-        return Theme.of(context).colorScheme.primary;
-      case 'budget_exceeded':
-        return Colors.amber;
-      case 'income_received':
+      case 'error':
+        return Theme.of(context).colorScheme.error;
+      case 'warning':
+        return Colors.amber.shade700;
+      case 'success':
         return const Color(0xFF10B981);
-      case 'savings_goal':
-        return Colors.blue;
       default:
         return Theme.of(context).colorScheme.primary;
     }
@@ -258,14 +258,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   IconData _notifIcon(String type) {
     switch (type) {
-      case 'bill_due':
-        return Icons.receipt;
-      case 'budget_exceeded':
+      case 'error':
+        return Icons.error_outline_rounded;
+      case 'warning':
         return Icons.warning;
-      case 'income_received':
-        return Icons.trending_up;
-      case 'savings_goal':
-        return Icons.savings;
+      case 'success':
+        return Icons.check_circle_outline_rounded;
       default:
         return Icons.notifications;
     }

@@ -8,6 +8,7 @@ import '../../domain/entities/card_entity.dart';
 import '../../domain/entities/bank_account.dart';
 import 'app_text_field.dart';
 import 'currency_text_field.dart';
+import 'form_section_card.dart';
 import '../../core/utils/date_formatter.dart';
 import '../../core/utils/validators.dart';
 
@@ -98,115 +99,119 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'Tipo de renda',
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  GridView.count(
-                    crossAxisCount: 4,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    mainAxisSpacing: 8,
-                    crossAxisSpacing: 8,
-                    childAspectRatio: 1.0,
-                    children: _incomeTypes.map((t) {
-                      final isSelected = incomeType == t['value'];
-                      final iconKey = t['icon'] as String;
-                      final icon = _iconMap[iconKey] ?? Icons.attach_money;
-                      return GestureDetector(
-                        onTap: () => setLocalState(() {
-                          incomeType = t['value'] as String;
-                          if (_oneTimeTypes.contains(incomeType)) {
-                            isRecurring = false;
-                          } else {
-                            isRecurring = true;
-                          }
-                        }),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? theme.colorScheme.primary
-                                    .withValues(alpha: 0.1)
-                                : theme.colorScheme.surfaceContainerHighest
-                                    .withValues(alpha: 0.5),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: isSelected
-                                  ? theme.colorScheme.primary
-                                  : theme.colorScheme.outlineVariant
-                                      .withValues(alpha: 0.3),
-                              width: isSelected ? 2 : 1,
-                            ),
+                  FormSectionCard(
+                    child: Column(
+                      children: [
+                        Text(
+                          'Tipo de renda',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                icon,
-                                color: isSelected
-                                    ? theme.colorScheme.primary
-                                    : theme.colorScheme.onSurfaceVariant,
-                                size: 24,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                t['label'] as String,
-                                style: theme.textTheme.labelSmall?.copyWith(
+                        ),
+                        const SizedBox(height: 8),
+                        GridView.count(
+                          crossAxisCount: 4,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                          childAspectRatio: 1.0,
+                          children: _incomeTypes.map((t) {
+                            final isSelected = incomeType == t['value'];
+                            final iconKey = t['icon'] as String;
+                            final icon = _iconMap[iconKey] ?? Icons.attach_money;
+                            return GestureDetector(
+                              onTap: () => setLocalState(() {
+                                incomeType = t['value'] as String;
+                                if (_oneTimeTypes.contains(incomeType)) {
+                                  isRecurring = false;
+                                } else {
+                                  isRecurring = true;
+                                }
+                              }),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                decoration: BoxDecoration(
                                   color: isSelected
                                       ? theme.colorScheme.primary
-                                      : theme.colorScheme.onSurfaceVariant,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
+                                          .withValues(alpha: 0.1)
+                                      : theme.colorScheme.surfaceContainerHighest
+                                          .withValues(alpha: 0.5),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.outlineVariant
+                                            .withValues(alpha: 0.3),
+                                    width: isSelected ? 2 : 1,
+                                  ),
                                 ),
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      icon,
+                                      color: isSelected
+                                          ? theme.colorScheme.primary
+                                          : theme.colorScheme.onSurfaceVariant,
+                                      size: 24,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      t['label'] as String,
+                                      style: theme.textTheme.labelSmall?.copyWith(
+                                        color: isSelected
+                                            ? theme.colorScheme.primary
+                                            : theme.colorScheme.onSurfaceVariant,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w700
+                                            : FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
+                            );
+                          }).toList(),
                         ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        isRecurring
-                            ? 'Renda recorrente (mensal)'
-                            : 'Renda única (avulsa)',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              isRecurring
+                                  ? 'Renda recorrente (mensal)'
+                                  : 'Renda única (avulsa)',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Switch(
+                              value: isRecurring,
+                              onChanged: (v) =>
+                                  setLocalState(() => isRecurring = v),
+                            ),
+                          ],
                         ),
-                      ),
-                      Switch(
-                        value: isRecurring,
-                        onChanged: (v) => setLocalState(() => isRecurring = v),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  AppTextField(
-                    controller: titleCtrl,
-                    label: 'Título',
-                    prefixIcon: Icons.description,
-                    validator: Validators.required,
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 12),
-                  CurrencyTextField(
-                    controller: amountCtrl,
-                    label: 'Valor',
-                    validator: Validators.currency,
-                  ),
-                  const SizedBox(height: 12),
-                  if (isRecurring) ...[
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          controller: titleCtrl,
+                          label: 'Título',
+                          prefixIcon: Icons.description,
+                          validator: Validators.required,
+                          textInputAction: TextInputAction.next,
+                        ),
+                        const SizedBox(height: 12),
+                        CurrencyTextField(
+                          controller: amountCtrl,
+                          label: 'Valor',
+                          validator: Validators.currency,
+                        ),
+                        const SizedBox(height: 12),
+                        if (isRecurring) ...[
                     DropdownButtonFormField<String>(
                       value: paymentDayType,
                       decoration: const InputDecoration(
@@ -239,7 +244,7 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                         return null;
                       },
                     ),
-                  ] else ...[
+                        ] else ...[
                     AppTextField(
                       label: 'Data de recebimento',
                       prefixIcon: Icons.calendar_today,
@@ -260,16 +265,16 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                         }
                       },
                     ),
-                  ],
-                  const SizedBox(height: 12),
-                  AppTextField(
-                    controller: descCtrl,
-                    label: 'Descrição (opcional)',
-                    prefixIcon: Icons.notes,
-                    maxLines: 2,
-                  ),
-                  const SizedBox(height: 12),
-                  BlocBuilder<CardCubit, CardState>(
+                        ],
+                        const SizedBox(height: 12),
+                        AppTextField(
+                          controller: descCtrl,
+                          label: 'Descrição (opcional)',
+                          prefixIcon: Icons.notes,
+                          maxLines: 2,
+                        ),
+                        const SizedBox(height: 12),
+                        BlocBuilder<CardCubit, CardState>(
                     builder: (context, state) {
                       final cards =
                           state is CardLoaded ? state.cards : <CardUser>[];
@@ -292,9 +297,9 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                         onChanged: (v) => setLocalState(() => cardUserId = v),
                       );
                     },
-                  ),
-                  const SizedBox(height: 12),
-                  BlocBuilder<BankCubit, BankState>(
+                        ),
+                        const SizedBox(height: 12),
+                        BlocBuilder<BankCubit, BankState>(
                     builder: (context, state) {
                       final accounts = state is BankLoaded
                           ? state.accounts
@@ -319,20 +324,23 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                             setLocalState(() => bankAccountId = v),
                       );
                     },
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: isActive,
-                        onChanged: (v) =>
-                            setLocalState(() => isActive = v ?? true),
-                      ),
-                      Text(
-                        'Renda ativa',
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                    ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: isActive,
+                              onChanged: (v) =>
+                                  setLocalState(() => isActive = v ?? true),
+                            ),
+                            Text(
+                              'Renda ativa',
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(

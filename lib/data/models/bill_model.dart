@@ -16,6 +16,8 @@ class BillModel extends Bill {
     super.categoryIcon,
     super.categoryColor,
     super.lastPayment,
+    super.isPaidThisPeriod,
+    super.nextDueDate,
     super.createdAt,
     super.updatedAt,
   });
@@ -39,6 +41,8 @@ class BillModel extends Bill {
       categoryIcon: json['category']?['icon'] as String?,
       categoryColor: json['category']?['color'] as String?,
       lastPayment: lastPayment,
+      isPaidThisPeriod: json.toBool('is_paid_this_period'),
+      nextDueDate: json.dateTime('next_due_date') ?? json.dateTime('due_date'),
       createdAt: json.dateTime('created_at'),
       updatedAt: json.dateTime('updated_at'),
     );
@@ -80,6 +84,8 @@ class BillModel extends Bill {
       categoryId: map['category_id'] as int?,
       userId: map['user_id'] as int,
       description: map['description'] as String?,
+      isPaidThisPeriod: map['is_paid_this_period'] == 1,
+      nextDueDate: map.dateTime('next_due_date'),
       createdAt: map.dateTime('created_at'),
       updatedAt: map.dateTime('updated_at'),
     );

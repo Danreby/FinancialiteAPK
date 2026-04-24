@@ -30,7 +30,8 @@ class DashboardDataModel extends DashboardData {
 
     final pendingBillCount = upcomingBillsList.where((b) {
       final m = b as Map<String, dynamic>;
-      return m['is_overdue'] == true || m['status'] == 'overdue';
+      final status = (m['status'] ?? '').toString();
+      return status != 'paid';
     }).length;
 
     final pendingBill = stats.toDouble('current_month_pending_bill');
@@ -73,6 +74,8 @@ class DashboardDataModel extends DashboardData {
           title: m['title'] as String,
           amount: m.toDouble('amount'),
           dueDay: m.toInt('due_day'),
+          dueDate: m.dateTime('due_date') ?? m.dateTime('date'),
+          status: m['status'] as String? ?? 'pending',
           categoryName: null,
         );
       }).toList(),
@@ -118,6 +121,8 @@ class UpcomingBillModel extends UpcomingBill {
       required super.title,
       required super.amount,
       required super.dueDay,
+  super.dueDate,
+  super.status,
       super.categoryName});
 
   factory UpcomingBillModel.fromJson(Map<String, dynamic> json) {
@@ -126,6 +131,8 @@ class UpcomingBillModel extends UpcomingBill {
       title: json['title'] as String,
       amount: json.toDouble('amount'),
       dueDay: json['due_day'] as int,
+      dueDate: json.dateTime('due_date') ?? json.dateTime('date'),
+      status: json['status'] as String? ?? 'pending',
       categoryName: json['category_name'] as String?,
     );
   }

@@ -9,6 +9,8 @@ import '../../widgets/confirm_dialog.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/shadowed_fab.dart';
+import '../../widgets/responsive_content.dart';
+import '../../../core/utils/date_formatter.dart';
 import 'widgets/bill_dialogs.dart';
 import 'widgets/bill_list_item.dart';
 
@@ -47,6 +49,7 @@ class _BillsPageState extends State<BillsPage> {
   }
 
   bool _isPaidThisCycle(Bill bill) {
+    if (bill.isPaidThisPeriod) return true;
     final lp = bill.lastPayment;
     if (lp == null || lp.status != 'paid') return false;
     final now = DateTime.now();
@@ -55,30 +58,19 @@ class _BillsPageState extends State<BillsPage> {
     return dueDate.year == now.year && dueDate.month == now.month;
   }
 
-  (String, Color) _dueInfo(Bill bill, ThemeData theme) {
-    if (_isPaidThisCycle(bill)) {
-      final next = _nextDueDate(bill.dueDay);
-      final now = DateTime.now();
-      final nextCycle = DateTime(
-        next.month == 12 ? next.year + 1 : next.year,
-        next.month == 12 ? 1 : next.month + 1,
-        1,
-      );
-      final daysInNextCycleMonth =
-          DateTime(nextCycle.year, nextCycle.month + 1, 0).day;
-      final clampedDay = bill.dueDay > daysInNextCycleMonth
-          ? daysInNextCycleMonth
-          : bill.dueDay;
-      final nextDue = DateTime(nextCycle.year, nextCycle.month, clampedDay);
-      final diff =
-          nextDue.difference(DateTime(now.year, now.month, now.day)).inDays;
-      return ('Pago · próx. ${diff}d', Colors.green);
-    }
+  DateTime _effectiveDueDate(Bill bill) {
+    return bill.nextDueDate ?? _nextDueDate(bill.dueDay);
+  }
 
-    final nextDue = _nextDueDate(bill.dueDay);
+  (String, Color) _dueInfo(Bill bill, ThemeData theme) {
+    final dueDate = _effectiveDueDate(bill);
     final today =
         DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    final diff = nextDue.difference(today).inDays;
+    final diff = dueDate.difference(today).inDays;
+
+    if (_isPaidThisCycle(bill)) {
+      return ('Pago · próx. ${DateFormatter.shortDate(dueDate)}', Colors.green);
+    }
 
     if (diff < 0) {
       return ('Vencido há ${-diff}d', theme.colorScheme.error);
@@ -104,7 +96,8 @@ class _BillsPageState extends State<BillsPage> {
           const PageHeader(title: 'Contas a Pagar', bottomPadding: 16),
           const SizedBox(height: 12),
           Expanded(
-            child: BlocBuilder<BillCubit, BillState>(
+            child: ResponsiveContent(
+              child: BlocBuilder<BillCubit, BillState>(
               builder: (context, state) {
                 if (state is BillLoading) {
                   return const AppLoadingIndicator(
@@ -127,7 +120,7 @@ class _BillsPageState extends State<BillsPage> {
                   return RefreshIndicator(
                     onRefresh: () async => _loadData(),
                     child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.only(bottom: 90),
                       itemCount: state.bills.length + 1,
                       itemBuilder: (context, index) {
                         if (index == 0) {
@@ -165,6 +158,7 @@ class _BillsPageState extends State<BillsPage> {
                 }
                 return const SizedBox.shrink();
               },
+            ),
             ),
           ),
         ],

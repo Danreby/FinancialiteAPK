@@ -32,7 +32,11 @@ class NotificationRepositoryImpl extends BaseOfflineRepository
     try {
       if (await isOnline) {
         final response = await api.get(ApiConstants.notificationsUnreadCount);
-        return response.data['count'] as int? ?? 0;
+        final data = response.data;
+        if (data is Map<String, dynamic>) {
+          return data['unread_count'] as int? ?? data['count'] as int? ?? 0;
+        }
+        return 0;
       }
     } catch (_) {}
     final database = await db;

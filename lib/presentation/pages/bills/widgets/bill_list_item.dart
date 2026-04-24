@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/date_formatter.dart';
 import '../../../../domain/entities/bill.dart';
 
 class BillListItem extends StatelessWidget {
@@ -78,7 +79,9 @@ class BillListItem extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Vence: dia ${bill.dueDay}',
+                        bill.nextDueDate != null
+                            ? 'Vence em ${DateFormatter.shortDate(bill.nextDueDate!)}'
+                            : 'Vence: dia ${bill.dueDay}',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),

@@ -14,6 +14,8 @@ class Bill extends Equatable {
   final String? categoryIcon;
   final String? categoryColor;
   final BillPayment? lastPayment;
+  final bool isPaidThisPeriod;
+  final DateTime? nextDueDate;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -31,6 +33,8 @@ class Bill extends Equatable {
     this.categoryIcon,
     this.categoryColor,
     this.lastPayment,
+    this.isPaidThisPeriod = false,
+    this.nextDueDate,
     this.createdAt,
     this.updatedAt,
   });

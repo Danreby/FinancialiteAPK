@@ -12,11 +12,29 @@ class NotificationModel extends AppNotification {
     super.createdAt,
   });
 
+  static String _cleanText(dynamic value) {
+    if (value == null) return '';
+    final raw = value.toString();
+    return raw
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#039;', "'")
+        .replaceAll('&amp;', '&')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+  }
+
+  static String? _message(dynamic value) {
+    final text = _cleanText(value);
+    return text.isEmpty ? null : text;
+  }
+
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
       id: json['id'] as int?,
-      title: json['title'] as String,
-      message: json['message'] as String?,
+      title: _cleanText(json['title']).isEmpty
+          ? 'Notificação'
+          : _cleanText(json['title']),
+      message: _message(json['message']),
       type: json['type'] as String? ?? 'info',
       isRead: json.toBool('is_read'),
       userId: json['user_id'] as int,
@@ -37,8 +55,10 @@ class NotificationModel extends AppNotification {
   factory NotificationModel.fromDb(Map<String, dynamic> map) {
     return NotificationModel(
       id: map['id'] as int?,
-      title: map['title'] as String,
-      message: map['message'] as String?,
+      title: _cleanText(map['title']).isEmpty
+          ? 'Notificação'
+          : _cleanText(map['title']),
+      message: _message(map['message']),
       type: map['type'] as String? ?? 'info',
       isRead: map['is_read'] == 1,
       userId: map['user_id'] as int,
