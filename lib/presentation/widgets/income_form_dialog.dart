@@ -119,7 +119,8 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                           children: _incomeTypes.map((t) {
                             final isSelected = incomeType == t['value'];
                             final iconKey = t['icon'] as String;
-                            final icon = _iconMap[iconKey] ?? Icons.attach_money;
+                            final icon =
+                                _iconMap[iconKey] ?? Icons.attach_money;
                             return GestureDetector(
                               onTap: () => setLocalState(() {
                                 incomeType = t['value'] as String;
@@ -135,7 +136,8 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                                   color: isSelected
                                       ? theme.colorScheme.primary
                                           .withValues(alpha: 0.1)
-                                      : theme.colorScheme.surfaceContainerHighest
+                                      : theme
+                                          .colorScheme.surfaceContainerHighest
                                           .withValues(alpha: 0.5),
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
@@ -159,10 +161,12 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                                     const SizedBox(height: 4),
                                     Text(
                                       t['label'] as String,
-                                      style: theme.textTheme.labelSmall?.copyWith(
+                                      style:
+                                          theme.textTheme.labelSmall?.copyWith(
                                         color: isSelected
                                             ? theme.colorScheme.primary
-                                            : theme.colorScheme.onSurfaceVariant,
+                                            : theme
+                                                .colorScheme.onSurfaceVariant,
                                         fontWeight: isSelected
                                             ? FontWeight.w700
                                             : FontWeight.w500,
@@ -212,59 +216,61 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                         ),
                         const SizedBox(height: 12),
                         if (isRecurring) ...[
-                    DropdownButtonFormField<String>(
-                      value: paymentDayType,
-                      decoration: const InputDecoration(
-                        labelText: 'Tipo de dia',
-                        prefixIcon: Icon(Icons.calendar_today),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                            value: 'fixed', child: Text('Dia fixo do mês')),
-                        DropdownMenuItem(
-                            value: 'business_day',
-                            child: Text('Dia útil do mês')),
-                      ],
-                      onChanged: (v) =>
-                          setLocalState(() => paymentDayType = v ?? 'fixed'),
-                    ),
-                    const SizedBox(height: 12),
-                    AppTextField(
-                      controller: paymentDayCtrl,
-                      label: paymentDayType == 'fixed'
-                          ? 'Dia do mês'
-                          : 'Nº do dia útil',
-                      prefixIcon: Icons.today,
-                      keyboardType: TextInputType.number,
-                      validator: (v) {
-                        final n = int.tryParse(v ?? '');
-                        if (n == null || n < 1) return 'Mínimo 1';
-                        final max = paymentDayType == 'fixed' ? 31 : 25;
-                        if (n > max) return 'Máximo $max';
-                        return null;
-                      },
-                    ),
+                          DropdownButtonFormField<String>(
+                            value: paymentDayType,
+                            decoration: const InputDecoration(
+                              labelText: 'Tipo de dia',
+                              prefixIcon: Icon(Icons.calendar_today),
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                  value: 'fixed',
+                                  child: Text('Dia fixo do mês')),
+                              DropdownMenuItem(
+                                  value: 'business_day',
+                                  child: Text('Dia útil do mês')),
+                            ],
+                            onChanged: (v) => setLocalState(
+                                () => paymentDayType = v ?? 'fixed'),
+                          ),
+                          const SizedBox(height: 12),
+                          AppTextField(
+                            controller: paymentDayCtrl,
+                            label: paymentDayType == 'fixed'
+                                ? 'Dia do mês'
+                                : 'Nº do dia útil',
+                            prefixIcon: Icons.today,
+                            keyboardType: TextInputType.number,
+                            validator: (v) {
+                              final n = int.tryParse(v ?? '');
+                              if (n == null || n < 1) return 'Mínimo 1';
+                              final max = paymentDayType == 'fixed' ? 31 : 25;
+                              if (n > max) return 'Máximo $max';
+                              return null;
+                            },
+                          ),
                         ] else ...[
-                    AppTextField(
-                      label: 'Data de recebimento',
-                      prefixIcon: Icons.calendar_today,
-                      readOnly: true,
-                      controller: dateCtrl,
-                      onTap: () async {
-                        final picked = await showDatePicker(
-                          context: context,
-                          initialDate: receivedAt,
-                          firstDate: DateTime(2020),
-                          lastDate: DateTime(2030),
-                        );
-                        if (picked != null) {
-                          setLocalState(() {
-                            receivedAt = picked;
-                            dateCtrl.text = DateFormatter.shortDate(picked);
-                          });
-                        }
-                      },
-                    ),
+                          AppTextField(
+                            label: 'Data de recebimento',
+                            prefixIcon: Icons.calendar_today,
+                            readOnly: true,
+                            controller: dateCtrl,
+                            onTap: () async {
+                              final picked = await showDatePicker(
+                                context: context,
+                                initialDate: receivedAt,
+                                firstDate: DateTime(2020),
+                                lastDate: DateTime(2030),
+                              );
+                              if (picked != null) {
+                                setLocalState(() {
+                                  receivedAt = picked;
+                                  dateCtrl.text =
+                                      DateFormatter.shortDate(picked);
+                                });
+                              }
+                            },
+                          ),
                         ],
                         const SizedBox(height: 12),
                         AppTextField(
@@ -275,55 +281,58 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                         ),
                         const SizedBox(height: 12),
                         BlocBuilder<CardCubit, CardState>(
-                    builder: (context, state) {
-                      final cards =
-                          state is CardLoaded ? state.cards : <CardUser>[];
-                      return DropdownButtonFormField<int>(
-                        value: cardUserId,
-                        decoration: const InputDecoration(
-                          labelText: 'Cartão vinculado (opcional)',
-                          prefixIcon: Icon(Icons.credit_card),
-                        ),
-                        items: [
-                          const DropdownMenuItem<int>(
-                            value: null,
-                            child: Text('Nenhum'),
-                          ),
-                          ...cards.map((c) => DropdownMenuItem(
-                                value: c.id,
-                                child: Text(c.cardName ?? 'Cartão #${c.id}'),
-                              )),
-                        ],
-                        onChanged: (v) => setLocalState(() => cardUserId = v),
-                      );
-                    },
+                          builder: (context, state) {
+                            final cards = state is CardLoaded
+                                ? state.cards
+                                : <CardUser>[];
+                            return DropdownButtonFormField<int>(
+                              value: cardUserId,
+                              decoration: const InputDecoration(
+                                labelText: 'Cartão vinculado (opcional)',
+                                prefixIcon: Icon(Icons.credit_card),
+                              ),
+                              items: [
+                                const DropdownMenuItem<int>(
+                                  value: null,
+                                  child: Text('Nenhum'),
+                                ),
+                                ...cards.map((c) => DropdownMenuItem(
+                                      value: c.id,
+                                      child:
+                                          Text(c.cardName ?? 'Cartão #${c.id}'),
+                                    )),
+                              ],
+                              onChanged: (v) =>
+                                  setLocalState(() => cardUserId = v),
+                            );
+                          },
                         ),
                         const SizedBox(height: 12),
                         BlocBuilder<BankCubit, BankState>(
-                    builder: (context, state) {
-                      final accounts = state is BankLoaded
-                          ? state.accounts
-                          : <BankAccount>[];
-                      return DropdownButtonFormField<int>(
-                        value: bankAccountId,
-                        decoration: const InputDecoration(
-                          labelText: 'Conta bancária (opcional)',
-                          prefixIcon: Icon(Icons.account_balance),
-                        ),
-                        items: [
-                          const DropdownMenuItem<int>(
-                            value: null,
-                            child: Text('Nenhuma'),
-                          ),
-                          ...accounts.map((a) => DropdownMenuItem(
-                                value: a.id,
-                                child: Text(a.displayName),
-                              )),
-                        ],
-                        onChanged: (v) =>
-                            setLocalState(() => bankAccountId = v),
-                      );
-                    },
+                          builder: (context, state) {
+                            final accounts = state is BankLoaded
+                                ? state.accounts
+                                : <BankAccount>[];
+                            return DropdownButtonFormField<int>(
+                              value: bankAccountId,
+                              decoration: const InputDecoration(
+                                labelText: 'Conta bancária (opcional)',
+                                prefixIcon: Icon(Icons.account_balance),
+                              ),
+                              items: [
+                                const DropdownMenuItem<int>(
+                                  value: null,
+                                  child: Text('Nenhuma'),
+                                ),
+                                ...accounts.map((a) => DropdownMenuItem(
+                                      value: a.id,
+                                      child: Text(a.displayName),
+                                    )),
+                              ],
+                              onChanged: (v) =>
+                                  setLocalState(() => bankAccountId = v),
+                            );
+                          },
                         ),
                         const SizedBox(height: 12),
                         Row(

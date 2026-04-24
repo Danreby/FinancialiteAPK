@@ -90,8 +90,9 @@ class _TransactionsPageState extends State<TransactionsPage> {
     final cardsState = context.read<CardCubit>().state;
     final categoriesState = context.read<CategoryCubit>().state;
     final cards = cardsState is CardLoaded ? cardsState.cards : <CardUser>[];
-    final categories =
-        categoriesState is CategoryLoaded ? categoriesState.categories : <Category>[];
+    final categories = categoriesState is CategoryLoaded
+        ? categoriesState.categories
+        : <Category>[];
 
     showModalBottomSheet(
       context: context,
@@ -115,7 +116,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
                     children: [
                       Row(
                         children: [
-                          Text('Filtros', style: Theme.of(context).textTheme.titleLarge),
+                          Text('Filtros',
+                              style: Theme.of(context).textTheme.titleLarge),
                           const Spacer(),
                           TextButton(
                             onPressed: () {
@@ -141,10 +143,13 @@ class _TransactionsPageState extends State<TransactionsPage> {
                         items: const [
                           DropdownMenuItem(value: 'all', child: Text('Todos')),
                           DropdownMenuItem(value: 'paid', child: Text('Pago')),
-                          DropdownMenuItem(value: 'unpaid', child: Text('Pendente')),
-                          DropdownMenuItem(value: 'overdue', child: Text('Vencido')),
+                          DropdownMenuItem(
+                              value: 'unpaid', child: Text('Pendente')),
+                          DropdownMenuItem(
+                              value: 'overdue', child: Text('Vencido')),
                         ],
-                        onChanged: (v) => setModalState(() => tempStatus = v ?? 'all'),
+                        onChanged: (v) =>
+                            setModalState(() => tempStatus = v ?? 'all'),
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
@@ -155,10 +160,14 @@ class _TransactionsPageState extends State<TransactionsPage> {
                         ),
                         items: const [
                           DropdownMenuItem(value: 'all', child: Text('Todas')),
-                          DropdownMenuItem(value: 'recurring', child: Text('Recorrente')),
-                          DropdownMenuItem(value: 'non_recurring', child: Text('Não recorrente')),
+                          DropdownMenuItem(
+                              value: 'recurring', child: Text('Recorrente')),
+                          DropdownMenuItem(
+                              value: 'non_recurring',
+                              child: Text('Não recorrente')),
                         ],
-                        onChanged: (v) => setModalState(() => tempRecurring = v ?? 'all'),
+                        onChanged: (v) =>
+                            setModalState(() => tempRecurring = v ?? 'all'),
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<int?>(
@@ -168,13 +177,15 @@ class _TransactionsPageState extends State<TransactionsPage> {
                           prefixIcon: Icon(Icons.credit_card),
                         ),
                         items: [
-                          const DropdownMenuItem<int?>(value: null, child: Text('Todos')),
+                          const DropdownMenuItem<int?>(
+                              value: null, child: Text('Todos')),
                           ...cards.map((c) => DropdownMenuItem<int?>(
                                 value: c.id,
                                 child: Text(c.cardName ?? 'Cartão #${c.id}'),
                               )),
                         ],
-                        onChanged: (v) => setModalState(() => tempBankUserId = v),
+                        onChanged: (v) =>
+                            setModalState(() => tempBankUserId = v),
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<int?>(
@@ -184,13 +195,15 @@ class _TransactionsPageState extends State<TransactionsPage> {
                           prefixIcon: Icon(Icons.category_outlined),
                         ),
                         items: [
-                          const DropdownMenuItem<int?>(value: null, child: Text('Todas')),
+                          const DropdownMenuItem<int?>(
+                              value: null, child: Text('Todas')),
                           ...categories.map((c) => DropdownMenuItem<int?>(
                                 value: c.id,
                                 child: Text(c.name),
                               )),
                         ],
-                        onChanged: (v) => setModalState(() => tempCategoryId = v),
+                        onChanged: (v) =>
+                            setModalState(() => tempCategoryId = v),
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
@@ -200,12 +213,19 @@ class _TransactionsPageState extends State<TransactionsPage> {
                           prefixIcon: Icon(Icons.sort),
                         ),
                         items: const [
-                          DropdownMenuItem(value: 'created_desc', child: Text('Mais recentes')),
-                          DropdownMenuItem(value: 'created_asc', child: Text('Mais antigas')),
-                          DropdownMenuItem(value: 'amount_desc', child: Text('Maior valor')),
-                          DropdownMenuItem(value: 'amount_asc', child: Text('Menor valor')),
+                          DropdownMenuItem(
+                              value: 'created_desc',
+                              child: Text('Mais recentes')),
+                          DropdownMenuItem(
+                              value: 'created_asc',
+                              child: Text('Mais antigas')),
+                          DropdownMenuItem(
+                              value: 'amount_desc', child: Text('Maior valor')),
+                          DropdownMenuItem(
+                              value: 'amount_asc', child: Text('Menor valor')),
                         ],
-                        onChanged: (v) => setModalState(() => tempOrder = v ?? 'created_desc'),
+                        onChanged: (v) => setModalState(
+                            () => tempOrder = v ?? 'created_desc'),
                       ),
                       const SizedBox(height: 20),
                       FilledButton(
@@ -261,7 +281,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
                       child: SegmentedButton<String>(
                         segments: const [
                           ButtonSegment(value: 'all', label: Text('Todos')),
-                          ButtonSegment(value: 'credit', label: Text('Entrada')),
+                          ButtonSegment(
+                              value: 'credit', label: Text('Entrada')),
                           ButtonSegment(value: 'debit', label: Text('Saída')),
                         ],
                         selected: {_typeFilter},
@@ -378,7 +399,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
                             confirmDismiss: (_) => ConfirmDialog.show(
                               context,
                               title: 'Excluir transação',
-                              message: 'Deseja realmente excluir esta transação?',
+                              message:
+                                  'Deseja realmente excluir esta transação?',
                               confirmText: 'Excluir',
                               confirmColor: theme.colorScheme.error,
                             ),
@@ -396,7 +418,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
                               categoryIcon: isCredit
                                   ? Icons.arrow_circle_up_rounded
                                   : Icons.arrow_circle_down_rounded,
-                              onTap: () => context.push('/transactions/${tx.id}'),
+                              onTap: () =>
+                                  context.push('/transactions/${tx.id}'),
                             ),
                           );
                         },

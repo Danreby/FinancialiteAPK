@@ -98,67 +98,67 @@ class _BillsPageState extends State<BillsPage> {
           Expanded(
             child: ResponsiveContent(
               child: BlocBuilder<BillCubit, BillState>(
-              builder: (context, state) {
-                if (state is BillLoading) {
-                  return const AppLoadingIndicator(
-                      useShimmer: true, shimmerLines: 6);
-                }
-                if (state is BillError) {
-                  return AppErrorWidget(
-                      message: state.message, onRetry: _loadData);
-                }
-                if (state is BillLoaded) {
-                  if (state.bills.isEmpty) {
-                    return EmptyStateWidget(
-                      icon: Icons.receipt_long,
-                      title: 'Nenhuma conta',
-                      subtitle: 'Adicione uma conta a pagar',
-                      actionLabel: 'Nova conta',
-                      onAction: () => showBillCreateDialog(context),
+                builder: (context, state) {
+                  if (state is BillLoading) {
+                    return const AppLoadingIndicator(
+                        useShimmer: true, shimmerLines: 6);
+                  }
+                  if (state is BillError) {
+                    return AppErrorWidget(
+                        message: state.message, onRetry: _loadData);
+                  }
+                  if (state is BillLoaded) {
+                    if (state.bills.isEmpty) {
+                      return EmptyStateWidget(
+                        icon: Icons.receipt_long,
+                        title: 'Nenhuma conta',
+                        subtitle: 'Adicione uma conta a pagar',
+                        actionLabel: 'Nova conta',
+                        onAction: () => showBillCreateDialog(context),
+                      );
+                    }
+                    return RefreshIndicator(
+                      onRefresh: () async => _loadData(),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.only(bottom: 90),
+                        itemCount: state.bills.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: SectionHeader(
+                                title: 'Suas Contas',
+                                padding: EdgeInsets.zero,
+                              ),
+                            );
+                          }
+                          final bill = state.bills[index - 1];
+                          final (dueLabel, color) = _dueInfo(bill, theme);
+                          final isPaid = _isPaidThisCycle(bill);
+                          return BillListItem(
+                            bill: bill,
+                            dueLabel: dueLabel,
+                            dueColor: color,
+                            isPaid: isPaid,
+                            onTap: () => showBillPayDialog(
+                                context, bill.id!, bill.amount),
+                            onConfirmDismiss: () => ConfirmDialog.show(
+                              context,
+                              title: 'Excluir conta',
+                              message: 'Deseja excluir "${bill.title}"?',
+                              confirmText: 'Excluir',
+                              confirmColor: theme.colorScheme.error,
+                            ),
+                            onDismissed: () =>
+                                context.read<BillCubit>().deleteBill(bill.id!),
+                          );
+                        },
+                      ),
                     );
                   }
-                  return RefreshIndicator(
-                    onRefresh: () async => _loadData(),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 90),
-                      itemCount: state.bills.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == 0) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: SectionHeader(
-                              title: 'Suas Contas',
-                              padding: EdgeInsets.zero,
-                            ),
-                          );
-                        }
-                        final bill = state.bills[index - 1];
-                        final (dueLabel, color) = _dueInfo(bill, theme);
-                        final isPaid = _isPaidThisCycle(bill);
-                        return BillListItem(
-                          bill: bill,
-                          dueLabel: dueLabel,
-                          dueColor: color,
-                          isPaid: isPaid,
-                          onTap: () =>
-                              showBillPayDialog(context, bill.id!, bill.amount),
-                          onConfirmDismiss: () => ConfirmDialog.show(
-                            context,
-                            title: 'Excluir conta',
-                            message: 'Deseja excluir "${bill.title}"?',
-                            confirmText: 'Excluir',
-                            confirmColor: theme.colorScheme.error,
-                          ),
-                          onDismissed: () =>
-                              context.read<BillCubit>().deleteBill(bill.id!),
-                        );
-                      },
-                    ),
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
+                  return const SizedBox.shrink();
+                },
+              ),
             ),
           ),
         ],

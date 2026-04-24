@@ -116,118 +116,120 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           final typeColor = _notifColor(n.type);
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Dismissible(
-                              key: Key('notif_${n.id}'),
-                              direction: DismissDirection.endToStart,
-                              background: Container(
-                                alignment: Alignment.centerRight,
-                                padding: const EdgeInsets.only(right: 20),
-                                color: theme.colorScheme.error,
-                                child: const Icon(Icons.delete,
-                                    color: Colors.white),
-                              ),
-                              onDismissed: (_) => context
-                                  .read<NotificationCubit>()
-                                  .deleteNotification(n.id!),
-                              child: GestureDetector(
-                                onTap: isUnread
-                                    ? () => context
-                                        .read<NotificationCubit>()
-                                        .markAsRead(n.id!)
-                                    : null,
-                                child: Container(
-                                  padding: const EdgeInsets.all(14),
-                                  decoration: BoxDecoration(
-                                    color: isUnread
-                                        ? Color.alphaBlend(
-                                            theme.colorScheme.primary
-                                                .withValues(alpha: 0.03),
-                                            theme.colorScheme.surface,
-                                          )
-                                        : theme.colorScheme.surface,
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: theme.colorScheme.outlineVariant
-                                          .withValues(alpha: 0.5),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Dismissible(
+                                key: Key('notif_${n.id}'),
+                                direction: DismissDirection.endToStart,
+                                background: Container(
+                                  alignment: Alignment.centerRight,
+                                  padding: const EdgeInsets.only(right: 20),
+                                  color: theme.colorScheme.error,
+                                  child: const Icon(Icons.delete,
+                                      color: Colors.white),
+                                ),
+                                onDismissed: (_) => context
+                                    .read<NotificationCubit>()
+                                    .deleteNotification(n.id!),
+                                child: GestureDetector(
+                                  onTap: isUnread
+                                      ? () => context
+                                          .read<NotificationCubit>()
+                                          .markAsRead(n.id!)
+                                      : null,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      color: isUnread
+                                          ? Color.alphaBlend(
+                                              theme.colorScheme.primary
+                                                  .withValues(alpha: 0.03),
+                                              theme.colorScheme.surface,
+                                            )
+                                          : theme.colorScheme.surface,
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: theme.colorScheme.outlineVariant
+                                            .withValues(alpha: 0.5),
+                                      ),
                                     ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 44,
-                                        height: 44,
-                                        decoration: BoxDecoration(
-                                          color:
-                                              typeColor.withValues(alpha: 0.08),
-                                          borderRadius:
-                                              BorderRadius.circular(14),
-                                        ),
-                                        child: Icon(_notifIcon(n.type),
-                                            color: typeColor, size: 22),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              n.title,
-                                              style: theme.textTheme.bodyLarge
-                                                  ?.copyWith(
-                                                fontWeight: isUnread
-                                                    ? FontWeight.w600
-                                                    : FontWeight.w400,
-                                              ),
-                                            ),
-                                            if (n.message != null) ...[
-                                              const SizedBox(height: 2),
-                                              Text(
-                                                n.message!,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: theme
-                                                    .textTheme.bodyMedium
-                                                    ?.copyWith(
-                                                  color: theme.colorScheme
-                                                      .onSurfaceVariant,
-                                                ),
-                                              ),
-                                            ],
-                                            if (n.createdAt != null) ...[
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                DateFormatter.relativeTime(
-                                                    n.createdAt!),
-                                                style: theme.textTheme.bodySmall
-                                                    ?.copyWith(
-                                                  color:
-                                                      theme.colorScheme.outline,
-                                                ),
-                                              ),
-                                            ],
-                                          ],
-                                        ),
-                                      ),
-                                      if (isUnread)
+                                    child: Row(
+                                      children: [
                                         Container(
-                                          width: 8,
-                                          height: 8,
-                                          margin:
-                                              const EdgeInsets.only(left: 8),
+                                          width: 44,
+                                          height: 44,
                                           decoration: BoxDecoration(
-                                            color: theme.colorScheme.primary,
-                                            shape: BoxShape.circle,
+                                            color: typeColor.withValues(
+                                                alpha: 0.08),
+                                            borderRadius:
+                                                BorderRadius.circular(14),
+                                          ),
+                                          child: Icon(_notifIcon(n.type),
+                                              color: typeColor, size: 22),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                n.title,
+                                                style: theme.textTheme.bodyLarge
+                                                    ?.copyWith(
+                                                  fontWeight: isUnread
+                                                      ? FontWeight.w600
+                                                      : FontWeight.w400,
+                                                ),
+                                              ),
+                                              if (n.message != null) ...[
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  n.message!,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: theme
+                                                      .textTheme.bodyMedium
+                                                      ?.copyWith(
+                                                    color: theme.colorScheme
+                                                        .onSurfaceVariant,
+                                                  ),
+                                                ),
+                                              ],
+                                              if (n.createdAt != null) ...[
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  DateFormatter.relativeTime(
+                                                      n.createdAt!),
+                                                  style: theme
+                                                      .textTheme.bodySmall
+                                                      ?.copyWith(
+                                                    color: theme
+                                                        .colorScheme.outline,
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
                                           ),
                                         ),
-                                    ],
+                                        if (isUnread)
+                                          Container(
+                                            width: 8,
+                                            height: 8,
+                                            margin:
+                                                const EdgeInsets.only(left: 8),
+                                            decoration: BoxDecoration(
+                                              color: theme.colorScheme.primary,
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
                           );
                         },
                       ),

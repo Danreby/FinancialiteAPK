@@ -121,8 +121,8 @@ class UpcomingBillModel extends UpcomingBill {
       required super.title,
       required super.amount,
       required super.dueDay,
-  super.dueDate,
-  super.status,
+      super.dueDate,
+      super.status,
       super.categoryName});
 
   factory UpcomingBillModel.fromJson(Map<String, dynamic> json) {

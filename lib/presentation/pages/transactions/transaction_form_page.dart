@@ -139,169 +139,171 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                             const SizedBox(height: 20),
                             FormSectionCard(
                               child: Column(
-                              children: [
-                                AppTextField(
-                                  controller: _descriptionController,
-                                  label: 'Título',
-                                  prefixIcon: Icons.description,
-                                  validator: Validators.required,
-                                  textInputAction: TextInputAction.next,
-                                  maxLength: 100,
-                                ),
-                                const SizedBox(height: 16),
-                                CurrencyTextField(
-                                  controller: _amountController,
-                                  label: 'Valor',
-                                  validator: Validators.currency,
-                                ),
-                                const SizedBox(height: 16),
-                                Opacity(
-                                  opacity: _type != 'debit' && !_isRecurring
-                                      ? 1.0
-                                      : 0.5,
-                                  child: IgnorePointer(
-                                    ignoring: _type == 'debit' || _isRecurring,
-                                    child: AppTextField(
-                                      controller: _installmentsController,
-                                      label: 'Parcelas',
-                                      prefixIcon: Icons.format_list_numbered,
-                                      keyboardType: TextInputType.number,
-                                      readOnly:
+                                children: [
+                                  AppTextField(
+                                    controller: _descriptionController,
+                                    label: 'Título',
+                                    prefixIcon: Icons.description,
+                                    validator: Validators.required,
+                                    textInputAction: TextInputAction.next,
+                                    maxLength: 100,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  CurrencyTextField(
+                                    controller: _amountController,
+                                    label: 'Valor',
+                                    validator: Validators.currency,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Opacity(
+                                    opacity: _type != 'debit' && !_isRecurring
+                                        ? 1.0
+                                        : 0.5,
+                                    child: IgnorePointer(
+                                      ignoring:
                                           _type == 'debit' || _isRecurring,
-                                      validator: (v) {
-                                        if (_type == 'debit' || _isRecurring)
+                                      child: AppTextField(
+                                        controller: _installmentsController,
+                                        label: 'Parcelas',
+                                        prefixIcon: Icons.format_list_numbered,
+                                        keyboardType: TextInputType.number,
+                                        readOnly:
+                                            _type == 'debit' || _isRecurring,
+                                        validator: (v) {
+                                          if (_type == 'debit' || _isRecurring)
+                                            return null;
+                                          final n = int.tryParse(v ?? '');
+                                          if (n == null || n < 1)
+                                            return 'Mínimo 1';
+                                          if (n > 360) return 'Máximo 360';
                                           return null;
-                                        final n = int.tryParse(v ?? '');
-                                        if (n == null || n < 1)
-                                          return 'Mínimo 1';
-                                        if (n > 360) return 'Máximo 360';
-                                        return null;
-                                      },
+                                        },
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(height: 16),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Transação recorrente',
-                                      style:
-                                          theme.textTheme.bodyMedium?.copyWith(
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    Switch(
-                                      value: _isRecurring,
-                                      onChanged: _type == 'debit'
-                                          ? null
-                                          : (v) {
-                                              setState(() {
-                                                _isRecurring = v;
-                                                if (v)
-                                                  _installmentsController.text =
-                                                      '1';
-                                              });
-                                            },
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                BlocBuilder<CategoryCubit, CategoryState>(
-                                  builder: (context, state) {
-                                    final categories = state is CategoryLoaded
-                                        ? state.categories
-                                        : <Category>[];
-                                    return DropdownButtonFormField<int>(
-                                      value: _categoryId,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Categoria',
-                                        prefixIcon: Icon(Icons.category),
-                                      ),
-                                      items: categories
-                                          .map((c) => DropdownMenuItem(
-                                                value: c.id,
-                                                child: Text(c.name),
-                                              ))
-                                          .toList(),
-                                      onChanged: (v) =>
-                                          setState(() => _categoryId = v),
-                                    );
-                                  },
-                                ),
-                                const SizedBox(height: 16),
-                                BlocBuilder<CardCubit, CardState>(
-                                  builder: (context, state) {
-                                    final cards = state is CardLoaded
-                                        ? state.cards
-                                        : <CardUser>[];
-                                    return DropdownButtonFormField<int>(
-                                      value: _cardUserId,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Cartão (opcional)',
-                                        prefixIcon: Icon(Icons.credit_card),
-                                      ),
-                                      items: [
-                                        const DropdownMenuItem<int>(
-                                          value: null,
-                                          child: Text('Nenhum'),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Transação recorrente',
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                          fontWeight: FontWeight.w500,
                                         ),
-                                        ...cards.map((c) => DropdownMenuItem(
-                                              value: c.id,
-                                              child: Text(c.cardName ??
-                                                  'Cartão #${c.id}'),
-                                            )),
-                                      ],
-                                      onChanged: (v) =>
-                                          setState(() => _cardUserId = v),
-                                    );
-                                  },
-                                ),
-                                const SizedBox(height: 16),
-                                AppTextField(
-                                  label: 'Data',
-                                  prefixIcon: Icons.calendar_today,
-                                  readOnly: true,
-                                  controller: TextEditingController(
-                                    text:
-                                        '${_date.day.toString().padLeft(2, '0')}/${_date.month.toString().padLeft(2, '0')}/${_date.year}',
+                                      ),
+                                      Switch(
+                                        value: _isRecurring,
+                                        onChanged: _type == 'debit'
+                                            ? null
+                                            : (v) {
+                                                setState(() {
+                                                  _isRecurring = v;
+                                                  if (v)
+                                                    _installmentsController
+                                                        .text = '1';
+                                                });
+                                              },
+                                      ),
+                                    ],
                                   ),
-                                  suffix: Container(
-                                    width: 40,
-                                    height: 40,
-                                    margin: const EdgeInsets.only(right: 4),
-                                    decoration: BoxDecoration(
-                                      color: theme
-                                          .colorScheme.surfaceContainerHighest,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Icon(
-                                      Icons.calendar_month,
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                      size: 20,
-                                    ),
+                                  const SizedBox(height: 16),
+                                  BlocBuilder<CategoryCubit, CategoryState>(
+                                    builder: (context, state) {
+                                      final categories = state is CategoryLoaded
+                                          ? state.categories
+                                          : <Category>[];
+                                      return DropdownButtonFormField<int>(
+                                        value: _categoryId,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Categoria',
+                                          prefixIcon: Icon(Icons.category),
+                                        ),
+                                        items: categories
+                                            .map((c) => DropdownMenuItem(
+                                                  value: c.id,
+                                                  child: Text(c.name),
+                                                ))
+                                            .toList(),
+                                        onChanged: (v) =>
+                                            setState(() => _categoryId = v),
+                                      );
+                                    },
                                   ),
-                                  onTap: () async {
-                                    final picked = await showDatePicker(
-                                      context: context,
-                                      initialDate: _date,
-                                      firstDate: DateTime(2020),
-                                      lastDate: DateTime(2030),
-                                    );
-                                    if (picked != null)
-                                      setState(() => _date = picked);
-                                  },
-                                ),
-                                const SizedBox(height: 16),
-                                AppTextField(
-                                  controller: _notesController,
-                                  label: 'Observações',
-                                  prefixIcon: Icons.notes,
-                                  maxLines: 3,
-                                ),
-                              ],
-                            ),
+                                  const SizedBox(height: 16),
+                                  BlocBuilder<CardCubit, CardState>(
+                                    builder: (context, state) {
+                                      final cards = state is CardLoaded
+                                          ? state.cards
+                                          : <CardUser>[];
+                                      return DropdownButtonFormField<int>(
+                                        value: _cardUserId,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Cartão (opcional)',
+                                          prefixIcon: Icon(Icons.credit_card),
+                                        ),
+                                        items: [
+                                          const DropdownMenuItem<int>(
+                                            value: null,
+                                            child: Text('Nenhum'),
+                                          ),
+                                          ...cards.map((c) => DropdownMenuItem(
+                                                value: c.id,
+                                                child: Text(c.cardName ??
+                                                    'Cartão #${c.id}'),
+                                              )),
+                                        ],
+                                        onChanged: (v) =>
+                                            setState(() => _cardUserId = v),
+                                      );
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+                                  AppTextField(
+                                    label: 'Data',
+                                    prefixIcon: Icons.calendar_today,
+                                    readOnly: true,
+                                    controller: TextEditingController(
+                                      text:
+                                          '${_date.day.toString().padLeft(2, '0')}/${_date.month.toString().padLeft(2, '0')}/${_date.year}',
+                                    ),
+                                    suffix: Container(
+                                      width: 40,
+                                      height: 40,
+                                      margin: const EdgeInsets.only(right: 4),
+                                      decoration: BoxDecoration(
+                                        color: theme.colorScheme
+                                            .surfaceContainerHighest,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Icon(
+                                        Icons.calendar_month,
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant,
+                                        size: 20,
+                                      ),
+                                    ),
+                                    onTap: () async {
+                                      final picked = await showDatePicker(
+                                        context: context,
+                                        initialDate: _date,
+                                        firstDate: DateTime(2020),
+                                        lastDate: DateTime(2030),
+                                      );
+                                      if (picked != null)
+                                        setState(() => _date = picked);
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+                                  AppTextField(
+                                    controller: _notesController,
+                                    label: 'Observações',
+                                    prefixIcon: Icons.notes,
+                                    maxLines: 3,
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: 24),
                             Container(
