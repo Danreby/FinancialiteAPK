@@ -414,10 +414,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
                               subtitle:
                                   '${isCredit ? 'Crédito' : 'Débito'} • ${tx.categoryName ?? 'Sem categoria'}${tx.date != null ? ' • ${DateFormatter.shortDate(tx.date!)}' : ''}',
                               amount: CurrencyFormatter.format(tx.amount),
-                              isExpense: !isCredit,
-                              categoryIcon: isCredit
-                                  ? Icons.arrow_circle_up_rounded
-                                  : Icons.arrow_circle_down_rounded,
+                              isExpense: true,
+                              categoryIcon: Icons.arrow_circle_down_rounded,
                               onTap: () =>
                                   context.push('/transactions/${tx.id}'),
                             ),

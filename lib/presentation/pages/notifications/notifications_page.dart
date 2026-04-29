@@ -7,6 +7,7 @@ import '../../widgets/empty_state_widget.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/responsive_content.dart';
+import 'widgets/notification_type_style.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -113,14 +114,20 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         itemBuilder: (context, index) {
                           final n = state.notifications[index];
                           final isUnread = !n.isRead;
-                          final typeColor = _notifColor(n.type);
+                          final typeStyle =
+                              NotificationTypeMapper.resolve(context, n.type);
+                          final canMutate = n.id != null;
+                          final keyValue = n.id?.toString() ??
+                              '${n.title}_${n.createdAt?.millisecondsSinceEpoch ?? index}_$index';
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 6),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(16),
                               child: Dismissible(
-                                key: Key('notif_${n.id}'),
-                                direction: DismissDirection.endToStart,
+                                key: Key('notif_$keyValue'),
+                                direction: canMutate
+                                    ? DismissDirection.endToStart
+                                    : DismissDirection.none,
                                 background: Container(
                                   alignment: Alignment.centerRight,
                                   padding: const EdgeInsets.only(right: 20),
@@ -128,11 +135,14 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                   child: const Icon(Icons.delete,
                                       color: Colors.white),
                                 ),
-                                onDismissed: (_) => context
-                                    .read<NotificationCubit>()
-                                    .deleteNotification(n.id!),
+                                onDismissed: (_) {
+                                  if (!canMutate) return;
+                                  context
+                                      .read<NotificationCubit>()
+                                      .deleteNotification(n.id!);
+                                },
                                 child: GestureDetector(
-                                  onTap: isUnread
+                                  onTap: isUnread && canMutate
                                       ? () => context
                                           .read<NotificationCubit>()
                                           .markAsRead(n.id!)
@@ -159,13 +169,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                           width: 44,
                                           height: 44,
                                           decoration: BoxDecoration(
-                                            color: typeColor.withValues(
-                                                alpha: 0.08),
+                                            color: typeStyle.color
+                                                .withValues(alpha: 0.08),
                                             borderRadius:
                                                 BorderRadius.circular(14),
                                           ),
-                                          child: Icon(_notifIcon(n.type),
-                                              color: typeColor, size: 22),
+                                          child: Icon(typeStyle.icon,
+                                              color: typeStyle.color, size: 22),
                                         ),
                                         const SizedBox(width: 12),
                                         Expanded(
@@ -220,7 +230,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                             margin:
                                                 const EdgeInsets.only(left: 8),
                                             decoration: BoxDecoration(
-                                              color: theme.colorScheme.primary,
+                                              color: typeStyle.color,
                                               shape: BoxShape.circle,
                                             ),
                                           ),
@@ -243,31 +253,5 @@ class _NotificationsPageState extends State<NotificationsPage> {
         ],
       ),
     );
-  }
-
-  Color _notifColor(String type) {
-    switch (type) {
-      case 'error':
-        return Theme.of(context).colorScheme.error;
-      case 'warning':
-        return Colors.amber.shade700;
-      case 'success':
-        return const Color(0xFF10B981);
-      default:
-        return Theme.of(context).colorScheme.primary;
-    }
-  }
-
-  IconData _notifIcon(String type) {
-    switch (type) {
-      case 'error':
-        return Icons.error_outline_rounded;
-      case 'warning':
-        return Icons.warning;
-      case 'success':
-        return Icons.check_circle_outline_rounded;
-      default:
-        return Icons.notifications;
-    }
   }
 }

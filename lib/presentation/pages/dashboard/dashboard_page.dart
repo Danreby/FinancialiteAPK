@@ -10,6 +10,7 @@ import '../../widgets/app_error_widget.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/page_header.dart';
+import '../../widgets/responsive_content.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 import 'widgets/balance_card.dart';
@@ -119,21 +120,20 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildContent(BuildContext context, DashboardLoaded state) {
     final data = state.data;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 8),
-        DashboardBalanceCard(
-          balance: data.balance,
-          totalIncome: data.totalIncome,
-          totalExpense: data.totalExpense,
-          pendingBillAmount: data.pendingBillAmount,
-          monthDebitTotal: data.monthDebitTotal,
-        ),
-        const SizedBox(height: 24),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
+    return ResponsiveContent(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          DashboardBalanceCard(
+            balance: data.balance,
+            totalIncome: data.totalIncome,
+            totalExpense: data.totalExpense,
+            pendingBillAmount: data.pendingBillAmount,
+            monthDebitTotal: data.monthDebitTotal,
+          ),
+          const SizedBox(height: 24),
+          Row(
             children: [
               Expanded(
                 child: StatCard(
@@ -163,11 +163,8 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ],
           ),
-        ),
-        const SizedBox(height: 20),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
+          const SizedBox(height: 20),
+          Row(
             children: [
               Expanded(
                 child: QuickActionButton(
@@ -188,45 +185,42 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ],
           ),
-        ),
-        if (data.monthlyChart.isNotEmpty) ...[
-          const SizedBox(height: 28),
-          SectionHeader(
-            title: 'Evolução Mensal',
-            actionText: 'Ver relatórios',
-            onAction: () => context.push('/reports'),
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: MonthlyLineChart(data: data.monthlyChart),
-          ),
+          if (data.monthlyChart.isNotEmpty) ...[
+            const SizedBox(height: 28),
+            SectionHeader(
+              title: 'Evolução Mensal',
+              actionText: 'Ver relatórios',
+              onAction: () => context.push('/reports'),
+            ),
+            const SizedBox(height: 12),
+            MonthlyLineChart(data: data.monthlyChart),
+          ],
+          if (data.upcomingBills.isNotEmpty) ...[
+            const SizedBox(height: 28),
+            SectionHeader(
+              title: 'Próximas Contas',
+              actionText: 'Ver todas',
+              onAction: () => context.push('/bills'),
+            ),
+            const SizedBox(height: 12),
+            UpcomingBillsSection(bills: data.upcomingBills),
+          ],
+          if (data.topCategories.isNotEmpty) ...[
+            const SizedBox(height: 28),
+            SectionHeader(
+              title: 'Gastos por Categoria',
+              actionText: 'Ver relatório',
+              onAction: () => context.push('/reports'),
+            ),
+            const SizedBox(height: 12),
+            CategorySpendingSection(
+              categories: data.topCategories,
+              totalExpense: data.totalExpense,
+            ),
+          ],
+          const SizedBox(height: 32),
         ],
-        if (data.upcomingBills.isNotEmpty) ...[
-          const SizedBox(height: 28),
-          SectionHeader(
-            title: 'Próximas Contas',
-            actionText: 'Ver todas',
-            onAction: () => context.push('/bills'),
-          ),
-          const SizedBox(height: 12),
-          UpcomingBillsSection(bills: data.upcomingBills),
-        ],
-        if (data.topCategories.isNotEmpty) ...[
-          const SizedBox(height: 28),
-          SectionHeader(
-            title: 'Gastos por Categoria',
-            actionText: 'Ver relatório',
-            onAction: () => context.push('/reports'),
-          ),
-          const SizedBox(height: 12),
-          CategorySpendingSection(
-            categories: data.topCategories,
-            totalExpense: data.totalExpense,
-          ),
-        ],
-        const SizedBox(height: 32),
-      ],
+      ),
     );
   }
 }
