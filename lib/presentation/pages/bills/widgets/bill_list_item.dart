@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../../../../domain/entities/bill.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class BillListItem extends StatelessWidget {
   final Bill bill;
@@ -26,6 +27,7 @@ class BillListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final appColors = theme.appColors;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Dismissible(
@@ -47,10 +49,10 @@ class BillListItem extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
+              color: appColors.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                color: appColors.divider.withValues(alpha: 0.7),
               ),
             ),
             child: Row(
@@ -62,7 +64,11 @@ class BillListItem extends StatelessWidget {
                     color: dueColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.receipt, color: dueColor, size: 22),
+                  child: Icon(
+                    isPaid ? Icons.check_circle_rounded : Icons.receipt_rounded,
+                    color: dueColor,
+                    size: 22,
+                  ),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -73,18 +79,31 @@ class BillListItem extends StatelessWidget {
                         bill.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodyLarge?.copyWith(
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        bill.nextDueDate != null
-                            ? 'Vence em ${DateFormatter.shortDate(bill.nextDueDate!)}'
-                            : 'Vence: dia ${bill.dueDay}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
+                      const SizedBox(height: 3),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_today_rounded,
+                            size: 11,
+                            color: dueColor,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            dueLabel,
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: dueColor,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -95,23 +114,29 @@ class BillListItem extends StatelessWidget {
                   children: [
                     Text(
                       CurrencyFormatter.format(bill.amount),
-                      style: theme.textTheme.titleSmall?.copyWith(
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 15,
                         fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 3),
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: dueColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
+                        color: (isPaid ? Colors.green : dueColor)
+                            .withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        dueLabel,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: dueColor,
+                        isPaid ? 'Pago' : 'Pendente',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 10,
                           fontWeight: FontWeight.w600,
+                          color: isPaid ? Colors.green : dueColor,
                         ),
                       ),
                     ),

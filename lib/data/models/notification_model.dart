@@ -14,11 +14,22 @@ class NotificationModel extends AppNotification {
 
   static String _cleanText(dynamic value) {
     if (value == null) return '';
-    final raw = value.toString();
+    var raw = value.toString();
+    // If the value looks like a JSON object/array, try to extract a message key
+    if (raw.trimLeft().startsWith('{') || raw.trimLeft().startsWith('[')) {
+      try {
+        // Attempt to find common message keys in JSON-like strings
+        final msgMatch = RegExp(r'"(?:message|body|text|msg)"\s*:\s*"([^"]+)"')
+            .firstMatch(raw);
+        if (msgMatch != null) raw = msgMatch.group(1)!;
+      } catch (_) {}
+    }
     return raw
         .replaceAll('&quot;', '"')
         .replaceAll('&#039;', "'")
         .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
         .replaceAll(RegExp(r'\s+'), ' ')
         .trim();
   }

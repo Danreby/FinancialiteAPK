@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../blocs/dashboard/dashboard_cubit.dart';
 import '../../blocs/notification/notification_cubit.dart';
 import '../../blocs/savings/savings_cubit.dart';
@@ -42,7 +43,9 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final appColors = theme.appColors;
     return Scaffold(
+      backgroundColor: appColors.background,
       body: RefreshIndicator(
         onRefresh: () async {
           final monthKey = DateFormatter.monthKey(DateTime.now());
@@ -65,9 +68,11 @@ class _DashboardPageState extends State<DashboardPage> {
                       child: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest
-                              .withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(14),
+                          color: appColors.surface.withValues(alpha: 0.8),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: appColors.divider.withValues(alpha: 0.6),
+                          ),
                         ),
                         child: Badge(
                           isLabelVisible: unread > 0,
