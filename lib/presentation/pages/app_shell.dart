@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../blocs/connectivity/connectivity_cubit.dart';
 import '../blocs/notification/notification_cubit.dart';
 import '../widgets/connectivity_banner.dart';
+import '../../core/theme/app_theme.dart';
 
 class AppShell extends StatefulWidget {
   final Widget child;
@@ -55,6 +56,8 @@ class _AppShellState extends State<AppShell> {
     final isOnline = context.watch<ConnectivityCubit>().state;
     final selectedIndex = _calculateSelectedIndex(context);
     final theme = Theme.of(context);
+    final appColors = theme.appColors;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       body: Column(
@@ -65,10 +68,16 @@ class _AppShellState extends State<AppShell> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
+          color: appColors.headerBackground,
+          border: Border(
+            top: BorderSide(
+              color: appColors.divider.withValues(alpha: 0.8),
+              width: 1,
+            ),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.06),
               blurRadius: 20,
               offset: const Offset(0, -4),
             ),
@@ -76,20 +85,20 @@ class _AppShellState extends State<AppShell> {
         ),
         child: SafeArea(
           top: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: SizedBox(
+            height: 60,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _NavItem(
-                  icon: Icons.grid_view_rounded,
+                  icon: Icons.grid_view_outlined,
                   selectedIcon: Icons.grid_view_rounded,
                   label: 'Início',
                   isSelected: selectedIndex == 0,
                   onTap: () => _onItemTapped(0),
                 ),
                 _NavItem(
-                  icon: Icons.swap_horiz_rounded,
+                  icon: Icons.swap_horiz_outlined,
                   selectedIcon: Icons.swap_horiz_rounded,
                   label: 'Transações',
                   isSelected: selectedIndex == 1,
@@ -110,8 +119,8 @@ class _AppShellState extends State<AppShell> {
                   onTap: () => _onItemTapped(3),
                 ),
                 _NavItem(
-                  icon: Icons.more_horiz_rounded,
-                  selectedIcon: Icons.more_horiz_rounded,
+                  icon: Icons.menu_rounded,
+                  selectedIcon: Icons.menu_rounded,
                   label: 'Mais',
                   isSelected: selectedIndex == 4,
                   onTap: () => _onItemTapped(4),
@@ -143,35 +152,36 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = isSelected
-        ? theme.colorScheme.primary
-        : theme.colorScheme.onSurfaceVariant;
+    final primary = theme.colorScheme.primary;
+    final unselected = theme.colorScheme.onSurfaceVariant;
+    final color = isSelected ? primary : unselected;
 
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
-        width: 64,
+        width: 68,
+        height: 60,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                    ? primary.withValues(alpha: 0.12)
                     : Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 isSelected ? selectedIcon : icon,
-                size: 24,
+                size: 22,
                 color: color,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               label,
               style: TextStyle(

@@ -2,10 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'app_colors.dart';
 
+/// ThemeExtension that carries the full ThemeColors palette so any widget
+/// can access branded colors (e.g. headerBackground, sidebarBackground)
+/// via `Theme.of(context).extension<AppThemeExtension>()!.colors`.
+class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
+  final ThemeColors colors;
+  const AppThemeExtension(this.colors);
+
+  @override
+  AppThemeExtension copyWith({ThemeColors? colors}) =>
+      AppThemeExtension(colors ?? this.colors);
+
+  @override
+  AppThemeExtension lerp(ThemeExtension<AppThemeExtension>? other, double t) =>
+      this;
+}
+
+extension ThemeDataX on ThemeData {
+  ThemeColors get appColors =>
+      extension<AppThemeExtension>()?.colors ?? AppColorScheme.rose.light;
+}
+
 class AppTheme {
   AppTheme._();
-
-  static const _darkBackground = Color(0xFF0F1119);
 
   static ThemeData light(AppColorScheme colorScheme) =>
       _build(colorScheme.light, Brightness.light);
@@ -15,7 +34,7 @@ class AppTheme {
 
   static ThemeData _build(ThemeColors colors, Brightness brightness) {
     final isDark = brightness == Brightness.dark;
-    final contrastColor = isDark ? _darkBackground : Colors.white;
+    final contrastColor = isDark ? colors.background : Colors.white;
     final overlayStyle =
         isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark;
     final containerAlpha = isDark ? 0.15 : 0.2;
@@ -26,6 +45,7 @@ class AppTheme {
       useMaterial3: true,
       brightness: brightness,
       fontFamily: 'Inter',
+      extensions: [AppThemeExtension(colors)],
       colorScheme: ColorScheme(
         brightness: brightness,
         primary: colors.primary,
