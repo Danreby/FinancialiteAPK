@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/page_header.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_theme.dart';
 
 class MorePage extends StatelessWidget {
   const MorePage({super.key});
@@ -85,7 +86,7 @@ class MorePage extends StatelessWidget {
   }
 
   Widget _buildGroup(
-      BuildContext context, dynamic appColors, List<_MenuItemData> items) {
+      BuildContext context, ThemeColors appColors, List<_MenuItemData> items) {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -167,6 +168,14 @@ class MorePage extends StatelessWidget {
       ),
     );
   }
+}
+
+class _MenuItemData {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+  const _MenuItemData(this.icon, this.label, this.color, this.onTap);
 }
 
 class _SectionLabel extends StatelessWidget {

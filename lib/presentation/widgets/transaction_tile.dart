@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
 
 class TransactionTile extends StatelessWidget {
   final String title;
@@ -24,7 +23,6 @@ class TransactionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appColors = theme.appColors;
     final amountColor = isExpense
         ? theme.colorScheme.error
         : const Color(0xFF10B981);
