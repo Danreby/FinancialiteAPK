@@ -23,9 +23,8 @@ class TransactionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final amountColor = isExpense
-        ? theme.colorScheme.error
-        : const Color(0xFF10B981);
+    final amountColor =
+        isExpense ? theme.colorScheme.error : const Color(0xFF10B981);
     final iconBg = categoryColor ?? amountColor;
 
     return InkWell(
