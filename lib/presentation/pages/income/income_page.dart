@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/income/income_cubit.dart';
-import '../../../domain/entities/income.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
@@ -34,7 +33,6 @@ class _IncomePageState extends State<IncomePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
       floatingActionButton:
           ShadowedFab(onPressed: () => showIncomeFormDialog(context)),

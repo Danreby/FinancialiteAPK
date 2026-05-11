@@ -26,7 +26,7 @@ class BillRepositoryImpl extends BaseOfflineRepository
           final database = await db;
           final batch = database.batch();
           for (final item in list) {
-            batch.insert('bills', (item as BillModel).toDbMap(),
+            batch.insert('bills', item.toDbMap(),
                 conflictAlgorithm: ConflictAlgorithm.replace);
           }
           await batch.commit(noResult: true);
@@ -51,7 +51,7 @@ class BillRepositoryImpl extends BaseOfflineRepository
       final response = await api.post(ApiConstants.bills, data: sanitized);
       final bill = BillModel.fromJson(response.data['data'] ?? response.data);
       final database = await db;
-      await database.insert('bills', (bill as BillModel).toDbMap(),
+      await database.insert('bills', bill.toDbMap(),
           conflictAlgorithm: ConflictAlgorithm.replace);
       return bill;
     }

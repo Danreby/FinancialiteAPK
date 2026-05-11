@@ -26,7 +26,7 @@ class CategoryRepositoryImpl extends BaseOfflineRepository
         final database = await db;
         final batch = database.batch();
         for (final item in list) {
-          batch.insert('categories', (item as CategoryModel).toDbMap(),
+          batch.insert('categories', item.toDbMap(),
               conflictAlgorithm: ConflictAlgorithm.replace);
         }
         await batch.commit(noResult: true);

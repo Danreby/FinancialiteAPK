@@ -24,7 +24,7 @@ class SavingsRepositoryImpl extends BaseOfflineRepository
         final database = await db;
         final batch = database.batch();
         for (final item in list) {
-          batch.insert('savings_goals', (item as SavingsGoalModel).toDbMap(),
+          batch.insert('savings_goals', item.toDbMap(),
               conflictAlgorithm: ConflictAlgorithm.replace);
         }
         await batch.commit(noResult: true);

@@ -54,7 +54,6 @@ class _BankTransferPageState extends State<BankTransferPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
       body: BlocBuilder<BankCubit, BankState>(
         builder: (context, state) {

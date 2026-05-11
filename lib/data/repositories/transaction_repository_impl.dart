@@ -35,7 +35,7 @@ class TransactionRepositoryImpl extends BaseOfflineRepository
           final database = await db;
           final batch = database.batch();
           for (final item in list) {
-            batch.insert('transactions', (item as TransactionModel).toDbMap(),
+            batch.insert('transactions', item.toDbMap(),
                 conflictAlgorithm: ConflictAlgorithm.replace);
           }
           await batch.commit(noResult: true);
@@ -91,7 +91,7 @@ class TransactionRepositoryImpl extends BaseOfflineRepository
           TransactionModel.fromJson(response.data['data'] ?? response.data);
       final database = await db;
       await database.insert(
-          'transactions', (transaction as TransactionModel).toDbMap(),
+          'transactions', transaction.toDbMap(),
           conflictAlgorithm: ConflictAlgorithm.replace);
       return transaction;
     }
@@ -117,7 +117,7 @@ class TransactionRepositoryImpl extends BaseOfflineRepository
           TransactionModel.fromJson(response.data['data'] ?? response.data);
       final database = await db;
       await database.update(
-          'transactions', (transaction as TransactionModel).toDbMap(),
+          'transactions', transaction.toDbMap(),
           where: 'id = ?', whereArgs: [id]);
       return transaction;
     }

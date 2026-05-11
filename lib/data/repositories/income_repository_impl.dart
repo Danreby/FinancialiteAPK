@@ -26,7 +26,7 @@ class IncomeRepositoryImpl extends BaseOfflineRepository
           final database = await db;
           final batch = database.batch();
           for (final item in list) {
-            batch.insert('incomes', (item as IncomeModel).toDbMap(),
+            batch.insert('incomes', item.toDbMap(),
                 conflictAlgorithm: ConflictAlgorithm.replace);
           }
           await batch.commit(noResult: true);

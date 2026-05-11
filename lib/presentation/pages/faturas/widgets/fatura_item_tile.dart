@@ -24,7 +24,7 @@ class FaturaItemTile extends StatelessWidget {
     final categoryIcon = item['category_icon'] as String?;
     final categoryColor = item['category_color'] as String?;
     final bankName = item['bank_name'] as String?;
-    final iconColor = colorFromHex(categoryColor) ?? theme.colorScheme.error;
+    final iconColor = colorFromHex(categoryColor);
 
     return InkWell(
       onTap: onTap,

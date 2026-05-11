@@ -24,7 +24,7 @@ class BankRepositoryImpl extends BaseOfflineRepository
         final database = await db;
         final batch = database.batch();
         for (final item in list) {
-          batch.insert('bank_users', (item as BankAccountModel).toDbMap(),
+          batch.insert('bank_users', item.toDbMap(),
               conflictAlgorithm: ConflictAlgorithm.replace);
         }
         await batch.commit(noResult: true);

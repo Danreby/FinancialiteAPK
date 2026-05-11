@@ -24,7 +24,7 @@ class BudgetRepositoryImpl extends BaseOfflineRepository
         final database = await db;
         final batch = database.batch();
         for (final item in list) {
-          batch.insert('budgets', (item as BudgetModel).toDbMap(),
+          batch.insert('budgets', item.toDbMap(),
               conflictAlgorithm: ConflictAlgorithm.replace);
         }
         await batch.commit(noResult: true);

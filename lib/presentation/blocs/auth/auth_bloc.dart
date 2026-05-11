@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/user.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../core/security/secure_storage.dart';
-import '../../../core/error/exceptions.dart';
 import '../../../core/utils/error_message.dart';
 
 part 'auth_event.dart';
