@@ -90,8 +90,7 @@ class TransactionRepositoryImpl extends BaseOfflineRepository
       final transaction =
           TransactionModel.fromJson(response.data['data'] ?? response.data);
       final database = await db;
-      await database.insert(
-          'transactions', transaction.toDbMap(),
+      await database.insert('transactions', transaction.toDbMap(),
           conflictAlgorithm: ConflictAlgorithm.replace);
       return transaction;
     }
@@ -116,8 +115,7 @@ class TransactionRepositoryImpl extends BaseOfflineRepository
       final transaction =
           TransactionModel.fromJson(response.data['data'] ?? response.data);
       final database = await db;
-      await database.update(
-          'transactions', transaction.toDbMap(),
+      await database.update('transactions', transaction.toDbMap(),
           where: 'id = ?', whereArgs: [id]);
       return transaction;
     }
