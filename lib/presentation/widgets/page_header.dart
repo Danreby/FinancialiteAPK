@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/app_tokens.dart';
 
 class PageHeader extends StatelessWidget {
   final String title;
@@ -22,19 +23,12 @@ class PageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appColors = theme.appColors;
-    final isDark = theme.brightness == Brightness.dark;
     final topPad = MediaQuery.of(context).padding.top;
 
     return Container(
       decoration: BoxDecoration(
         color: appColors.headerBackground,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.07),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: AppShadows.xs,
         border: Border(
           bottom: BorderSide(
             color: appColors.divider.withValues(alpha: 0.7),
@@ -63,7 +57,7 @@ class PageHeader extends StatelessWidget {
                       height: 38,
                       decoration: BoxDecoration(
                         color: appColors.surface.withValues(alpha: 0.7),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
                         border: Border.all(
                           color: appColors.divider,
                           width: 1,

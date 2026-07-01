@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/theme/app_tokens.dart';
 
 class TransactionTile extends StatelessWidget {
   final String title;
@@ -23,13 +25,13 @@ class TransactionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final amountColor =
-        isExpense ? theme.colorScheme.error : const Color(0xFF10B981);
+    final appColors = theme.appColors;
+    final amountColor = isExpense ? appColors.expense : appColors.income;
     final iconBg = categoryColor ?? amountColor;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
@@ -39,7 +41,7 @@ class TransactionTile extends StatelessWidget {
               height: 42,
               decoration: BoxDecoration(
                 color: iconBg.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Icon(categoryIcon, size: 19, color: iconBg),
             ),

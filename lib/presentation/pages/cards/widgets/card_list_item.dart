@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../domain/entities/card_entity.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class CardListItem extends StatelessWidget {
   final CardUser card;
@@ -36,25 +37,28 @@ class CardListItem extends StatelessWidget {
           padding: const EdgeInsets.only(right: 20),
           decoration: BoxDecoration(
             color: theme.colorScheme.error,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
           ),
           child: const Icon(Icons.delete, color: Colors.white),
         ),
         confirmDismiss: (_) => onConfirmDismiss(),
         onDismissed: (_) => onDismissed(),
         child: Container(
+          // Intentional bank-card-art visual: gradient kept as-is (not
+          // flattened) to preserve the physical-card look; radius/shadow
+          // are still capped per the design sweep.
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: gradient,
             ),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
             boxShadow: [
               BoxShadow(
                 color: gradient[0].withValues(alpha: 0.4),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -70,7 +74,7 @@ class CardListItem extends StatelessWidget {
                       height: 44,
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppRadius.xl),
                       ),
                       child: const Icon(Icons.credit_card,
                           color: Colors.white, size: 22),
@@ -99,7 +103,7 @@ class CardListItem extends StatelessWidget {
                       height: 30,
                       decoration: BoxDecoration(
                         color: Colors.amber.withValues(alpha: 0.8),
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
                       ),
                     ),
                   ],
@@ -149,7 +153,7 @@ class CardListItem extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                   child: LinearProgressIndicator(
                     value: usedPercent / 100,
                     minHeight: 8,

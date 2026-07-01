@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
+import '../../../../core/theme/app_tokens.dart';
 import '../../../../domain/entities/dashboard.dart';
 
 class UpcomingBillsSection extends StatelessWidget {
@@ -20,7 +21,7 @@ class UpcomingBillsSection extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
                     border: Border.all(
                       color: theme.colorScheme.outlineVariant
                           .withValues(alpha: 0.5),
@@ -36,7 +37,7 @@ class UpcomingBillsSection extends StatelessWidget {
                           decoration: BoxDecoration(
                             color:
                                 theme.colorScheme.error.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
                           ),
                           child: Icon(
                             Icons.receipt_long_rounded,

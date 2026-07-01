@@ -15,6 +15,8 @@ import '../../../domain/repositories/transaction_repository.dart';
 import '../../widgets/page_header.dart';
 import 'widgets/extract_stat_card.dart';
 import 'widgets/credit_debit_chart.dart';
+import '../../../core/theme/app_tokens.dart';
+import '../../../core/theme/app_theme.dart';
 
 class ExtractPage extends StatelessWidget {
   const ExtractPage({super.key});
@@ -142,14 +144,14 @@ class _ExtractViewState extends State<_ExtractView> {
                                 child: ExtractStatCard(
                                     label: 'Crédito',
                                     value: totalIn,
-                                    color: theme.colorScheme.error,
+                                    color: theme.appColors.income,
                                     icon: Icons.credit_card)),
                             const SizedBox(width: 10),
                             Expanded(
                                 child: ExtractStatCard(
                                     label: 'Débito',
                                     value: totalOut,
-                                    color: theme.colorScheme.error,
+                                    color: theme.appColors.expense,
                                     icon: Icons.account_balance)),
                             const SizedBox(width: 10),
                             Expanded(
@@ -157,8 +159,8 @@ class _ExtractViewState extends State<_ExtractView> {
                                     label: 'Saldo',
                                     value: balance,
                                     color: balance >= 0
-                                        ? const Color(0xFF10B981)
-                                        : theme.colorScheme.error,
+                                        ? theme.appColors.income
+                                        : theme.appColors.expense,
                                     icon: Icons.account_balance_wallet)),
                           ],
                         ),
@@ -236,7 +238,7 @@ class _ExtractViewState extends State<_ExtractView> {
           color: selected
               ? theme.colorScheme.primary
               : theme.colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
         ),
         child: Text(
           label,

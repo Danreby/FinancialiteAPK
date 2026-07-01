@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class ExtractStatCard extends StatelessWidget {
   final String label;
@@ -22,7 +23,7 @@ class ExtractStatCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
             color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
       ),

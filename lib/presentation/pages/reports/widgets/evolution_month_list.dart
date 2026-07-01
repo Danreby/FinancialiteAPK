@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class EvolutionMonthList extends StatelessWidget {
   final List<dynamic> chart;
@@ -18,7 +19,7 @@ class EvolutionMonthList extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
             color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
       ),
@@ -59,7 +60,7 @@ class EvolutionMonthList extends StatelessWidget {
                                 ? const Color(0xFF10B981)
                                 : theme.colorScheme.error)
                             .withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
                       ),
                       child: Icon(
                         isPositive ? Icons.trending_up : Icons.trending_down,

@@ -6,6 +6,7 @@ import '../../../widgets/empty_state_widget.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../../core/utils/icon_utils.dart';
 import 'category_form_dialog.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class CategoryList extends StatelessWidget {
   final List<dynamic> categories;
@@ -32,7 +33,7 @@ class CategoryList extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.xl),
               child: Dismissible(
                 key: Key('cat_${cat.id}'),
                 direction: DismissDirection.endToStart,
@@ -55,7 +56,7 @@ class CategoryList extends StatelessWidget {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
                     border: Border.all(
                       color: theme.colorScheme.outlineVariant
                           .withValues(alpha: 0.5),
@@ -69,7 +70,7 @@ class CategoryList extends StatelessWidget {
                         decoration: BoxDecoration(
                           color:
                               colorFromHex(cat.color).withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(AppRadius.xl),
                         ),
                         child: Icon(
                           iconFromName(cat.icon),

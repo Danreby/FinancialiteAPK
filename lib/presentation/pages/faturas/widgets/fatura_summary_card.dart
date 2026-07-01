@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class FaturaSummaryCard extends StatelessWidget {
   final double totalSpent;
@@ -28,13 +29,15 @@ class FaturaSummaryCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
             colors: [
               isPaid ? const Color(0xFF10B981) : theme.colorScheme.error,
               (isPaid ? const Color(0xFF10B981) : theme.colorScheme.error)
-                  .withValues(alpha: 0.8),
+                  .withValues(alpha: 0.85),
             ],
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
         ),
         child: Row(
           children: [
@@ -43,7 +46,7 @@ class FaturaSummaryCard extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
               ),
               child:
                   const Icon(Icons.credit_card, color: Colors.white, size: 20),

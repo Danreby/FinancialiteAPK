@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/theme/app_tokens.dart';
 import '../../../../domain/entities/dashboard.dart';
 
 class MonthlyLineChart extends StatelessWidget {
@@ -49,7 +50,7 @@ class MonthlyLineChart extends StatelessWidget {
       height: 240,
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
           color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),

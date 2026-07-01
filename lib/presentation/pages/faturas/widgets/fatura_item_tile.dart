@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/icon_utils.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class FaturaItemTile extends StatelessWidget {
   final Map<String, dynamic> item;
@@ -28,7 +29,7 @@ class FaturaItemTile extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.xl),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Row(
@@ -38,7 +39,7 @@ class FaturaItemTile extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
               ),
               child:
                   Icon(iconFromName(categoryIcon), size: 22, color: iconColor),
@@ -101,7 +102,7 @@ class FaturaItemTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Text(
         label,

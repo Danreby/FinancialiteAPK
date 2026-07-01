@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class TransactionTypeSelector extends StatelessWidget {
   final String type;
@@ -25,7 +26,7 @@ class TransactionTypeSelector extends StatelessWidget {
                 color: type == 'debit'
                     ? theme.colorScheme.error
                     : theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -63,7 +64,7 @@ class TransactionTypeSelector extends StatelessWidget {
                 color: type == 'credit'
                     ? const Color(0xFF10B981)
                     : theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

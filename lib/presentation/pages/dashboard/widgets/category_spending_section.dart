@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/theme/app_tokens.dart';
 import '../../../../domain/entities/dashboard.dart';
 
 class CategorySpendingSection extends StatelessWidget {
@@ -20,7 +21,7 @@ class CategorySpendingSection extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(
             color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
           ),
@@ -75,7 +76,7 @@ class CategorySpendingSection extends StatelessWidget {
                         decoration: BoxDecoration(
                           color:
                               theme.colorScheme.primary.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppRadius.md),
                         ),
                         child: Text(
                           '${percent.toStringAsFixed(0)}%',
@@ -89,7 +90,7 @@ class CategorySpendingSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppRadius.xs),
                     child: LinearProgressIndicator(
                       value: percent / 100,
                       minHeight: 4,

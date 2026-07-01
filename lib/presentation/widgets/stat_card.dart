@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/app_tokens.dart';
 
 class StatCard extends StatelessWidget {
   final String title;
@@ -36,16 +37,10 @@ class StatCard extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: gradient,
           color: isGradient ? null : (backgroundColor ?? appColors.surface),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: (isGradient ? effectiveColor : Colors.black)
-                  .withValues(alpha: isGradient ? 0.2 : 0.05),
-              blurRadius: isGradient ? 14 : 8,
-              offset: const Offset(0, 4),
-              spreadRadius: isGradient ? -2 : 0,
-            ),
-          ],
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          boxShadow: isGradient
+              ? AppShadows.buttonPrimary(effectiveColor)
+              : AppShadows.xs,
           border: isGradient
               ? null
               : Border.all(
@@ -64,7 +59,7 @@ class StatCard extends StatelessWidget {
                   color: isGradient
                       ? Colors.white.withValues(alpha: 0.2)
                       : effectiveColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Icon(
                   icon,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../../../../domain/entities/dashboard.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class MonthlySummaryList extends StatelessWidget {
   final List<MonthlyChartData> chart;
@@ -16,7 +17,7 @@ class MonthlySummaryList extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
             color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
       ),
@@ -100,7 +101,7 @@ class MonthlySummaryList extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Text(text,
           style: TextStyle(

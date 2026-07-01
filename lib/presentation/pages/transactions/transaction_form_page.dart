@@ -15,6 +15,7 @@ import '../../widgets/page_header.dart';
 import '../../widgets/responsive_content.dart';
 import '../../widgets/form_section_card.dart';
 import 'widgets/transaction_type_selector.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class TransactionFormPage extends StatefulWidget {
   final int? transactionId;
@@ -275,7 +276,8 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                       decoration: BoxDecoration(
                                         color: theme.colorScheme
                                             .surfaceContainerHighest,
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(
+                                            AppRadius.lg),
                                       ),
                                       child: Icon(
                                         Icons.calendar_month,
@@ -308,15 +310,10 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                             const SizedBox(height: 24),
                             Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: theme.colorScheme.primary
-                                        .withValues(alpha: 0.3),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
+                                borderRadius:
+                                    BorderRadius.circular(AppRadius.xxl),
+                                boxShadow: AppShadows.buttonPrimary(
+                                    theme.colorScheme.primary),
                               ),
                               child: SizedBox(
                                 height: 56,
@@ -325,7 +322,8 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                                   onPressed: _submit,
                                   style: FilledButton.styleFrom(
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius:
+                                          BorderRadius.circular(AppRadius.xxl),
                                     ),
                                   ),
                                   child: Text(

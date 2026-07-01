@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_tokens.dart';
 
 class AppErrorWidget extends StatelessWidget {
   final String message;
@@ -51,7 +52,7 @@ class AppErrorWidget extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(200, 48),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
                 ),
               ),

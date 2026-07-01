@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../core/theme/app_tokens.dart';
 
 class AppLoadingIndicator extends StatelessWidget {
   final String? message;
@@ -66,7 +67,7 @@ class AppLoadingIndicator extends StatelessWidget {
                 height: 72,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
                 ),
               ),
             );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class DashboardBalanceCard extends StatelessWidget {
   final double balance;
@@ -28,27 +29,12 @@ class DashboardBalanceCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              theme.colorScheme.primary,
-              theme.colorScheme.primary.withValues(alpha: 0.88),
-              appColors.primaryDark,
-            ],
-          ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.primary.withValues(alpha: 0.32),
-              blurRadius: 28,
-              offset: const Offset(0, 12),
-              spreadRadius: -4,
-            ),
-          ],
+          gradient: appColors.heroGradient,
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          boxShadow: appColors.elevatedShadow,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           child: Stack(
             children: [
               // Decorative circles
@@ -105,7 +91,7 @@ class DashboardBalanceCard extends StatelessWidget {
                                     ? const Color(0xFF34D399)
                                     : const Color(0xFFF87171))
                                 .withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(AppRadius.pill),
                             border: Border.all(
                               color: (isPositive
                                       ? const Color(0xFF34D399)
@@ -256,7 +242,7 @@ class _BalanceStat extends StatelessWidget {
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Icon(icon, size: 11, color: color),
               ),

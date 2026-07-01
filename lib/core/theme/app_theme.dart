@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'app_colors.dart';
+import 'app_tokens.dart';
 
 /// ThemeExtension that carries the full ThemeColors palette so any widget
 /// can access branded colors (e.g. headerBackground, sidebarBackground)
@@ -85,19 +86,22 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          side: AppBorders.hairline(colors.cardBorder),
+        ),
         color: colors.surface,
         clipBehavior: Clip.antiAlias,
         margin: EdgeInsets.zero,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          elevation: 0,
+          elevation: 1,
+          shadowColor: colors.accent.withValues(alpha: 0.3),
           backgroundColor: colors.primary,
           foregroundColor: contrastColor,
-          minimumSize: const Size(double.infinity, 56),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          minimumSize: const Size(double.infinity, 48),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
           textStyle: const TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
@@ -108,9 +112,8 @@ class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size(double.infinity, 56),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          minimumSize: const Size(double.infinity, 48),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
           textStyle: const TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
@@ -121,9 +124,8 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          minimumSize: const Size(double.infinity, 56),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          minimumSize: const Size(double.infinity, 48),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
           side: BorderSide(color: colors.divider, width: 1.5),
           foregroundColor: colors.onSurface,
           textStyle: const TextStyle(
@@ -147,27 +149,27 @@ class AppTheme {
         filled: true,
         fillColor: colors.inputFill,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderSide: AppBorders.hairline(colors.cardBorder),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderSide: AppBorders.hairline(colors.cardBorder),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: colors.primary, width: 2),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderSide: BorderSide(color: colors.accent, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           borderSide: BorderSide(color: colors.error, width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           borderSide: BorderSide(color: colors.error, width: 2),
         ),
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         hintStyle: TextStyle(
           color: colors.hint,
           fontWeight: FontWeight.w400,
@@ -185,6 +187,7 @@ class AppTheme {
         elevation: 0,
         backgroundColor: colors.surface,
         indicatorColor: colors.primary.withValues(alpha: trackAlpha),
+        indicatorShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return TextStyle(
@@ -213,74 +216,70 @@ class AppTheme {
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: colors.primary,
         foregroundColor: contrastColor,
-        elevation: 6,
-        highlightElevation: isDark ? null : 12,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        extendedTextStyle: isDark
-            ? null
-            : const TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w700,
-                fontSize: 15,
-                letterSpacing: 0.3,
-              ),
+        elevation: 1,
+        highlightElevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        extendedTextStyle: const TextStyle(
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w700,
+          fontSize: 15,
+          letterSpacing: 0.3,
+        ),
       ),
       dividerTheme: DividerThemeData(
         color: colors.divider,
         thickness: 1,
         space: 0,
       ),
-      chipTheme: isDark
-          ? null
-          : ChipThemeData(
-              backgroundColor: colors.chipBackground,
-              selectedColor: colors.primary.withValues(alpha: 0.15),
-              labelStyle: const TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24)),
-              side: BorderSide.none,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            ),
-      snackBarTheme: isDark
-          ? null
-          : SnackBarThemeData(
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14)),
-              elevation: 4,
-              insetPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            ),
+      chipTheme: ChipThemeData(
+        backgroundColor: colors.chipBackground,
+        selectedColor: colors.primary.withValues(alpha: 0.15),
+        labelStyle: const TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
+        side: AppBorders.hairline(colors.cardBorder),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: colors.onSurface,
+        contentTextStyle: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 14,
+          color: colors.surface,
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        elevation: 2,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: colors.surface,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
         ),
-        clipBehavior: isDark ? null : Clip.antiAlias,
+        clipBehavior: Clip.antiAlias,
         dragHandleSize: const Size(40, 4),
         showDragHandle: true,
         dragHandleColor: colors.divider,
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: colors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        elevation: 8,
-        titleTextStyle: isDark
-            ? null
-            : TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w700,
-                fontSize: 18,
-                color: colors.onSurface,
-              ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xxl)),
+        elevation: 2,
+        shadowColor: Colors.black.withValues(alpha: 0.15),
+        titleTextStyle: TextStyle(
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w700,
+          fontSize: 18,
+          color: colors.onSurface,
+        ),
       ),
       listTileTheme: ListTileThemeData(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
         titleTextStyle: TextStyle(
           fontFamily: 'Inter',
           fontWeight: FontWeight.w600,

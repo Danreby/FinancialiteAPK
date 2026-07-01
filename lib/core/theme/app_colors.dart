@@ -135,7 +135,13 @@ class ThemeColors {
 }
 
 // ---------------------------------------------------------------------------
-// Helper builders – keep common light / dark values in one place
+// Helper builders – keep common light / dark values in one place.
+//
+// Chrome (background/headerBackground/sidebarBackground/divider/cardBorder/
+// inputFill) defaults to a neutral, brand-agnostic palette in light mode,
+// mirroring financialite's web app where the topbar/sidebar/card borders are
+// always white/neutral-gray regardless of the active accent color -- only
+// `chipBackground` and the gradients stay lightly brand-tinted.
 // ---------------------------------------------------------------------------
 
 ThemeColors _buildLightTheme({
@@ -149,14 +155,14 @@ ThemeColors _buildLightTheme({
   required List<Color> heroGradientColors,
   required List<BoxShadow> cardShadow,
   required List<BoxShadow> elevatedShadow,
-  Color background = const Color(0xFFF8F9FE),
-  Color headerBackground = const Color(0xFFEEF0F8),
-  Color sidebarBackground = const Color(0xFFE8EAF6),
+  Color background = const Color(0xFFFAFAFA),
+  Color headerBackground = const Color(0xFFFFFFFF),
+  Color sidebarBackground = const Color(0xFFFFFFFF),
   Color surfaceVariant = const Color(0xFFF1F3F8),
-  Color onSurface = const Color(0xFF1A1D26),
-  Color divider = const Color(0xFFE5E7EB),
-  Color inputFill = const Color(0xFFF3F4F6),
-  Color cardBorder = const Color(0xFFF3F4F6),
+  Color onSurface = const Color(0xFF18181B),
+  Color divider = const Color(0xFFE5E5E5),
+  Color inputFill = const Color(0xFFFFFFFF),
+  Color cardBorder = const Color(0xFFE5E5E5),
   Color shimmerBase = const Color(0xFFE5E7EB),
   Color shimmerHighlight = const Color(0xFFF9FAFB),
 }) {
@@ -172,24 +178,24 @@ ThemeColors _buildLightTheme({
     surface: const Color(0xFFFFFFFF),
     surfaceVariant: surfaceVariant,
     onSurface: onSurface,
-    onSurfaceVariant: const Color(0xFF6B7280),
+    onSurfaceVariant: const Color(0xFF52525B),
     error: const Color(0xFFEF4444),
-    success: const Color(0xFF10B981),
+    success: const Color(0xFF22C55E),
     warning: const Color(0xFFF59E0B),
     info: const Color(0xFF3B82F6),
-    hint: const Color(0xFF9CA3AF),
+    hint: const Color(0xFFA1A1AA),
     divider: divider,
     inputFill: inputFill,
     chipBackground: chipBackground,
     cardBorder: cardBorder,
-    income: const Color(0xFF10B981),
-    expense: const Color(0xFFEF4444),
+    income: const Color(0xFF16A34A),
+    expense: const Color(0xFFDC2626),
     shimmerBase: shimmerBase,
     shimmerHighlight: shimmerHighlight,
     primaryGradient: LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [primary, primaryDark],
+      colors: [accent, primaryDark],
     ),
     cardGradient: LinearGradient(
       begin: Alignment.topLeft,
@@ -197,8 +203,8 @@ ThemeColors _buildLightTheme({
       colors: cardGradientColors,
     ),
     heroGradient: LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
       colors: heroGradientColors,
     ),
     cardShadow: cardShadow,
@@ -212,25 +218,23 @@ ThemeColors _buildDarkTheme({
   required Color primaryDark,
   required Color secondary,
   required Color accent,
+  required Color background,
+  required Color surface,
+  required Color surfaceVariant,
   required Color chipBackground,
+  required Color divider,
   required List<Color> cardGradientColors,
   required List<Color> heroGradientColors,
   required List<BoxShadow> cardShadow,
   required List<BoxShadow> elevatedShadow,
   List<Color>? primaryGradientColors,
-  Color background = const Color(0xFF0F1119),
-  Color headerBackground = const Color(0xFF140E20),
-  Color sidebarBackground = const Color(0xFF0F0A1A),
-  Color surface = const Color(0xFF1A1D2E),
-  Color surfaceVariant = const Color(0xFF222640),
-  Color onSurface = const Color(0xFFF3F4F6),
-  Color onSurfaceVariant = const Color(0xFF9CA3AF),
-  Color hint = const Color(0xFF6B7280),
-  Color divider = const Color(0xFF2A2D42),
-  Color inputFill = const Color(0xFF222640),
-  Color cardBorder = const Color(0xFF2A2D42),
-  Color shimmerBase = const Color(0xFF222640),
-  Color shimmerHighlight = const Color(0xFF2A2D42),
+  Color onSurface = const Color(0xFFF4F4F5),
+  Color onSurfaceVariant = const Color(0xFFA1A1AA),
+  Color hint = const Color(0xFF71717A),
+  Color? inputFill,
+  Color? cardBorder,
+  Color? shimmerBase,
+  Color? shimmerHighlight,
 }) {
   return ThemeColors(
     primary: primary,
@@ -239,8 +243,8 @@ ThemeColors _buildDarkTheme({
     secondary: secondary,
     accent: accent,
     background: background,
-    headerBackground: headerBackground,
-    sidebarBackground: sidebarBackground,
+    headerBackground: surface,
+    sidebarBackground: surface,
     surface: surface,
     surfaceVariant: surfaceVariant,
     onSurface: onSurface,
@@ -251,13 +255,13 @@ ThemeColors _buildDarkTheme({
     info: const Color(0xFF60A5FA),
     hint: hint,
     divider: divider,
-    inputFill: inputFill,
+    inputFill: inputFill ?? surface,
     chipBackground: chipBackground,
-    cardBorder: cardBorder,
+    cardBorder: cardBorder ?? divider,
     income: const Color(0xFF34D399),
     expense: const Color(0xFFF87171),
-    shimmerBase: shimmerBase,
-    shimmerHighlight: shimmerHighlight,
+    shimmerBase: shimmerBase ?? surfaceVariant,
+    shimmerHighlight: shimmerHighlight ?? divider,
     primaryGradient: LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
@@ -269,8 +273,8 @@ ThemeColors _buildDarkTheme({
       colors: cardGradientColors,
     ),
     heroGradient: LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
       colors: heroGradientColors,
     ),
     cardShadow: cardShadow,
@@ -279,7 +283,10 @@ ThemeColors _buildDarkTheme({
 }
 
 // ---------------------------------------------------------------------------
-// Reusable shadow presets
+// Reusable shadow presets. Flat and neutral for cards/ambient use; only
+// [_elevatedShadow] carries brand color, and only for the primary button --
+// never as a page/card glow (mirrors financialite web's rule that color only
+// appears directly under `.themed-button-primary`).
 // ---------------------------------------------------------------------------
 
 List<BoxShadow> _defaultLightCardShadow() => [
@@ -306,8 +313,8 @@ List<BoxShadow> _cardShadow(Color color, double alpha) => [
 List<BoxShadow> _elevatedShadow(Color color, double alpha) => [
       BoxShadow(
         color: color.withValues(alpha: alpha),
-        blurRadius: 24,
-        offset: const Offset(0, 8),
+        blurRadius: 4,
+        offset: const Offset(0, 2),
       ),
     ];
 
@@ -319,33 +326,19 @@ extension AppColorSchemeExtension on AppColorScheme {
   ThemeColors get light {
     switch (this) {
       case AppColorScheme.rose:
+        // Exact mirror of financialite's web rose palette
+        // (resources/js/Constants/theme.js + resources/css/app.css).
         return _buildLightTheme(
-          primary: const Color(0xFF7B1818),
-          primaryLight: const Color(0xFFB44B4B),
-          primaryDark: const Color(0xFF5E1212),
-          secondary: const Color(0xFFA12A2A),
-          accent: const Color(0xFFC23A3A),
-          background: const Color(0xFFFEF2F2),
-          headerBackground: const Color(0xFFFECACA),
-          sidebarBackground: const Color(0xFFFEE2E2),
-          chipBackground: const Color(0xFFFFF5F5),
-          divider: const Color(0xFFFCA5A5),
-          inputFill: const Color(0xFFFFF5F5),
-          cardBorder: const Color(0xFFFECACA),
-          shimmerBase: const Color(0xFFFCA5A5),
-          shimmerHighlight: const Color(0xFFFEF2F2),
-          cardGradientColors: const [
-            Color(0xFF7B1818),
-            Color(0xFF8D2020),
-            Color(0xFFA12A2A)
-          ],
-          heroGradientColors: const [
-            Color(0xFF7B1818),
-            Color(0xFF5E1212),
-            Color(0xFF3D0B0B)
-          ],
+          primary: const Color(0xFFBE123C),
+          primaryLight: const Color(0xFFFDA4AF),
+          primaryDark: const Color(0xFF9F1239),
+          secondary: const Color(0xFFE11D48),
+          accent: const Color(0xFFF43F5E),
+          chipBackground: const Color(0xFFFEF2F2),
+          cardGradientColors: const [Color(0xFFFFFFFF), Color(0xFFFEF2F2)],
+          heroGradientColors: const [Color(0xFFBE123C), Color(0xFF9F1239)],
           cardShadow: _defaultLightCardShadow(),
-          elevatedShadow: _elevatedShadow(const Color(0xFF7B1818), 0.3),
+          elevatedShadow: _elevatedShadow(const Color(0xFFF43F5E), 0.3),
         );
       case AppColorScheme.forest:
         return _buildLightTheme(
@@ -354,27 +347,11 @@ extension AppColorSchemeExtension on AppColorScheme {
           primaryDark: const Color(0xFF047857),
           secondary: const Color(0xFF34D399),
           accent: const Color(0xFF2DD4BF),
-          background: const Color(0xFFF0FDF4),
-          headerBackground: const Color(0xFFBBF7D0),
-          sidebarBackground: const Color(0xFFDCFCE7),
           chipBackground: const Color(0xFFECFDF5),
-          divider: const Color(0xFFA7F3D0),
-          inputFill: const Color(0xFFECFDF5),
-          cardBorder: const Color(0xFFBBF7D0),
-          shimmerBase: const Color(0xFFA7F3D0),
-          shimmerHighlight: const Color(0xFFF0FDF4),
-          cardGradientColors: const [
-            Color(0xFF059669),
-            Color(0xFF10B981),
-            Color(0xFF34D399)
-          ],
-          heroGradientColors: const [
-            Color(0xFF059669),
-            Color(0xFF047857),
-            Color(0xFF065F46)
-          ],
+          cardGradientColors: const [Color(0xFFFFFFFF), Color(0xFFECFDF5)],
+          heroGradientColors: const [Color(0xFF059669), Color(0xFF047857)],
           cardShadow: _defaultLightCardShadow(),
-          elevatedShadow: _elevatedShadow(const Color(0xFF059669), 0.3),
+          elevatedShadow: _elevatedShadow(const Color(0xFF2DD4BF), 0.3),
         );
       case AppColorScheme.black:
         return _buildLightTheme(
@@ -385,19 +362,10 @@ extension AppColorSchemeExtension on AppColorScheme {
           accent: const Color(0xFF4B5563),
           onSurface: const Color(0xFF111827),
           chipBackground: const Color(0xFFF3F4F6),
-          cardBorder: const Color(0xFFE5E7EB),
-          cardGradientColors: const [
-            Color(0xFF1F2937),
-            Color(0xFF374151),
-            Color(0xFF4B5563)
-          ],
-          heroGradientColors: const [
-            Color(0xFF1F2937),
-            Color(0xFF111827),
-            Color(0xFF030712)
-          ],
-          cardShadow: _cardShadow(const Color(0xFF111827), 0.08),
-          elevatedShadow: _elevatedShadow(const Color(0xFF1F2937), 0.4),
+          cardGradientColors: const [Color(0xFFFFFFFF), Color(0xFFF3F4F6)],
+          heroGradientColors: const [Color(0xFF1F2937), Color(0xFF111827)],
+          cardShadow: _defaultLightCardShadow(),
+          elevatedShadow: _elevatedShadow(const Color(0xFF1F2937), 0.3),
         );
       case AppColorScheme.gold:
         return _buildLightTheme(
@@ -407,27 +375,11 @@ extension AppColorSchemeExtension on AppColorScheme {
           secondary: const Color(0xFFF59E0B),
           accent: const Color(0xFFEF8C00),
           background: const Color(0xFFFFFBEB),
-          headerBackground: const Color(0xFFFDE68A),
-          sidebarBackground: const Color(0xFFFEF3C7),
-          surfaceVariant: const Color(0xFFFFF8E1),
           chipBackground: const Color(0xFFFEF9C3),
-          divider: const Color(0xFFFDE68A),
-          inputFill: const Color(0xFFFFF8E1),
-          cardBorder: const Color(0xFFFDE68A),
-          shimmerBase: const Color(0xFFFDE68A),
-          shimmerHighlight: const Color(0xFFFFFBEB),
-          cardGradientColors: const [
-            Color(0xFFD97706),
-            Color(0xFFF59E0B),
-            Color(0xFFFCD34D)
-          ],
-          heroGradientColors: const [
-            Color(0xFFD97706),
-            Color(0xFFB45309),
-            Color(0xFF92400E)
-          ],
-          cardShadow: _cardShadow(const Color(0xFFD97706), 0.08),
-          elevatedShadow: _elevatedShadow(const Color(0xFFD97706), 0.35),
+          cardGradientColors: const [Color(0xFFFFFFFF), Color(0xFFFFFBEB)],
+          heroGradientColors: const [Color(0xFFD97706), Color(0xFFB45309)],
+          cardShadow: _defaultLightCardShadow(),
+          elevatedShadow: _elevatedShadow(const Color(0xFFD97706), 0.3),
         );
       case AppColorScheme.lavender:
         return _buildLightTheme(
@@ -436,27 +388,10 @@ extension AppColorSchemeExtension on AppColorScheme {
           primaryDark: const Color(0xFF6D28D9),
           secondary: const Color(0xFF8B5CF6),
           accent: const Color(0xFF9333EA),
-          background: const Color(0xFFFAF5FF),
-          headerBackground: const Color(0xFFDDD6FE),
-          sidebarBackground: const Color(0xFFEDE9FE),
-          surfaceVariant: const Color(0xFFF5F3FF),
           chipBackground: const Color(0xFFEDE9FE),
-          divider: const Color(0xFFE9D5FF),
-          inputFill: const Color(0xFFF5F3FF),
-          cardBorder: const Color(0xFFE9D5FF),
-          shimmerBase: const Color(0xFFE9D5FF),
-          shimmerHighlight: const Color(0xFFFAF5FF),
-          cardGradientColors: const [
-            Color(0xFF7C3AED),
-            Color(0xFF8B5CF6),
-            Color(0xFFA78BFA)
-          ],
-          heroGradientColors: const [
-            Color(0xFF7C3AED),
-            Color(0xFF6D28D9),
-            Color(0xFF4C1D95)
-          ],
-          cardShadow: _cardShadow(const Color(0xFF7C3AED), 0.06),
+          cardGradientColors: const [Color(0xFFFFFFFF), Color(0xFFEDE9FE)],
+          heroGradientColors: const [Color(0xFF7C3AED), Color(0xFF6D28D9)],
+          cardShadow: _defaultLightCardShadow(),
           elevatedShadow: _elevatedShadow(const Color(0xFF7C3AED), 0.3),
         );
       case AppColorScheme.midnight:
@@ -466,27 +401,10 @@ extension AppColorSchemeExtension on AppColorScheme {
           primaryDark: const Color(0xFF1E3A8A),
           secondary: const Color(0xFF3B82F6),
           accent: const Color(0xFF2563EB),
-          background: const Color(0xFFEEF2FF),
-          headerBackground: const Color(0xFFC7D2FE),
-          sidebarBackground: const Color(0xFFE0E7FF),
-          surfaceVariant: const Color(0xFFEEF2FF),
           chipBackground: const Color(0xFFDBEAFE),
-          divider: const Color(0xFFBFDBFE),
-          inputFill: const Color(0xFFEFF6FF),
-          cardBorder: const Color(0xFFBFDBFE),
-          shimmerBase: const Color(0xFFBFDBFE),
-          shimmerHighlight: const Color(0xFFEFF6FF),
-          cardGradientColors: const [
-            Color(0xFF1E40AF),
-            Color(0xFF2563EB),
-            Color(0xFF3B82F6)
-          ],
-          heroGradientColors: const [
-            Color(0xFF1E40AF),
-            Color(0xFF1E3A8A),
-            Color(0xFF172554)
-          ],
-          cardShadow: _cardShadow(const Color(0xFF1E40AF), 0.06),
+          cardGradientColors: const [Color(0xFFFFFFFF), Color(0xFFDBEAFE)],
+          heroGradientColors: const [Color(0xFF1E40AF), Color(0xFF1E3A8A)],
+          cardShadow: _defaultLightCardShadow(),
           elevatedShadow: _elevatedShadow(const Color(0xFF1E40AF), 0.3),
         );
     }
@@ -495,28 +413,26 @@ extension AppColorSchemeExtension on AppColorScheme {
   ThemeColors get dark {
     switch (this) {
       case AppColorScheme.rose:
+        // background/headerBackground/sidebarBackground/cardBorder below are
+        // sourced 1:1 from financialite's dark-mode CSS variables
+        // (--theme-bgPageDark/--theme-bgTopbarDark/--theme-bgSidebarDark/
+        // --theme-borderDark).
         return _buildDarkTheme(
-          primary: const Color(0xFFC66A6A),
-          primaryLight: const Color(0xFFE7A5A5),
-          primaryDark: const Color(0xFF7B1818),
-          secondary: const Color(0xFFA84D4D),
-          accent: const Color(0xFFD37A7A),
+          primary: const Color(0xFFFB7185),
+          primaryLight: const Color(0xFFFDA4AF),
+          primaryDark: const Color(0xFFE11D48),
+          secondary: const Color(0xFFF43F5E),
+          accent: const Color(0xFFF43F5E),
           background: const Color(0xFF0A0404),
-          headerBackground: const Color(0xFF140505),
-          sidebarBackground: const Color(0xFF1A0606),
-          chipBackground: const Color(0xFF2A1616),
-          cardGradientColors: const [
-            Color(0xFF2A1616),
-            Color(0xFF221818),
-            Color(0xFF1A1D2E)
-          ],
-          heroGradientColors: const [
-            Color(0xFF2A1616),
-            Color(0xFF1D1010),
-            Color(0xFF0F1119)
-          ],
+          surface: const Color(0xFF150707),
+          surfaceVariant: const Color(0xFF1F0A0A),
+          chipBackground: const Color(0x33F43F5E),
+          divider: const Color(0x80450A0A),
+          cardBorder: const Color(0x80450A0A),
+          cardGradientColors: const [Color(0xFF1F0A0A), Color(0xFF150707)],
+          heroGradientColors: const [Color(0xFFBE123C), Color(0xFF0A0404)],
           cardShadow: _cardShadow(Colors.black, 0.25),
-          elevatedShadow: _elevatedShadow(const Color(0xFFC66A6A), 0.2),
+          elevatedShadow: _elevatedShadow(const Color(0xFFFB7185), 0.2),
         );
       case AppColorScheme.forest:
         return _buildDarkTheme(
@@ -526,19 +442,12 @@ extension AppColorSchemeExtension on AppColorScheme {
           secondary: const Color(0xFF10B981),
           accent: const Color(0xFF2DD4BF),
           background: const Color(0xFF021008),
-          headerBackground: const Color(0xFF071F12),
-          sidebarBackground: const Color(0xFF0A2817),
-          chipBackground: const Color(0xFF0A2520),
-          cardGradientColors: const [
-            Color(0xFF0A2520),
-            Color(0xFF152028),
-            Color(0xFF1A1D2E)
-          ],
-          heroGradientColors: const [
-            Color(0xFF0A2520),
-            Color(0xFF0F1A1E),
-            Color(0xFF0F1119)
-          ],
+          surface: const Color(0xFF0C1F14),
+          surfaceVariant: const Color(0xFF12291B),
+          chipBackground: const Color(0x2622C55E),
+          divider: const Color(0x8014532D),
+          cardGradientColors: const [Color(0xFF12291B), Color(0xFF0C1F14)],
+          heroGradientColors: const [Color(0xFF059669), Color(0xFF021008)],
           cardShadow: _cardShadow(Colors.black, 0.25),
           elevatedShadow: _elevatedShadow(const Color(0xFF34D399), 0.2),
         );
@@ -550,30 +459,16 @@ extension AppColorSchemeExtension on AppColorScheme {
           secondary: const Color(0xFFE5E7EB),
           accent: const Color(0xFFFFFFFF),
           background: const Color(0xFF0A0A0A),
-          headerBackground: const Color(0xFF111111),
-          sidebarBackground: const Color(0xFF161616),
           surface: const Color(0xFF141414),
           surfaceVariant: const Color(0xFF1E1E1E),
           onSurface: const Color(0xFFF9FAFB),
           divider: const Color(0xFF2E2E2E),
-          inputFill: const Color(0xFF1E1E1E),
           chipBackground: const Color(0xFF1E1E1E),
-          cardBorder: const Color(0xFF2E2E2E),
-          shimmerBase: const Color(0xFF1E1E1E),
-          shimmerHighlight: const Color(0xFF2E2E2E),
           primaryGradientColors: const [Color(0xFF374151), Color(0xFF1F2937)],
-          cardGradientColors: const [
-            Color(0xFF1F2937),
-            Color(0xFF141414),
-            Color(0xFF0A0A0A)
-          ],
-          heroGradientColors: const [
-            Color(0xFF1F2937),
-            Color(0xFF111827),
-            Color(0xFF0A0A0A)
-          ],
-          cardShadow: _cardShadow(Colors.black, 0.5),
-          elevatedShadow: _elevatedShadow(Colors.black, 0.4),
+          cardGradientColors: const [Color(0xFF1E1E1E), Color(0xFF141414)],
+          heroGradientColors: const [Color(0xFF1F2937), Color(0xFF0A0A0A)],
+          cardShadow: _cardShadow(Colors.black, 0.4),
+          elevatedShadow: _elevatedShadow(Colors.black, 0.3),
         );
       case AppColorScheme.gold:
         return _buildDarkTheme(
@@ -583,29 +478,15 @@ extension AppColorSchemeExtension on AppColorScheme {
           secondary: const Color(0xFFFBBF24),
           accent: const Color(0xFFD97706),
           background: const Color(0xFF0F0A02),
-          headerBackground: const Color(0xFF1A1005),
-          sidebarBackground: const Color(0xFF1F1607),
           surface: const Color(0xFF1A1A0A),
           surfaceVariant: const Color(0xFF22200A),
           onSurface: const Color(0xFFFEF9C3),
           onSurfaceVariant: const Color(0xFFFCD34D),
           hint: const Color(0xFF92400E),
           divider: const Color(0xFF2A2510),
-          inputFill: const Color(0xFF22200A),
           chipBackground: const Color(0xFF2A2000),
-          cardBorder: const Color(0xFF2A2510),
-          shimmerBase: const Color(0xFF22200A),
-          shimmerHighlight: const Color(0xFF2A2510),
-          cardGradientColors: const [
-            Color(0xFF2A2000),
-            Color(0xFF1A1800),
-            Color(0xFF0F1119)
-          ],
-          heroGradientColors: const [
-            Color(0xFF2A2000),
-            Color(0xFF1A1500),
-            Color(0xFF0F1119)
-          ],
+          cardGradientColors: const [Color(0xFF22200A), Color(0xFF1A1A0A)],
+          heroGradientColors: const [Color(0xFFD97706), Color(0xFF0F0A02)],
           cardShadow: _cardShadow(Colors.black, 0.3),
           elevatedShadow: _elevatedShadow(const Color(0xFFFCD34D), 0.2),
         );
@@ -617,29 +498,15 @@ extension AppColorSchemeExtension on AppColorScheme {
           secondary: const Color(0xFF8B5CF6),
           accent: const Color(0xFF9333EA),
           background: const Color(0xFF0D0416),
-          headerBackground: const Color(0xFF150721),
-          sidebarBackground: const Color(0xFF1E0A2E),
           surface: const Color(0xFF14102A),
           surfaceVariant: const Color(0xFF1E1840),
           onSurface: const Color(0xFFF5F3FF),
           onSurfaceVariant: const Color(0xFFC4B5FD),
           hint: const Color(0xFF7C6FAA),
           divider: const Color(0xFF2A2050),
-          inputFill: const Color(0xFF1E1840),
           chipBackground: const Color(0xFF1A1040),
-          cardBorder: const Color(0xFF2A2050),
-          shimmerBase: const Color(0xFF1E1840),
-          shimmerHighlight: const Color(0xFF2A2050),
-          cardGradientColors: const [
-            Color(0xFF1A1040),
-            Color(0xFF14102A),
-            Color(0xFF0F1119)
-          ],
-          heroGradientColors: const [
-            Color(0xFF1A1040),
-            Color(0xFF100C29),
-            Color(0xFF0F1119)
-          ],
+          cardGradientColors: const [Color(0xFF1E1840), Color(0xFF14102A)],
+          heroGradientColors: const [Color(0xFF7C3AED), Color(0xFF0D0416)],
           cardShadow: _cardShadow(Colors.black, 0.3),
           elevatedShadow: _elevatedShadow(const Color(0xFFA78BFA), 0.25),
         );
@@ -651,29 +518,15 @@ extension AppColorSchemeExtension on AppColorScheme {
           secondary: const Color(0xFF3B82F6),
           accent: const Color(0xFF2563EB),
           background: const Color(0xFF050614),
-          headerBackground: const Color(0xFF0A0D1F),
-          sidebarBackground: const Color(0xFF0F1129),
           surface: const Color(0xFF0D1425),
           surfaceVariant: const Color(0xFF141D35),
           onSurface: const Color(0xFFEFF6FF),
           onSurfaceVariant: const Color(0xFF93C5FD),
           hint: const Color(0xFF3B568A),
           divider: const Color(0xFF1A2540),
-          inputFill: const Color(0xFF141D35),
           chipBackground: const Color(0xFF0D1835),
-          cardBorder: const Color(0xFF1A2540),
-          shimmerBase: const Color(0xFF141D35),
-          shimmerHighlight: const Color(0xFF1A2540),
-          cardGradientColors: const [
-            Color(0xFF0D1835),
-            Color(0xFF0D1425),
-            Color(0xFF060A18)
-          ],
-          heroGradientColors: const [
-            Color(0xFF0D1835),
-            Color(0xFF08102A),
-            Color(0xFF060A18)
-          ],
+          cardGradientColors: const [Color(0xFF141D35), Color(0xFF0D1425)],
+          heroGradientColors: const [Color(0xFF1E40AF), Color(0xFF050614)],
           cardShadow: _cardShadow(Colors.black, 0.4),
           elevatedShadow: _elevatedShadow(const Color(0xFF60A5FA), 0.2),
         );

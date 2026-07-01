@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/month_selector.dart';
 import '../../widgets/page_header.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class ReportsPage extends StatefulWidget {
   const ReportsPage({super.key});
@@ -87,7 +88,7 @@ class _ReportsPageState extends State<ReportsPage> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(
             color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
           ),
@@ -99,7 +100,7 @@ class _ReportsPageState extends State<ReportsPage> {
               height: 52,
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Icon(icon, color: color, size: 24),
             ),
@@ -130,7 +131,7 @@ class _ReportsPageState extends State<ReportsPage> {
               height: 32,
               decoration: BoxDecoration(
                 color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
               ),
               child: Icon(
                 Icons.chevron_right,

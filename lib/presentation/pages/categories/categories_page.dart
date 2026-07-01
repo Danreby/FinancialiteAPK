@@ -7,6 +7,7 @@ import '../../widgets/page_header.dart';
 import '../../widgets/shadowed_fab.dart';
 import 'widgets/category_form_dialog.dart';
 import 'widgets/category_list.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
@@ -50,7 +51,7 @@ class _CategoriesPageState extends State<CategoriesPage>
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHighest
                   .withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppRadius.xl),
             ),
             child: Row(
               children: List.generate(3, (index) {
@@ -66,7 +67,7 @@ class _CategoriesPageState extends State<CategoriesPage>
                         color: isSelected
                             ? theme.colorScheme.primary
                             : Colors.transparent,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
                       ),
                       child: Text(
                         labels[index],

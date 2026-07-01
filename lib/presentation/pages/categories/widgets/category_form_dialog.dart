@@ -5,6 +5,7 @@ import '../../../../domain/entities/category.dart';
 import '../../../widgets/app_text_field.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/utils/icon_utils.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 void showCategoryDialog(BuildContext context, {Category? editing}) {
   final nameCtrl = TextEditingController(text: editing?.name ?? '');
@@ -66,7 +67,7 @@ void showCategoryDialog(BuildContext context, {Category? editing}) {
     context: context,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
     ),
     builder: (ctx) => Padding(
       padding: EdgeInsets.fromLTRB(
@@ -86,7 +87,7 @@ void showCategoryDialog(BuildContext context, {Category? editing}) {
                     margin: const EdgeInsets.only(bottom: 20),
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2),
+                      borderRadius: BorderRadius.circular(AppRadius.xs),
                     ),
                   ),
                 ),
@@ -142,7 +143,7 @@ void showCategoryDialog(BuildContext context, {Category? editing}) {
                                 ? colorFromHex(selectedColor)
                                     .withValues(alpha: 0.15)
                                 : Colors.grey.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
                             border: sel
                                 ? Border.all(
                                     color: colorFromHex(selectedColor),
@@ -186,14 +187,7 @@ void showCategoryDialog(BuildContext context, {Category? editing}) {
                             border: sel
                                 ? Border.all(color: Colors.white, width: 2)
                                 : null,
-                            boxShadow: sel
-                                ? [
-                                    BoxShadow(
-                                        color: colorFromHex(col)
-                                            .withValues(alpha: 0.5),
-                                        blurRadius: 8)
-                                  ]
-                                : null,
+                            boxShadow: sel ? AppShadows.sm : null,
                           ),
                           child: sel
                               ? const Icon(Icons.check,
@@ -227,7 +221,7 @@ void showCategoryDialog(BuildContext context, {Category? editing}) {
                     },
                     style: FilledButton.styleFrom(
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
+                          borderRadius: BorderRadius.circular(AppRadius.xxl)),
                     ),
                     child: const Text('Salvar',
                         style: TextStyle(

@@ -14,6 +14,7 @@ import '../../widgets/page_header.dart';
 import '../../widgets/responsive_content.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../../core/theme/app_tokens.dart';
 import 'widgets/balance_card.dart';
 import 'widgets/monthly_line_chart.dart';
 import 'widgets/quick_action_button.dart';
@@ -69,7 +70,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: appColors.surface.withValues(alpha: 0.8),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
                           border: Border.all(
                             color: appColors.divider.withValues(alpha: 0.6),
                           ),

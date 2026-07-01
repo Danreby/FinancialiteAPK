@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
+import '../../../../core/theme/app_tokens.dart';
 import '../../../../domain/entities/savings_goal.dart';
 
 class SavingsGoalCard extends StatelessWidget {
@@ -29,14 +30,14 @@ class SavingsGoalCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         onTap: onTap,
         onLongPress: onLongPress,
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(
               color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
             ),
@@ -51,7 +52,7 @@ class SavingsGoalCard extends StatelessWidget {
                     height: 48,
                     decoration: BoxDecoration(
                       color: progressColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                     ),
                     child: Center(
                       child: goal.icon != null && goal.icon!.isNotEmpty
@@ -89,7 +90,7 @@ class SavingsGoalCard extends StatelessWidget {
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: progressColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),
                     child: Text(
                       '${(progress * 100).toStringAsFixed(0)}%',
@@ -112,7 +113,7 @@ class SavingsGoalCard extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               ClipRRect(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
                 child: LinearProgressIndicator(
                   value: progress,
                   minHeight: 10,

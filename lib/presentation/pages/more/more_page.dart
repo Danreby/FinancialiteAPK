@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../widgets/page_header.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class MorePage extends StatelessWidget {
   const MorePage({super.key});
@@ -103,7 +104,7 @@ class MorePage extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: appColors.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(color: appColors.divider.withValues(alpha: 0.7)),
         ),
         child: Column(
@@ -115,14 +116,15 @@ class MorePage extends StatelessWidget {
                   color: Colors.transparent,
                   child: InkWell(
                     borderRadius: BorderRadius.only(
-                      topLeft: i == 0 ? const Radius.circular(16) : Radius.zero,
+                      topLeft:
+                          i == 0 ? const Radius.circular(AppRadius.xl) : Radius.zero,
                       topRight:
-                          i == 0 ? const Radius.circular(16) : Radius.zero,
+                          i == 0 ? const Radius.circular(AppRadius.xl) : Radius.zero,
                       bottomLeft: i == items.length - 1
-                          ? const Radius.circular(16)
+                          ? const Radius.circular(AppRadius.xl)
                           : Radius.zero,
                       bottomRight: i == items.length - 1
-                          ? const Radius.circular(16)
+                          ? const Radius.circular(AppRadius.xl)
                           : Radius.zero,
                     ),
                     onTap: item.onTap,
@@ -136,7 +138,7 @@ class MorePage extends StatelessWidget {
                             height: 40,
                             decoration: BoxDecoration(
                               color: item.color.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
                             ),
                             child: Icon(item.icon, color: item.color, size: 20),
                           ),

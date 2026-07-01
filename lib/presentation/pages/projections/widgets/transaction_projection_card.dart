@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/icon_utils.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class TransactionProjectionCard extends StatelessWidget {
   final Map<String, dynamic> tx;
@@ -24,7 +25,7 @@ class TransactionProjectionCard extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(
               color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
         ),
@@ -35,7 +36,7 @@ class TransactionProjectionCard extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 color: catColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
               ),
               child: Icon(
                 isRecurring ? Icons.autorenew : Icons.credit_card,

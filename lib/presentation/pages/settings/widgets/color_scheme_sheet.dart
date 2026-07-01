@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../blocs/theme/theme_cubit.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 void showColorSchemeSheet(BuildContext context, String current) {
   final theme = Theme.of(context);
@@ -16,7 +17,7 @@ void showColorSchemeSheet(BuildContext context, String current) {
     context: context,
     backgroundColor: theme.colorScheme.surface,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
     ),
     builder: (ctx) => Padding(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
@@ -30,7 +31,7 @@ void showColorSchemeSheet(BuildContext context, String current) {
               height: 4,
               decoration: BoxDecoration(
                 color: Colors.grey.shade400,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(AppRadius.xs),
               ),
             ),
           ),
@@ -42,60 +43,82 @@ void showColorSchemeSheet(BuildContext context, String current) {
                 ),
           ),
           const SizedBox(height: 16),
-          ...schemes.asMap().entries.map((entry) {
-            final i = entry.key;
-            final (key, label, color) = entry.value;
-            return Column(
-              children: [
-                if (i > 0)
-                  Divider(
-                      height: 1,
-                      color: theme.colorScheme.outlineVariant
-                          .withValues(alpha: 0.3)),
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () {
-                      context.read<ThemeCubit>().setColorScheme(key);
-                      Navigator.pop(ctx);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 32,
-                            height: 32,
+          ...schemes.map((entry) {
+            final (key, label, color) = entry;
+            final isSelected = key == current;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+              child: Material(
+                color: isSelected
+                    ? color.withValues(alpha: 0.08)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  onTap: () {
+                    context.read<ThemeCubit>().setColorScheme(key);
+                    Navigator.pop(ctx);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.fromBorderSide(
+                        AppBorders.hairline(
+                          isSelected
+                              ? color.withValues(alpha: 0.4)
+                              : Colors.transparent,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.fromBorderSide(
+                              AppBorders.hairline(
+                                isSelected
+                                    ? color
+                                    : theme.colorScheme.outlineVariant
+                                        .withValues(alpha: 0.4),
+                              ),
+                            ),
+                          ),
+                          child: Container(
                             decoration: BoxDecoration(
                               color: color,
                               shape: BoxShape.circle,
                             ),
                           ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Text(
-                              label,
-                              style:
-                                  Theme.of(ctx).textTheme.bodyLarge?.copyWith(
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                            ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Text(
+                            label,
+                            style:
+                                Theme.of(ctx).textTheme.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
                           ),
-                          Radio<String>(
-                            value: key,
-                            groupValue: current,
-                            onChanged: (v) {
-                              context.read<ThemeCubit>().setColorScheme(v!);
-                              Navigator.pop(ctx);
-                            },
-                          ),
-                        ],
-                      ),
+                        ),
+                        Radio<String>(
+                          value: key,
+                          groupValue: current,
+                          onChanged: (v) {
+                            context.read<ThemeCubit>().setColorScheme(v!);
+                            Navigator.pop(ctx);
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
+              ),
             );
           }),
         ],

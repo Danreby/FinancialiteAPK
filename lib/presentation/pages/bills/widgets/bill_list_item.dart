@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../domain/entities/bill.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class BillListItem extends StatelessWidget {
   final Bill bill;
@@ -37,7 +38,7 @@ class BillListItem extends StatelessWidget {
           padding: const EdgeInsets.only(right: 20),
           decoration: BoxDecoration(
             color: theme.colorScheme.error,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
           ),
           child: const Icon(Icons.delete, color: Colors.white),
         ),
@@ -49,7 +50,7 @@ class BillListItem extends StatelessWidget {
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: appColors.surface,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.xl),
               border: Border.all(
                 color: appColors.divider.withValues(alpha: 0.7),
               ),
@@ -61,7 +62,7 @@ class BillListItem extends StatelessWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     color: dueColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
                   ),
                   child: Icon(
                     isPaid ? Icons.check_circle_rounded : Icons.receipt_rounded,
@@ -127,7 +128,7 @@ class BillListItem extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: (isPaid ? Colors.green : dueColor)
                             .withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
                       ),
                       child: Text(
                         isPaid ? 'Pago' : 'Pendente',

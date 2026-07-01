@@ -6,6 +6,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/app_text_field.dart';
 import '../../../core/utils/validators.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -133,17 +135,10 @@ class _LoginPageState extends State<LoginPage> {
                   bottom: 40,
                 ),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      theme.colorScheme.primary,
-                      theme.colorScheme.primary.withValues(alpha: 0.85),
-                    ],
-                  ),
+                  gradient: theme.appColors.heroGradient,
                   borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(40),
-                    bottomRight: Radius.circular(40),
+                    bottomLeft: Radius.circular(AppRadius.xxl),
+                    bottomRight: Radius.circular(AppRadius.xxl),
                   ),
                 ),
                 child: Column(
@@ -152,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(AppRadius.xl),
                       ),
                       child: const Icon(
                         Icons.account_balance_wallet_rounded,
@@ -226,17 +221,12 @@ class _LoginPageState extends State<LoginPage> {
                           return AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.md),
                               boxShadow: isLoading
                                   ? []
-                                  : [
-                                      BoxShadow(
-                                        color: theme.colorScheme.primary
-                                            .withValues(alpha: 0.3),
-                                        blurRadius: 20,
-                                        offset: const Offset(0, 8),
-                                      ),
-                                    ],
+                                  : AppShadows.buttonPrimary(
+                                      theme.colorScheme.primary),
                             ),
                             child: FilledButton(
                               onPressed: isLoading ? null : _submit,

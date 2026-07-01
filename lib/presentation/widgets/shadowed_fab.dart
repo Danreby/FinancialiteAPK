@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_tokens.dart';
 
 class ShadowedFab extends StatelessWidget {
   final VoidCallback onPressed;
@@ -15,13 +16,7 @@ class ShadowedFab extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.primary.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        boxShadow: AppShadows.buttonPrimary(theme.colorScheme.primary),
         shape: BoxShape.circle,
       ),
       child: FloatingActionButton(

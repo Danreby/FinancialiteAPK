@@ -8,6 +8,7 @@ import '../../widgets/app_error_widget.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/month_selector.dart';
 import '../../widgets/page_header.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class ReportCategoryPage extends StatefulWidget {
   const ReportCategoryPage({super.key});
@@ -100,7 +101,7 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                           height: 260,
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
                             border: Border.all(
                                 color: theme.colorScheme.outlineVariant
                                     .withValues(alpha: 0.5)),
@@ -147,7 +148,7 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                         Container(
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
                             border: Border.all(
                                 color: theme.colorScheme.outlineVariant
                                     .withValues(alpha: 0.5)),
@@ -176,8 +177,8 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                                           decoration: BoxDecoration(
                                             color: colors[i % colors.length]
                                                 .withValues(alpha: 0.12),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                                AppRadius.md),
                                           ),
                                           child: Center(
                                             child: Container(
@@ -205,8 +206,8 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                                                               FontWeight.w600)),
                                               const SizedBox(height: 4),
                                               ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
+                                                borderRadius: BorderRadius
+                                                    .circular(AppRadius.xs),
                                                 child: LinearProgressIndicator(
                                                   value: pct / 100,
                                                   minHeight: 4,

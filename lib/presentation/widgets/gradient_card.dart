@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_tokens.dart';
 
 class GradientCard extends StatelessWidget {
   final Gradient gradient;
@@ -20,7 +21,7 @@ class GradientCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = borderRadius ?? BorderRadius.circular(24);
+    final radius = borderRadius ?? BorderRadius.circular(AppRadius.xxl);
     return GestureDetector(
       onTap: onTap,
       child: Container(

@@ -13,6 +13,7 @@ import '../../widgets/page_header.dart';
 import '../../widgets/shadowed_fab.dart';
 import 'widgets/bank_account_card.dart';
 import 'widgets/bank_dialogs.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class BankAccountsPage extends StatefulWidget {
   const BankAccountsPage({super.key});
@@ -51,7 +52,7 @@ class _BankAccountsPageState extends State<BankAccountsPage> {
                   height: 44,
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
                     border: Border.all(
                       color: theme.colorScheme.outlineVariant
                           .withValues(alpha: 0.5),

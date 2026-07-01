@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/theme/app_tokens.dart';
 import '../../../../domain/entities/budget.dart';
 
 class BudgetListItem extends StatelessWidget {
@@ -35,7 +36,7 @@ class BudgetListItem extends StatelessWidget {
           padding: const EdgeInsets.only(right: 20),
           decoration: BoxDecoration(
             color: theme.colorScheme.error,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
           ),
           child: const Icon(Icons.delete, color: Colors.white),
         ),
@@ -45,7 +46,7 @@ class BudgetListItem extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(
               color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
             ),
@@ -60,7 +61,7 @@ class BudgetListItem extends StatelessWidget {
                     height: 48,
                     decoration: BoxDecoration(
                       color: progressColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                     ),
                     child: Icon(
                       Icons.pie_chart_rounded,
@@ -98,7 +99,7 @@ class BudgetListItem extends StatelessWidget {
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: progressColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
                     ),
                     child: Text(
                       '${(progress * 100).toStringAsFixed(0)}%',
@@ -112,7 +113,7 @@ class BudgetListItem extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               ClipRRect(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
                 child: LinearProgressIndicator(
                   value: progress,
                   minHeight: 8,
@@ -152,7 +153,7 @@ class BudgetListItem extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: theme.colorScheme.primaryContainer
                                   .withValues(alpha: 0.5),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(AppRadius.md),
                             ),
                             child: Text(
                               c.categoryName ?? '',

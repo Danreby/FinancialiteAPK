@@ -17,6 +17,7 @@ import '../../../domain/entities/category.dart';
 import '../../../domain/entities/card_entity.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/shadowed_fab.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class TransactionsPage extends StatefulWidget {
   const TransactionsPage({super.key});
@@ -389,7 +390,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                               ),
                               decoration: BoxDecoration(
                                 color: theme.colorScheme.error,
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(AppRadius.xl),
                               ),
                               child: const Icon(
                                 Icons.delete_outline_rounded,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../../../../domain/entities/dashboard.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class MonthlyBarChart extends StatelessWidget {
   final List<MonthlyChartData> chart;
@@ -36,7 +37,7 @@ class MonthlyBarChart extends StatelessWidget {
           height: 260,
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(
                 color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
           ),

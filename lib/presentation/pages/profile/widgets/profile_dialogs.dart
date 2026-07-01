@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../blocs/profile/profile_cubit.dart';
 import '../../../widgets/app_text_field.dart';
 import '../../../../core/utils/validators.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 void showEditProfileDialog(BuildContext context, String currentName) {
   final nameCtrl = TextEditingController(text: currentName);
@@ -12,7 +13,7 @@ void showEditProfileDialog(BuildContext context, String currentName) {
     isScrollControlled: true,
     backgroundColor: Theme.of(context).colorScheme.surface,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
     ),
     builder: (ctx) => Padding(
       padding: EdgeInsets.fromLTRB(
@@ -29,7 +30,7 @@ void showEditProfileDialog(BuildContext context, String currentName) {
                 height: 4,
                 decoration: BoxDecoration(
                   color: Colors.grey.shade400,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppRadius.xs),
                 ),
               ),
             ),
@@ -75,7 +76,7 @@ void showChangePasswordDialog(BuildContext context) {
     isScrollControlled: true,
     backgroundColor: Theme.of(context).colorScheme.surface,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
     ),
     builder: (ctx) => Padding(
       padding: EdgeInsets.fromLTRB(
@@ -92,7 +93,7 @@ void showChangePasswordDialog(BuildContext context) {
                 height: 4,
                 decoration: BoxDecoration(
                   color: Colors.grey.shade400,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppRadius.xs),
                 ),
               ),
             ),
@@ -149,7 +150,8 @@ void showDeleteAccountDialog(BuildContext context) {
   showDialog(
     context: context,
     builder: (ctx) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.xxl)),
       title: Column(
         children: [
           Container(
@@ -157,7 +159,7 @@ void showDeleteAccountDialog(BuildContext context) {
             height: 56,
             decoration: BoxDecoration(
               color: Theme.of(ctx).colorScheme.error.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.md),
             ),
             child: Icon(
               Icons.warning_amber_rounded,

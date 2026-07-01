@@ -1,5 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_tokens.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class CreditDebitChart extends StatelessWidget {
   final double totalIn;
@@ -20,7 +22,7 @@ class CreditDebitChart extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
             color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
       ),
@@ -36,13 +38,13 @@ class CreditDebitChart extends StatelessWidget {
                 sections: [
                   PieChartSectionData(
                     value: totalIn,
-                    color: const Color(0xFF7C3AED),
+                    color: theme.appColors.income,
                     radius: 12,
                     title: '',
                   ),
                   PieChartSectionData(
                     value: totalOut,
-                    color: theme.colorScheme.error,
+                    color: theme.appColors.expense,
                     radius: 12,
                     title: '',
                   ),
@@ -56,10 +58,10 @@ class CreditDebitChart extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _chartLegend(
-                    'Crédito', pctIn * 100, const Color(0xFF7C3AED), theme),
+                    'Crédito', pctIn * 100, theme.appColors.income, theme),
                 const SizedBox(height: 6),
                 _chartLegend('Débito', (1 - pctIn) * 100,
-                    theme.colorScheme.error, theme),
+                    theme.appColors.expense, theme),
               ],
             ),
           ),

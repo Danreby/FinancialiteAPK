@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../domain/entities/bank_account.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class BankAccountCard extends StatelessWidget {
   final BankAccount account;
@@ -29,7 +30,7 @@ class BankAccountCard extends StatelessWidget {
           padding: const EdgeInsets.only(right: 20),
           decoration: BoxDecoration(
             color: theme.colorScheme.error,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
           ),
           child: const Icon(Icons.delete, color: Colors.white),
         ),
@@ -39,7 +40,7 @@ class BankAccountCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(
               color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
             ),
@@ -51,7 +52,7 @@ class BankAccountCard extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
                 ),
                 child: Icon(Icons.account_balance,
                     color: theme.colorScheme.primary, size: 22),

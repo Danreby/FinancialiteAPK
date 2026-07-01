@@ -8,6 +8,7 @@ import '../../../core/utils/date_formatter.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/responsive_content.dart';
 import 'widgets/notification_type_style.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -122,7 +123,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 6),
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(AppRadius.xl),
                               child: Dismissible(
                                 key: Key('notif_$keyValue'),
                                 direction: canMutate
@@ -157,7 +158,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                               theme.colorScheme.surface,
                                             )
                                           : theme.colorScheme.surface,
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius:
+                                          BorderRadius.circular(AppRadius.xl),
                                       border: Border.all(
                                         color: theme.colorScheme.outlineVariant
                                             .withValues(alpha: 0.5),
@@ -171,8 +173,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                           decoration: BoxDecoration(
                                             color: typeStyle.color
                                                 .withValues(alpha: 0.08),
-                                            borderRadius:
-                                                BorderRadius.circular(14),
+                                            borderRadius: BorderRadius.circular(
+                                                AppRadius.sm),
                                           ),
                                           child: Icon(typeStyle.icon,
                                               color: typeStyle.color, size: 22),

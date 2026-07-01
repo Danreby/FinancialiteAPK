@@ -11,6 +11,7 @@ import '../../widgets/income_form_dialog.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/shadowed_fab.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class IncomePage extends StatefulWidget {
   const IncomePage({super.key});
@@ -106,7 +107,8 @@ class _IncomePageState extends State<IncomePage> {
                                   padding: const EdgeInsets.only(right: 20),
                                   decoration: BoxDecoration(
                                     color: theme.colorScheme.error,
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius:
+                                        BorderRadius.circular(AppRadius.xl),
                                   ),
                                   child: const Icon(Icons.delete,
                                       color: Colors.white),
@@ -125,7 +127,8 @@ class _IncomePageState extends State<IncomePage> {
                                   padding: const EdgeInsets.all(14),
                                   decoration: BoxDecoration(
                                     color: theme.colorScheme.surface,
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius:
+                                        BorderRadius.circular(AppRadius.xl),
                                     border: Border.all(
                                       color: theme.colorScheme.outlineVariant
                                           .withValues(alpha: 0.5),
@@ -139,8 +142,8 @@ class _IncomePageState extends State<IncomePage> {
                                         decoration: BoxDecoration(
                                           color:
                                               iconColor.withValues(alpha: 0.12),
-                                          borderRadius:
-                                              BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                              AppRadius.xl),
                                         ),
                                         child: Icon(
                                           isReceived
@@ -191,7 +194,7 @@ class _IncomePageState extends State<IncomePage> {
                                                               alpha: 0.1),
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                              6),
+                                                              AppRadius.sm),
                                                     ),
                                                     child: const Text(
                                                       'Recorrente',
@@ -240,7 +243,8 @@ class _IncomePageState extends State<IncomePage> {
                                                       .colorScheme.primary
                                                       .withValues(alpha: 0.1),
                                                   borderRadius:
-                                                      BorderRadius.circular(10),
+                                                      BorderRadius.circular(
+                                                          AppRadius.lg),
                                                 ),
                                                 child: Text(
                                                   'Receber',

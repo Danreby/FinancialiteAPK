@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -45,15 +47,7 @@ class _SplashPageState extends State<SplashPage>
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              theme.colorScheme.primary,
-              theme.colorScheme.primary.withValues(alpha: 0.85),
-              theme.colorScheme.primary.withValues(alpha: 0.7),
-            ],
-          ),
+          gradient: theme.appColors.heroGradient,
         ),
         child: Center(
           child: AnimatedBuilder(
@@ -74,7 +68,7 @@ class _SplashPageState extends State<SplashPage>
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(28),
+                    borderRadius: BorderRadius.circular(AppRadius.xxl),
                   ),
                   child: const Icon(
                     Icons.account_balance_wallet_rounded,

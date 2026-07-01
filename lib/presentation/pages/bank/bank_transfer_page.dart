@@ -6,6 +6,7 @@ import '../../widgets/currency_text_field.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/bank_account.dart';
 import '../../widgets/page_header.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class BankTransferPage extends StatefulWidget {
   const BankTransferPage({super.key});
@@ -78,7 +79,7 @@ class _BankTransferPageState extends State<BankTransferPage> {
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
                             border: Border.all(
                               color: theme.colorScheme.outlineVariant
                                   .withValues(alpha: 0.5),
@@ -92,7 +93,7 @@ class _BankTransferPageState extends State<BankTransferPage> {
                                 decoration: BoxDecoration(
                                   color: theme.colorScheme.error
                                       .withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(AppRadius.xl),
                                 ),
                                 child: Icon(Icons.output,
                                     color: theme.colorScheme.error, size: 20),
@@ -130,7 +131,7 @@ class _BankTransferPageState extends State<BankTransferPage> {
                             decoration: BoxDecoration(
                               color: theme.colorScheme.primary
                                   .withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppRadius.xl),
                             ),
                             child: Icon(Icons.arrow_downward,
                                 color: theme.colorScheme.primary, size: 22),
@@ -141,7 +142,7 @@ class _BankTransferPageState extends State<BankTransferPage> {
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
                             border: Border.all(
                               color: theme.colorScheme.outlineVariant
                                   .withValues(alpha: 0.5),
@@ -154,7 +155,7 @@ class _BankTransferPageState extends State<BankTransferPage> {
                                 height: 44,
                                 decoration: BoxDecoration(
                                   color: Colors.green.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(AppRadius.xl),
                                 ),
                                 child: const Icon(Icons.input,
                                     color: Colors.green, size: 20),
@@ -189,7 +190,7 @@ class _BankTransferPageState extends State<BankTransferPage> {
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
                             border: Border.all(
                               color: theme.colorScheme.outlineVariant
                                   .withValues(alpha: 0.5),
@@ -203,7 +204,7 @@ class _BankTransferPageState extends State<BankTransferPage> {
                                 decoration: BoxDecoration(
                                   color: theme.colorScheme.primary
                                       .withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(AppRadius.xl),
                                 ),
                                 child: Icon(Icons.attach_money,
                                     color: theme.colorScheme.primary, size: 22),
@@ -225,7 +226,7 @@ class _BankTransferPageState extends State<BankTransferPage> {
                           child: FilledButton(
                             style: FilledButton.styleFrom(
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(AppRadius.xl),
                               ),
                             ),
                             onPressed: _submit,

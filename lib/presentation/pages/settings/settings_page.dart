@@ -8,6 +8,7 @@ import '../../widgets/section_header.dart';
 import '../../widgets/page_header.dart';
 import 'widgets/color_scheme_sheet.dart';
 import 'widgets/settings_item.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -37,7 +38,7 @@ class SettingsPage extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
                     border: Border.all(
                       color: theme.colorScheme.outlineVariant
                           .withValues(alpha: 0.5),
@@ -104,7 +105,7 @@ class SettingsPage extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
                     border: Border.all(
                       color: theme.colorScheme.outlineVariant
                           .withValues(alpha: 0.5),
@@ -141,7 +142,7 @@ class SettingsPage extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
                     border: Border.all(
                       color: theme.colorScheme.outlineVariant
                           .withValues(alpha: 0.5),

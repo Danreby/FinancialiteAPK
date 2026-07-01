@@ -12,6 +12,7 @@ import 'form_section_card.dart';
 import '../../core/utils/date_formatter.dart';
 import '../../core/utils/validators.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/app_tokens.dart';
 
 const _iconMap = <String, IconData>{
   'work': Icons.work,
@@ -76,7 +77,7 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
         return Container(
           decoration: BoxDecoration(
             color: appColors.background,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
           ),
           child: Column(
             children: [
@@ -87,7 +88,7 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                 height: 4,
                 decoration: BoxDecoration(
                   color: appColors.divider,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppRadius.xs),
                 ),
               ),
               // Header bar — matches PageHeader style
@@ -108,11 +109,11 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
+                        color: appColors.income.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
                       ),
-                      child: const Icon(Icons.arrow_upward_rounded,
-                          size: 18, color: Color(0xFF10B981)),
+                      child: Icon(Icons.arrow_upward_rounded,
+                          size: 18, color: appColors.income),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -133,7 +134,7 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                         height: 32,
                         decoration: BoxDecoration(
                           color: appColors.surface.withValues(alpha: 0.7),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
                           border: Border.all(
                               color: appColors.divider.withValues(alpha: 0.6)),
                         ),
@@ -205,7 +206,7 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                                                     .surfaceContainerHighest
                                                     .withValues(alpha: 0.5),
                                             borderRadius:
-                                                BorderRadius.circular(14),
+                                                BorderRadius.circular(AppRadius.md),
                                             border: Border.all(
                                               color: isSelected
                                                   ? theme.colorScheme.primary
@@ -475,7 +476,7 @@ void showIncomeFormDialog(BuildContext context, {Income? editing}) {
                                 },
                                 style: FilledButton.styleFrom(
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
+                                    borderRadius: BorderRadius.circular(AppRadius.md),
                                   ),
                                 ),
                                 child: Text(

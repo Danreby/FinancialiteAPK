@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_tokens.dart';
 
 class EmptyStateWidget extends StatelessWidget {
   final IconData icon;
@@ -65,7 +66,7 @@ class EmptyStateWidget extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(180, 48),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
                 ),
               ),

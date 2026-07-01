@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
+import '../../../../core/theme/app_tokens.dart';
 
 class MonthlyProjectionChart extends StatelessWidget {
   final List<Map<String, dynamic>> months;
@@ -19,7 +20,7 @@ class MonthlyProjectionChart extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
             color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
       ),
@@ -133,13 +134,13 @@ class MonthlyProjectionChart extends StatelessWidget {
                         toY: income,
                         color: const Color(0xFF10B981).withValues(alpha: 0.85),
                         width: 10,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(AppRadius.xs),
                       ),
                       BarChartRodData(
                         toY: debit,
                         color: theme.colorScheme.error.withValues(alpha: 0.85),
                         width: 10,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(AppRadius.xs),
                       ),
                     ],
                   );
@@ -167,7 +168,7 @@ class _Legend extends StatelessWidget {
           width: 10,
           height: 10,
           decoration: BoxDecoration(
-              color: color, borderRadius: BorderRadius.circular(3)),
+              color: color, borderRadius: BorderRadius.circular(AppRadius.xs)),
         ),
         const SizedBox(width: 4),
         Text(label,
