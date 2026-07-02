@@ -46,21 +46,56 @@ class BankRepositoryImpl extends BaseOfflineRepository
   @override
   Future<BankAccount> createAccount(Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response = await api.post(ApiConstants.bankAccounts, data: sanitized);
-    return BankAccountModel.fromJson(response.data['data'] ?? response.data);
+    if (await isOnline) {
+      final response =
+          await api.post(ApiConstants.bankAccounts, data: sanitized);
+      final account =
+          BankAccountModel.fromJson(response.data['data'] ?? response.data);
+      final database = await db;
+      await database.insert('bank_users', account.toDbMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace);
+      return account;
+    }
+    final database = await db;
+    sanitized['created_at'] = DateTime.now().toIso8601String();
+    sanitized['synced'] = 0;
+    final id = await database.insert('bank_users', sanitized);
+    await addToSyncQueue('bank_users', id, 'create', sanitized);
+    sanitized['id'] = id;
+    return BankAccountModel.fromDb(sanitized);
   }
 
   @override
   Future<BankAccount> updateAccount(int id, Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response =
-        await api.put('${ApiConstants.bankAccounts}/$id', data: sanitized);
-    return BankAccountModel.fromJson(response.data['data'] ?? response.data);
+    if (await isOnline) {
+      final response =
+          await api.put('${ApiConstants.bankAccounts}/$id', data: sanitized);
+      final account =
+          BankAccountModel.fromJson(response.data['data'] ?? response.data);
+      final database = await db;
+      await database.update('bank_users', account.toDbMap(),
+          where: 'id = ?', whereArgs: [id]);
+      return account;
+    }
+    final database = await db;
+    sanitized['updated_at'] = DateTime.now().toIso8601String();
+    sanitized['synced'] = 0;
+    await database
+        .update('bank_users', sanitized, where: 'id = ?', whereArgs: [id]);
+    await addToSyncQueue('bank_users', id, 'update', sanitized);
+    final results =
+        await database.query('bank_users', where: 'id = ?', whereArgs: [id]);
+    return BankAccountModel.fromDb(results.first);
   }
 
   @override
   Future<void> deleteAccount(int id) async {
-    await api.delete('${ApiConstants.bankAccounts}/$id');
+    if (await isOnline) {
+      await api.delete('${ApiConstants.bankAccounts}/$id');
+    } else {
+      await addToSyncQueue('bank_users', id, 'delete', null);
+    }
     final database = await db;
     await database.delete('bank_users', where: 'id = ?', whereArgs: [id]);
   }

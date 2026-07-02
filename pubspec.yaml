@@ -80,3 +80,11 @@ flutter:
           weight: 600
         - asset: assets/fonts/Inter-Bold.ttf
           weight: 700
+    # Reserved exclusively for money figures (see AppMoneyStyle) -- a
+    # variable font, referenced at the two weights the design uses.
+    - family: SpaceGrotesk
+      fonts:
+        - asset: assets/fonts/SpaceGrotesk-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/SpaceGrotesk-Variable.ttf
+          weight: 700

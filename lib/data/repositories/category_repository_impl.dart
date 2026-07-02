@@ -44,21 +44,55 @@ class CategoryRepositoryImpl extends BaseOfflineRepository
   @override
   Future<Category> createCategory(Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response = await api.post(ApiConstants.categories, data: sanitized);
-    return CategoryModel.fromJson(response.data['data'] ?? response.data);
+    if (await isOnline) {
+      final response = await api.post(ApiConstants.categories, data: sanitized);
+      final category =
+          CategoryModel.fromJson(response.data['data'] ?? response.data);
+      final database = await db;
+      await database.insert('categories', category.toDbMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace);
+      return category;
+    }
+    final database = await db;
+    sanitized['created_at'] = DateTime.now().toIso8601String();
+    sanitized['synced'] = 0;
+    final id = await database.insert('categories', sanitized);
+    await addToSyncQueue('categories', id, 'create', sanitized);
+    sanitized['id'] = id;
+    return CategoryModel.fromDb(sanitized);
   }
 
   @override
   Future<Category> updateCategory(int id, Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response =
-        await api.put('${ApiConstants.categories}/$id', data: sanitized);
-    return CategoryModel.fromJson(response.data['data'] ?? response.data);
+    if (await isOnline) {
+      final response =
+          await api.put('${ApiConstants.categories}/$id', data: sanitized);
+      final category =
+          CategoryModel.fromJson(response.data['data'] ?? response.data);
+      final database = await db;
+      await database.update('categories', category.toDbMap(),
+          where: 'id = ?', whereArgs: [id]);
+      return category;
+    }
+    final database = await db;
+    sanitized['updated_at'] = DateTime.now().toIso8601String();
+    sanitized['synced'] = 0;
+    await database
+        .update('categories', sanitized, where: 'id = ?', whereArgs: [id]);
+    await addToSyncQueue('categories', id, 'update', sanitized);
+    final results =
+        await database.query('categories', where: 'id = ?', whereArgs: [id]);
+    return CategoryModel.fromDb(results.first);
   }
 
   @override
   Future<void> deleteCategory(int id) async {
-    await api.delete('${ApiConstants.categories}/$id');
+    if (await isOnline) {
+      await api.delete('${ApiConstants.categories}/$id');
+    } else {
+      await addToSyncQueue('categories', id, 'delete', null);
+    }
     final database = await db;
     await database.delete('categories', where: 'id = ?', whereArgs: [id]);
   }

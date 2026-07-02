@@ -137,6 +137,7 @@ class _DashboardPageState extends State<DashboardPage> {
             totalExpense: data.totalExpense,
             pendingBillAmount: data.pendingBillAmount,
             monthDebitTotal: data.monthDebitTotal,
+            trend: data.monthlyChart,
           ),
           const SizedBox(height: 24),
           Row(

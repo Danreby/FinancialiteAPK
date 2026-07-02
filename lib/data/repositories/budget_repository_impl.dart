@@ -39,21 +39,52 @@ class BudgetRepositoryImpl extends BaseOfflineRepository
   @override
   Future<Budget> createBudget(Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response = await api.post(ApiConstants.budgets, data: sanitized);
-    return BudgetModel.fromJson(response.data['data'] ?? response.data);
+    if (await isOnline) {
+      final response = await api.post(ApiConstants.budgets, data: sanitized);
+      final budget = BudgetModel.fromJson(response.data['data'] ?? response.data);
+      final database = await db;
+      await database.insert('budgets', budget.toDbMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace);
+      return budget;
+    }
+    final database = await db;
+    sanitized['created_at'] = DateTime.now().toIso8601String();
+    sanitized['synced'] = 0;
+    final id = await database.insert('budgets', sanitized);
+    await addToSyncQueue('budgets', id, 'create', sanitized);
+    sanitized['id'] = id;
+    return BudgetModel.fromDb(sanitized);
   }
 
   @override
   Future<Budget> updateBudget(int id, Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response =
-        await api.put('${ApiConstants.budgets}/$id', data: sanitized);
-    return BudgetModel.fromJson(response.data['data'] ?? response.data);
+    if (await isOnline) {
+      final response =
+          await api.put('${ApiConstants.budgets}/$id', data: sanitized);
+      final budget = BudgetModel.fromJson(response.data['data'] ?? response.data);
+      final database = await db;
+      await database.update('budgets', budget.toDbMap(),
+          where: 'id = ?', whereArgs: [id]);
+      return budget;
+    }
+    final database = await db;
+    sanitized['updated_at'] = DateTime.now().toIso8601String();
+    sanitized['synced'] = 0;
+    await database.update('budgets', sanitized, where: 'id = ?', whereArgs: [id]);
+    await addToSyncQueue('budgets', id, 'update', sanitized);
+    final results =
+        await database.query('budgets', where: 'id = ?', whereArgs: [id]);
+    return BudgetModel.fromDb(results.first);
   }
 
   @override
   Future<void> deleteBudget(int id) async {
-    await api.delete('${ApiConstants.budgets}/$id');
+    if (await isOnline) {
+      await api.delete('${ApiConstants.budgets}/$id');
+    } else {
+      await addToSyncQueue('budgets', id, 'delete', null);
+    }
     final database = await db;
     await database.delete('budgets', where: 'id = ?', whereArgs: [id]);
   }

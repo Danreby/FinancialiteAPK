@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_tokens.dart';
+import '../../../../core/theme/app_money_style.dart';
+import '../../../../domain/entities/dashboard.dart';
 
 class DashboardBalanceCard extends StatelessWidget {
   final double balance;
@@ -9,6 +12,7 @@ class DashboardBalanceCard extends StatelessWidget {
   final double totalExpense;
   final double pendingBillAmount;
   final double monthDebitTotal;
+  final List<MonthlyChartData> trend;
 
   const DashboardBalanceCard({
     super.key,
@@ -17,6 +21,7 @@ class DashboardBalanceCard extends StatelessWidget {
     required this.totalExpense,
     required this.pendingBillAmount,
     required this.monthDebitTotal,
+    this.trend = const [],
   });
 
   @override
@@ -30,11 +35,11 @@ class DashboardBalanceCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           gradient: appColors.heroGradient,
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-          boxShadow: appColors.elevatedShadow,
+          borderRadius: AppRadius.cardCut(),
+          boxShadow: AppShadows.cardBold(appColors.primary),
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadius.xl),
+          borderRadius: AppRadius.cardCut(),
           child: Stack(
             children: [
               // Decorative circles
@@ -129,17 +134,39 @@ class DashboardBalanceCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    // Balance amount
-                    Text(
-                      CurrencyFormatter.format(balance),
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 30,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: -1,
-                      ),
+                    const SizedBox(height: 10),
+                    // Balance amount (animated count-up) + inline trend sparkline
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: TweenAnimationBuilder<double>(
+                            tween: Tween(begin: 0, end: balance),
+                            duration: const Duration(milliseconds: 900),
+                            curve: Curves.easeOutExpo,
+                            builder: (context, animatedValue, _) {
+                              return Text.rich(
+                                AppMoneyStyle.rich(
+                                  amount: CurrencyFormatter.toInputFormat(
+                                      animatedValue),
+                                  style: AppMoneyStyle.hero,
+                                  digitColor: Colors.white,
+                                  symbolColor: Colors.white.withValues(alpha: 0.7),
+                                ),
+                                maxLines: 1,
+                              );
+                            },
+                          ),
+                        ),
+                        if (trend.length >= 2) ...[
+                          const SizedBox(width: 12),
+                          SizedBox(
+                            width: 64,
+                            height: 28,
+                            child: _TrendSparkline(trend: trend),
+                          ),
+                        ],
+                      ],
                     ),
                     const SizedBox(height: 22),
                     // Divider
@@ -156,7 +183,7 @@ class DashboardBalanceCard extends StatelessWidget {
                             Expanded(
                               child: _BalanceStat(
                                 label: 'Receitas',
-                                value: CurrencyFormatter.format(totalIncome),
+                                value: totalIncome,
                                 icon: Icons.arrow_upward_rounded,
                                 color: const Color(0xFF34D399),
                               ),
@@ -165,7 +192,7 @@ class DashboardBalanceCard extends StatelessWidget {
                             Expanded(
                               child: _BalanceStat(
                                 label: 'Despesas',
-                                value: CurrencyFormatter.format(totalExpense),
+                                value: totalExpense,
                                 icon: Icons.arrow_downward_rounded,
                                 color: const Color(0xFFFB7185),
                               ),
@@ -174,8 +201,7 @@ class DashboardBalanceCard extends StatelessWidget {
                             Expanded(
                               child: _BalanceStat(
                                 label: 'Crédito',
-                                value:
-                                    CurrencyFormatter.format(pendingBillAmount),
+                                value: pendingBillAmount,
                                 icon: Icons.credit_card_rounded,
                                 color: const Color(0xFF60A5FA),
                               ),
@@ -184,8 +210,7 @@ class DashboardBalanceCard extends StatelessWidget {
                             Expanded(
                               child: _BalanceStat(
                                 label: 'Débito',
-                                value:
-                                    CurrencyFormatter.format(monthDebitTotal),
+                                value: monthDebitTotal,
                                 icon: Icons.account_balance_rounded,
                                 color: const Color(0xFFFBBF24),
                               ),
@@ -205,6 +230,41 @@ class DashboardBalanceCard extends StatelessWidget {
   }
 }
 
+class _TrendSparkline extends StatelessWidget {
+  final List<MonthlyChartData> trend;
+  const _TrendSparkline({required this.trend});
+
+  @override
+  Widget build(BuildContext context) {
+    final spots = <FlSpot>[
+      for (var i = 0; i < trend.length; i++)
+        FlSpot(i.toDouble(), trend[i].income - trend[i].expense),
+    ];
+    return LineChart(
+      LineChartData(
+        gridData: const FlGridData(show: false),
+        titlesData: const FlTitlesData(show: false),
+        borderData: FlBorderData(show: false),
+        lineTouchData: const LineTouchData(enabled: false),
+        minY: spots.map((s) => s.y).reduce((a, b) => a < b ? a : b),
+        maxY: spots.map((s) => s.y).reduce((a, b) => a > b ? a : b),
+        lineBarsData: [
+          LineChartBarData(
+            spots: spots,
+            isCurved: true,
+            barWidth: 2,
+            color: Colors.white.withValues(alpha: 0.7),
+            dotData: const FlDotData(show: false),
+            belowBarData: BarAreaData(show: false),
+          ),
+        ],
+      ),
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.easeOutCubic,
+    );
+  }
+}
+
 class _Divider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -218,7 +278,7 @@ class _Divider extends StatelessWidget {
 
 class _BalanceStat extends StatelessWidget {
   final String label;
-  final String value;
+  final double value;
   final IconData icon;
   final Color color;
 
@@ -262,14 +322,12 @@ class _BalanceStat extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 5),
-          Text(
-            value,
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-              letterSpacing: -0.3,
+          Text.rich(
+            AppMoneyStyle.rich(
+              amount: CurrencyFormatter.toInputFormat(value),
+              style: AppMoneyStyle.small,
+              digitColor: Colors.white,
+              symbolColor: Colors.white.withValues(alpha: 0.55),
             ),
             overflow: TextOverflow.ellipsis,
           ),

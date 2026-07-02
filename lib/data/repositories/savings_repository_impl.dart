@@ -40,21 +40,55 @@ class SavingsRepositoryImpl extends BaseOfflineRepository
   @override
   Future<SavingsGoal> createGoal(Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response = await api.post(ApiConstants.savings, data: sanitized);
-    return SavingsGoalModel.fromJson(response.data['data'] ?? response.data);
+    if (await isOnline) {
+      final response = await api.post(ApiConstants.savings, data: sanitized);
+      final goal =
+          SavingsGoalModel.fromJson(response.data['data'] ?? response.data);
+      final database = await db;
+      await database.insert('savings_goals', goal.toDbMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace);
+      return goal;
+    }
+    final database = await db;
+    sanitized['created_at'] = DateTime.now().toIso8601String();
+    sanitized['synced'] = 0;
+    final id = await database.insert('savings_goals', sanitized);
+    await addToSyncQueue('savings_goals', id, 'create', sanitized);
+    sanitized['id'] = id;
+    return SavingsGoalModel.fromDb(sanitized);
   }
 
   @override
   Future<SavingsGoal> updateGoal(int id, Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response =
-        await api.put('${ApiConstants.savings}/$id', data: sanitized);
-    return SavingsGoalModel.fromJson(response.data['data'] ?? response.data);
+    if (await isOnline) {
+      final response =
+          await api.put('${ApiConstants.savings}/$id', data: sanitized);
+      final goal =
+          SavingsGoalModel.fromJson(response.data['data'] ?? response.data);
+      final database = await db;
+      await database.update('savings_goals', goal.toDbMap(),
+          where: 'id = ?', whereArgs: [id]);
+      return goal;
+    }
+    final database = await db;
+    sanitized['updated_at'] = DateTime.now().toIso8601String();
+    sanitized['synced'] = 0;
+    await database
+        .update('savings_goals', sanitized, where: 'id = ?', whereArgs: [id]);
+    await addToSyncQueue('savings_goals', id, 'update', sanitized);
+    final results =
+        await database.query('savings_goals', where: 'id = ?', whereArgs: [id]);
+    return SavingsGoalModel.fromDb(results.first);
   }
 
   @override
   Future<void> deleteGoal(int id) async {
-    await api.delete('${ApiConstants.savings}/$id');
+    if (await isOnline) {
+      await api.delete('${ApiConstants.savings}/$id');
+    } else {
+      await addToSyncQueue('savings_goals', id, 'delete', null);
+    }
     final database = await db;
     await database.update(
         'savings_goals', {'deleted_at': DateTime.now().toIso8601String()},

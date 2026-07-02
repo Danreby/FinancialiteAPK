@@ -6,6 +6,7 @@ import '../network/network_info.dart';
 import '../network/interceptors/auth_interceptor.dart';
 import '../network/interceptors/connectivity_interceptor.dart';
 import '../security/secure_storage.dart';
+import '../../data/services/sync_service.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/transaction_repository_impl.dart';
 import '../../data/repositories/bill_repository_impl.dart';
@@ -66,6 +67,9 @@ Future<void> init() async {
         connectivityInterceptor: sl(),
       ));
 
+  // Sync (drains the offline sync_queue once connectivity returns)
+  sl.registerLazySingleton(() => SyncService(sl(), sl()));
+
   // Repositories
   sl.registerLazySingleton<AuthRepository>(
       () => AuthRepositoryImpl(sl(), sl(), sl()));
@@ -97,7 +101,7 @@ Future<void> init() async {
   // BLoCs / Cubits
   sl.registerLazySingleton(() => AuthBloc(sl(), sl()));
   sl.registerLazySingleton(() => ThemeCubit());
-  sl.registerLazySingleton(() => ConnectivityCubit(sl()));
+  sl.registerLazySingleton(() => ConnectivityCubit(sl(), sl()));
   sl.registerLazySingleton(() => DashboardCubit(sl()));
   sl.registerLazySingleton(() => TransactionBloc(sl()));
   sl.registerLazySingleton(() => BillCubit(sl()));

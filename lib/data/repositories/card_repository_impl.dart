@@ -1,3 +1,4 @@
+import 'package:sqflite/sqflite.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/network/api_client.dart';
 import '../../core/network/network_info.dart';
@@ -41,21 +42,69 @@ class CardRepositoryImpl extends BaseOfflineRepository
   @override
   Future<CardUser> createCard(Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response = await api.post(ApiConstants.cards, data: sanitized);
-    return CardUserModel.fromJson(response.data['data'] ?? response.data);
+    if (await isOnline) {
+      final response = await api.post(ApiConstants.cards, data: sanitized);
+      final card = CardUserModel.fromJson(response.data['data'] ?? response.data);
+      final database = await db;
+      await database.insert('card_users', card.toDbMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace);
+      return card;
+    }
+    final database = await db;
+    sanitized['created_at'] = DateTime.now().toIso8601String();
+    sanitized['synced'] = 0;
+    final id = await database.insert('card_users', sanitized);
+    await addToSyncQueue('card_users', id, 'create', sanitized);
+    return CardUserModel(
+      id: id,
+      userId: sanitized['user_id'] as int? ?? 0,
+      cardId: sanitized['card_id'] as int,
+      dueDay: sanitized['due_day'] as int? ?? 10,
+      closingDay: sanitized['closing_day'] as int? ?? 3,
+      creditLimit: (sanitized['credit_limit'] as num? ?? 0).toDouble(),
+      nickname: sanitized['nickname'] as String?,
+    );
   }
 
   @override
   Future<CardUser> updateCard(int id, Map<String, dynamic> data) async {
     final sanitized = InputSanitizer.sanitizeMap(data);
-    final response =
-        await api.put('${ApiConstants.cards}/$id', data: sanitized);
-    return CardUserModel.fromJson(response.data['data'] ?? response.data);
+    if (await isOnline) {
+      final response =
+          await api.put('${ApiConstants.cards}/$id', data: sanitized);
+      final card = CardUserModel.fromJson(response.data['data'] ?? response.data);
+      final database = await db;
+      await database.update('card_users', card.toDbMap(),
+          where: 'id = ?', whereArgs: [id]);
+      return card;
+    }
+    final database = await db;
+    sanitized['updated_at'] = DateTime.now().toIso8601String();
+    sanitized['synced'] = 0;
+    await database
+        .update('card_users', sanitized, where: 'id = ?', whereArgs: [id]);
+    await addToSyncQueue('card_users', id, 'update', sanitized);
+    final results =
+        await database.query('card_users', where: 'id = ?', whereArgs: [id]);
+    final r = results.first;
+    return CardUserModel(
+      id: r['id'] as int?,
+      userId: r['user_id'] as int,
+      cardId: r['card_id'] as int,
+      dueDay: r['due_day'] as int? ?? 10,
+      closingDay: r['closing_day'] as int? ?? 3,
+      creditLimit: (r['credit_limit'] as num? ?? 0).toDouble(),
+      nickname: r['nickname'] as String?,
+    );
   }
 
   @override
   Future<void> deleteCard(int id) async {
-    await api.delete('${ApiConstants.cards}/$id');
+    if (await isOnline) {
+      await api.delete('${ApiConstants.cards}/$id');
+    } else {
+      await addToSyncQueue('card_users', id, 'delete', null);
+    }
     final database = await db;
     await database.delete('card_users', where: 'id = ?', whereArgs: [id]);
   }

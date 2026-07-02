@@ -8,6 +8,8 @@ import '../../widgets/app_text_field.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_tokens.dart';
+import '../../widgets/app_logo_mark.dart';
+import '../../widgets/pressable_scale.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -127,7 +129,8 @@ class _LoginPageState extends State<LoginPage> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              // Gradient Hero Section
+              // Gradient hero -- signature asymmetric corner instead of a
+              // symmetric rounded-bottom banner.
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.only(
@@ -137,24 +140,13 @@ class _LoginPageState extends State<LoginPage> {
                 decoration: BoxDecoration(
                   gradient: theme.appColors.heroGradient,
                   borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(AppRadius.xxl),
-                    bottomRight: Radius.circular(AppRadius.xxl),
+                    bottomLeft: Radius.circular(32),
+                    bottomRight: Radius.circular(4),
                   ),
                 ),
                 child: Column(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(AppRadius.xl),
-                      ),
-                      child: const Icon(
-                        Icons.account_balance_wallet_rounded,
-                        size: 44,
-                        color: Colors.white,
-                      ),
-                    ),
+                    const AppLogoMark(size: 72, barColor: Colors.white),
                     const SizedBox(height: 20),
                     const Text(
                       'Financialite',
@@ -228,19 +220,22 @@ class _LoginPageState extends State<LoginPage> {
                                   : AppShadows.buttonPrimary(
                                       theme.colorScheme.primary),
                             ),
-                            child: FilledButton(
-                              onPressed: isLoading ? null : _submit,
-                              child: isLoading
-                                  ? const SizedBox(
-                                      height: 22,
-                                      width: 22,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        strokeCap: StrokeCap.round,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Text('Entrar'),
+                            child: PressableScale(
+                              enabled: !isLoading,
+                              child: FilledButton(
+                                onPressed: isLoading ? null : _submit,
+                                child: isLoading
+                                    ? const SizedBox(
+                                        height: 22,
+                                        width: 22,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.5,
+                                          strokeCap: StrokeCap.round,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : const Text('Entrar'),
+                              ),
                             ),
                           );
                         },
