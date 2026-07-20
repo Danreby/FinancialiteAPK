@@ -10,7 +10,7 @@ import '../../widgets/section_header.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/shadowed_fab.dart';
 import '../../widgets/responsive_content.dart';
-import '../../../core/utils/date_formatter.dart';
+import '../../../core/theme/app_theme.dart';
 import 'widgets/bill_dialogs.dart';
 import 'widgets/bill_list_item.dart';
 
@@ -62,26 +62,32 @@ class _BillsPageState extends State<BillsPage> {
     return bill.nextDueDate ?? _nextDueDate(bill.dueDay);
   }
 
+  // Mirrors financialite (web)'s `getNextDueInfo` (resources/js/Utils/bills.js)
+  // text/threshold/color logic exactly, so a bill's due-date countdown reads
+  // identically on both platforms.
+  String _plural(int n) => 'dia${n != 1 ? 's' : ''}';
+
   (String, Color) _dueInfo(Bill bill, ThemeData theme) {
+    final appColors = theme.appColors;
     final dueDate = _effectiveDueDate(bill);
     final today =
         DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     final diff = dueDate.difference(today).inDays;
 
     if (_isPaidThisCycle(bill)) {
-      return ('Pago · próx. ${DateFormatter.shortDate(dueDate)}', Colors.green);
+      if (diff <= 0) return ('Pago', appColors.success);
+      return ('Pago · próx. $diff ${_plural(diff)}', appColors.success);
     }
 
     if (diff < 0) {
-      return ('Vencido há ${-diff}d', theme.colorScheme.error);
+      final overdue = -diff;
+      return ('Venceu há $overdue ${_plural(overdue)}', theme.colorScheme.error);
     } else if (diff == 0) {
-      return ('Vence hoje', theme.colorScheme.error);
-    } else if (diff == 1) {
-      return ('Vence amanhã', Colors.orange);
+      return ('Vence hoje', appColors.warning);
     } else if (diff <= 7) {
-      return ('Vence em ${diff}d', Colors.orange);
+      return ('Vence em $diff ${_plural(diff)}', appColors.info);
     } else {
-      return ('Vence em ${diff}d', theme.colorScheme.primary);
+      return ('Vence em $diff ${_plural(diff)}', theme.colorScheme.onSurfaceVariant);
     }
   }
 

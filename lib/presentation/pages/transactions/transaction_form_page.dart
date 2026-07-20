@@ -122,7 +122,7 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
           PageHeader(
               title: _isEditing ? 'Editar Transação' : 'Nova Transação',
               showBackButton: true,
-              bottomPadding: 16),
+              bottomPadding: 24),
           Expanded(
             child: _isLoadingTransaction
                 ? const Center(child: CircularProgressIndicator())

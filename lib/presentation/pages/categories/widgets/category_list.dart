@@ -5,6 +5,7 @@ import '../../../../domain/entities/category.dart';
 import '../../../widgets/empty_state_widget.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../../core/utils/icon_utils.dart';
+import '../../../widgets/category_icon_glyph.dart';
 import 'category_form_dialog.dart';
 import '../../../../core/theme/app_tokens.dart';
 
@@ -72,8 +73,8 @@ class CategoryList extends StatelessWidget {
                               colorFromHex(cat.color).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(AppRadius.xl),
                         ),
-                        child: Icon(
-                          iconFromName(cat.icon),
+                        child: CategoryIconGlyph(
+                          icon: cat.icon,
                           color: colorFromHex(cat.color),
                           size: 22,
                         ),

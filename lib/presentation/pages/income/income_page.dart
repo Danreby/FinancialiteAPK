@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../blocs/income/income_cubit.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
@@ -7,7 +8,6 @@ import '../../widgets/empty_state_widget.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/section_header.dart';
-import '../../widgets/income_form_dialog.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/shadowed_fab.dart';
@@ -36,7 +36,7 @@ class _IncomePageState extends State<IncomePage> {
     final theme = Theme.of(context);
     return Scaffold(
       floatingActionButton:
-          ShadowedFab(onPressed: () => showIncomeFormDialog(context)),
+          ShadowedFab(onPressed: () => context.push('/income/new')),
       body: Column(
         children: [
           const PageHeader(title: 'Receitas', bottomPadding: 16),
@@ -267,9 +267,8 @@ class _IncomePageState extends State<IncomePage> {
                                             size: 18,
                                             color: theme
                                                 .colorScheme.onSurfaceVariant),
-                                        onPressed: () => showIncomeFormDialog(
-                                            context,
-                                            editing: income),
+                                        onPressed: () =>
+                                            context.push('/income/${income.id}'),
                                         constraints: const BoxConstraints(
                                             maxWidth: 32, maxHeight: 32),
                                         padding: EdgeInsets.zero,

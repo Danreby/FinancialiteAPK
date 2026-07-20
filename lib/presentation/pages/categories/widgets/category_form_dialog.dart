@@ -5,46 +5,16 @@ import '../../../../domain/entities/category.dart';
 import '../../../widgets/app_text_field.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/utils/icon_utils.dart';
+import '../../../../core/utils/category_icons.dart';
 import '../../../../core/theme/app_tokens.dart';
 
 void showCategoryDialog(BuildContext context, {Category? editing}) {
   final nameCtrl = TextEditingController(text: editing?.name ?? '');
   String type = editing?.type ?? 'expense';
-  String selectedIcon = editing?.icon ?? 'category';
+  String selectedIcon = editing?.icon ?? categoryIconOptions.first.name;
   String selectedColor = editing?.color ?? '#6B7280';
   final formKey = GlobalKey<FormState>();
 
-  final iconOptions = <String>[
-    'shopping_cart',
-    'restaurant',
-    'home',
-    'directions_car',
-    'local_gas_station',
-    'credit_card',
-    'health_and_safety',
-    'sports_esports',
-    'school',
-    'commute',
-    'lightbulb',
-    'smartphone',
-    'fitness_center',
-    'movie',
-    'work',
-    'travel_explore',
-    'savings',
-    'account_balance',
-    'fastfood',
-    'coffee',
-    'flight',
-    'hotel',
-    'pets',
-    'subscriptions',
-    'music_note',
-    'book',
-    'local_pharmacy',
-    'cleaning_services',
-    'attach_money',
-  ];
   final colorOptions = <String>[
     '#E11D48',
     '#059669',
@@ -129,15 +99,17 @@ void showCategoryDialog(BuildContext context, {Category? editing}) {
                   height: 56,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: iconOptions.length,
+                    itemCount: categoryIconOptions.length,
                     itemBuilder: (_, i) {
-                      final ic = iconOptions[i];
-                      final sel = ic == selectedIcon;
+                      final option = categoryIconOptions[i];
+                      final sel = option.name == selectedIcon;
                       return GestureDetector(
-                        onTap: () => setLocalState(() => selectedIcon = ic),
+                        onTap: () =>
+                            setLocalState(() => selectedIcon = option.name),
                         child: Container(
                           width: 48,
                           margin: const EdgeInsets.only(right: 8),
+                          alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: sel
                                 ? colorFromHex(selectedColor)
@@ -150,11 +122,8 @@ void showCategoryDialog(BuildContext context, {Category? editing}) {
                                     width: 2)
                                 : null,
                           ),
-                          child: Icon(iconFromName(ic),
-                              size: 22,
-                              color: sel
-                                  ? colorFromHex(selectedColor)
-                                  : Colors.grey),
+                          child: Text(option.icon,
+                              style: const TextStyle(fontSize: 24)),
                         ),
                       );
                     },

@@ -13,6 +13,7 @@ import '../../widgets/transaction_tile.dart';
 import '../../widgets/responsive_content.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../../core/utils/icon_utils.dart';
 import '../../../domain/entities/category.dart';
 import '../../../domain/entities/card_entity.dart';
 import '../../widgets/page_header.dart';
@@ -283,8 +284,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
                         segments: const [
                           ButtonSegment(value: 'all', label: Text('Todos')),
                           ButtonSegment(
-                              value: 'credit', label: Text('Entrada')),
-                          ButtonSegment(value: 'debit', label: Text('Saída')),
+                              value: 'credit', label: Text('Crédito')),
+                          ButtonSegment(value: 'debit', label: Text('Débito')),
                         ],
                         selected: {_typeFilter},
                         onSelectionChanged: (value) {
@@ -415,8 +416,11 @@ class _TransactionsPageState extends State<TransactionsPage> {
                               subtitle:
                                   '${isCredit ? 'Crédito' : 'Débito'} • ${tx.categoryName ?? 'Sem categoria'}${tx.date != null ? ' • ${DateFormatter.shortDate(tx.date!)}' : ''}',
                               amount: CurrencyFormatter.format(tx.amount),
-                              isExpense: true,
-                              categoryIcon: Icons.arrow_circle_down_rounded,
+                              isExpense: !isCredit,
+                              categoryIconName: tx.categoryIcon,
+                              categoryColor: tx.categoryColor != null
+                                  ? colorFromHex(tx.categoryColor)
+                                  : null,
                               onTap: () =>
                                   context.push('/transactions/${tx.id}'),
                             ),

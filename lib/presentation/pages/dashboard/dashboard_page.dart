@@ -5,7 +5,6 @@ import '../../../../core/theme/app_theme.dart';
 import '../../blocs/dashboard/dashboard_cubit.dart';
 import '../../blocs/notification/notification_cubit.dart';
 import '../../blocs/savings/savings_cubit.dart';
-import '../../widgets/income_form_dialog.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/stat_card.dart';
@@ -187,7 +186,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   label: 'Nova Entrada',
                   icon: Icons.arrow_upward_rounded,
                   color: const Color(0xFF10B981),
-                  onTap: () => showIncomeFormDialog(context),
+                  onTap: () => context.push('/income/new'),
                 ),
               ),
             ],

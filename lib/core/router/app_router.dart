@@ -13,6 +13,7 @@ import '../../presentation/pages/transactions/transactions_page.dart';
 import '../../presentation/pages/transactions/transaction_form_page.dart';
 import '../../presentation/pages/bills/bills_page.dart';
 import '../../presentation/pages/income/income_page.dart';
+import '../../presentation/pages/income/income_form_page.dart';
 import '../../presentation/pages/budget/budget_page.dart';
 import '../../presentation/pages/savings/savings_page.dart';
 import '../../presentation/pages/bank/bank_accounts_page.dart';
@@ -129,6 +130,16 @@ class AppRouter {
               path: '/income',
               pageBuilder: (context, state) =>
                   const NoTransitionPage(child: IncomePage()),
+            ),
+            GoRoute(
+              path: '/income/new',
+              builder: (context, state) => const IncomeFormPage(),
+            ),
+            GoRoute(
+              path: '/income/:id',
+              builder: (context, state) => IncomeFormPage(
+                incomeId: int.tryParse(state.pathParameters['id'] ?? ''),
+              ),
             ),
             GoRoute(
               path: '/budget',

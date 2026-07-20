@@ -205,7 +205,7 @@ class _ExtractViewState extends State<_ExtractView> {
                                   : t.categoryName ?? '',
                               amount: CurrencyFormatter.format(t.amount),
                               isExpense: true,
-                              categoryIcon: iconFromName(t.categoryIcon),
+                              categoryIconName: t.categoryIcon,
                               categoryColor: colorFromHex(t.categoryColor),
                               onTap: () =>
                                   context.push('/transactions/${t.id}'),

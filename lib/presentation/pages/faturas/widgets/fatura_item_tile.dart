@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/icon_utils.dart';
+import '../../../widgets/category_icon_glyph.dart';
 import '../../../../core/theme/app_tokens.dart';
 
 class FaturaItemTile extends StatelessWidget {
@@ -41,8 +42,8 @@ class FaturaItemTile extends StatelessWidget {
                 color: iconColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.xl),
               ),
-              child:
-                  Icon(iconFromName(categoryIcon), size: 22, color: iconColor),
+              child: CategoryIconGlyph(
+                  icon: categoryIcon, size: 22, color: iconColor),
             ),
             const SizedBox(width: 14),
             Expanded(

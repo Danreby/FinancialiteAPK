@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/app_tokens.dart';
+import 'category_icon_glyph.dart';
 
 class TransactionTile extends StatelessWidget {
   final String title;
@@ -8,6 +9,13 @@ class TransactionTile extends StatelessWidget {
   final String amount;
   final bool isExpense;
   final IconData categoryIcon;
+
+  /// The category's raw stored icon key (e.g. 'piggy'). When set, takes
+  /// priority over [categoryIcon] and renders via [CategoryIconGlyph] so
+  /// this tile shows the same glyph financialite (web) would for the same
+  /// category -- [categoryIcon] remains as a plain-IconData fallback for
+  /// callers that don't have a real category (e.g. a generic list row).
+  final String? categoryIconName;
   final Color? categoryColor;
   final VoidCallback? onTap;
 
@@ -18,6 +26,7 @@ class TransactionTile extends StatelessWidget {
     required this.amount,
     required this.isExpense,
     this.categoryIcon = Icons.swap_horiz_rounded,
+    this.categoryIconName,
     this.categoryColor,
     this.onTap,
   });
@@ -43,7 +52,10 @@ class TransactionTile extends StatelessWidget {
                 color: iconBg.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
-              child: Icon(categoryIcon, size: 19, color: iconBg),
+              child: categoryIconName != null
+                  ? CategoryIconGlyph(
+                      icon: categoryIconName, size: 19, color: iconBg)
+                  : Icon(categoryIcon, size: 19, color: iconBg),
             ),
             const SizedBox(width: 12),
             Expanded(
