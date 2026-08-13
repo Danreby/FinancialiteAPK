@@ -68,6 +68,7 @@ class CategoryList extends StatelessWidget {
                       Container(
                         width: 44,
                         height: 44,
+                        alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color:
                               colorFromHex(cat.color).withValues(alpha: 0.12),

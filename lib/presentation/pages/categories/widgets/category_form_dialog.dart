@@ -122,8 +122,13 @@ void showCategoryDialog(BuildContext context, {Category? editing}) {
                                     width: 2)
                                 : null,
                           ),
-                          child: Text(option.icon,
-                              style: const TextStyle(fontSize: 24)),
+                          child: Icon(
+                            option.icon,
+                            size: 24,
+                            color: sel
+                                ? colorFromHex(selectedColor)
+                                : Theme.of(ctx).colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       );
                     },

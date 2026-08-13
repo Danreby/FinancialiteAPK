@@ -6,12 +6,12 @@ import '../../../../core/theme/app_tokens.dart';
 void showColorSchemeSheet(BuildContext context, String current) {
   final theme = Theme.of(context);
   final schemes = [
-    ('rose', '🌹 Rosé', const Color(0xFFE11D48)),
-    ('forest', '🌿 Floresta', const Color(0xFF059669)),
-    ('black', '🖤 Preto', const Color(0xFF1F2937)),
-    ('gold', '✨ Ouro', const Color(0xFFD97706)),
-    ('lavender', '💜 Lavanda', const Color(0xFF7C3AED)),
-    ('midnight', '🌙 Meia-noite', const Color(0xFF1E40AF)),
+    ('rose', 'Rosé', const Color(0xFFE11D48)),
+    ('forest', 'Floresta', const Color(0xFF059669)),
+    ('black', 'Preto', const Color(0xFF1F2937)),
+    ('gold', 'Ouro', const Color(0xFFD97706)),
+    ('lavender', 'Lavanda', const Color(0xFF7C3AED)),
+    ('midnight', 'Meia-noite', const Color(0xFF1E40AF)),
   ];
   showModalBottomSheet(
     context: context,

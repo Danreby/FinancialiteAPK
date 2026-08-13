@@ -145,15 +145,27 @@ class DashboardBalanceCard extends StatelessWidget {
                             duration: const Duration(milliseconds: 900),
                             curve: Curves.easeOutExpo,
                             builder: (context, animatedValue, _) {
-                              return Text.rich(
-                                AppMoneyStyle.rich(
-                                  amount: CurrencyFormatter.toInputFormat(
-                                      animatedValue),
-                                  style: AppMoneyStyle.hero,
-                                  digitColor: Colors.white,
-                                  symbolColor: Colors.white.withValues(alpha: 0.7),
+                              // FittedBox/scaleDown so amounts with more
+                              // digits (e.g. "R$ 1.000,00") shrink to fit
+                              // this row instead of overflowing and being
+                              // clipped away entirely at the 44px hero size.
+                              return Align(
+                                alignment: Alignment.centerLeft,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text.rich(
+                                    AppMoneyStyle.rich(
+                                      amount: CurrencyFormatter.toInputFormat(
+                                          animatedValue),
+                                      style: AppMoneyStyle.hero,
+                                      digitColor: Colors.white,
+                                      symbolColor:
+                                          Colors.white.withValues(alpha: 0.7),
+                                    ),
+                                    maxLines: 1,
+                                  ),
                                 ),
-                                maxLines: 1,
                               );
                             },
                           ),
@@ -322,14 +334,21 @@ class _BalanceStat extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 5),
-          Text.rich(
-            AppMoneyStyle.rich(
-              amount: CurrencyFormatter.toInputFormat(value),
-              style: AppMoneyStyle.small,
-              digitColor: Colors.white,
-              symbolColor: Colors.white.withValues(alpha: 0.55),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text.rich(
+                AppMoneyStyle.rich(
+                  amount: CurrencyFormatter.toInputFormat(value),
+                  style: AppMoneyStyle.small,
+                  digitColor: Colors.white,
+                  symbolColor: Colors.white.withValues(alpha: 0.55),
+                ),
+                maxLines: 1,
+              ),
             ),
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
