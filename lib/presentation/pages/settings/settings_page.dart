@@ -8,7 +8,7 @@ import '../../widgets/section_header.dart';
 import '../../widgets/page_header.dart';
 import 'widgets/color_scheme_sheet.dart';
 import 'widgets/settings_item.dart';
-import '../../../core/theme/app_tokens.dart';
+import '../../../core/theme/app_theme.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -35,63 +35,48 @@ class SettingsPage extends StatelessWidget {
               const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(AppRadius.xl),
-                    border: Border.all(
-                      color: theme.colorScheme.outlineVariant
-                          .withValues(alpha: 0.5),
+                child: Column(
+                  children: [
+                    SettingsItem(
+                      icon: Icons.dark_mode,
+                      iconColor: const Color(0xFF5C6BC0),
+                      title: 'Modo escuro',
+                      trailing: Switch.adaptive(
+                        value: themeState.isDark,
+                        onChanged: (_) =>
+                            context.read<ThemeCubit>().toggleThemeMode(),
+                      ),
                     ),
-                  ),
-                  child: Column(
-                    children: [
-                      SettingsItem(
-                        icon: Icons.dark_mode,
-                        iconColor: const Color(0xFF5C6BC0),
-                        title: 'Modo escuro',
-                        trailing: Switch.adaptive(
-                          value: themeState.isDark,
-                          onChanged: (_) =>
-                              context.read<ThemeCubit>().toggleThemeMode(),
-                        ),
-                      ),
-                      Divider(
-                        height: 1,
-                        indent: 74,
-                        color: theme.colorScheme.outlineVariant
-                            .withValues(alpha: 0.3),
-                      ),
-                      SettingsItem(
-                        icon: Icons.palette,
-                        iconColor: theme.colorScheme.primary,
-                        title: 'Tema de cores',
-                        subtitle: _themeLabel(themeState.colorSchemeName),
-                        onTap: () => showColorSchemeSheet(
-                            context, themeState.colorSchemeName),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 12,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.primary,
-                                shape: BoxShape.circle,
-                              ),
+                    SettingsItem(
+                      icon: Icons.palette,
+                      iconColor: theme.colorScheme.primary,
+                      title: 'Tema de cores',
+                      subtitle: _themeLabel(themeState.colorSchemeName),
+                      onTap: () => showColorSchemeSheet(
+                          context, themeState.colorSchemeName),
+                      showDivider: false,
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary,
+                              shape: BoxShape.circle,
                             ),
-                            const SizedBox(width: 8),
-                            Icon(
-                              Icons.chevron_right,
-                              size: 20,
-                              color: theme.colorScheme.onSurfaceVariant
-                                  .withValues(alpha: 0.5),
-                            ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.chevron_right,
+                            size: 20,
+                            color: theme.colorScheme.onSurfaceVariant
+                                .withValues(alpha: 0.5),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -102,32 +87,23 @@ class SettingsPage extends StatelessWidget {
               const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(AppRadius.xl),
-                    border: Border.all(
-                      color: theme.colorScheme.outlineVariant
-                          .withValues(alpha: 0.5),
-                    ),
-                  ),
-                  child: SettingsItem(
-                    icon: Icons.sync,
-                    iconColor: const Color(0xFF26A69A),
-                    title: 'Sincronizar dados',
-                    subtitle: 'Enviar dados pendentes para o servidor',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Sincronização iniciada...')),
-                      );
-                    },
-                    trailing: Icon(
-                      Icons.chevron_right,
-                      size: 20,
-                      color: theme.colorScheme.onSurfaceVariant
-                          .withValues(alpha: 0.5),
-                    ),
+                child: SettingsItem(
+                  icon: Icons.sync,
+                  iconColor: const Color(0xFF26A69A),
+                  title: 'Sincronizar dados',
+                  subtitle: 'Enviar dados pendentes para o servidor',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Sincronização iniciada...')),
+                    );
+                  },
+                  showDivider: false,
+                  trailing: Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: theme.colorScheme.onSurfaceVariant
+                        .withValues(alpha: 0.5),
                   ),
                 ),
               ),
@@ -139,34 +115,25 @@ class SettingsPage extends StatelessWidget {
               const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(AppRadius.xl),
-                    border: Border.all(
-                      color: theme.colorScheme.outlineVariant
-                          .withValues(alpha: 0.5),
-                    ),
-                  ),
-                  child: SettingsItem(
-                    icon: Icons.logout,
-                    iconColor: Colors.orange,
-                    title: 'Sair',
-                    onTap: () async {
-                      final confirmed = await ConfirmDialog.show(
-                        context,
-                        title: 'Sair',
-                        message: 'Deseja realmente sair?',
-                        confirmText: 'Sair',
-                      );
-                      if (confirmed == true) {
-                        context
-                            .read<AuthBloc>()
-                            .add(const AuthLogoutRequested());
-                        context.go('/login');
-                      }
-                    },
-                  ),
+                child: SettingsItem(
+                  icon: Icons.logout,
+                  iconColor: theme.appColors.warning,
+                  title: 'Sair',
+                  showDivider: false,
+                  onTap: () async {
+                    final confirmed = await ConfirmDialog.show(
+                      context,
+                      title: 'Sair',
+                      message: 'Deseja realmente sair?',
+                      confirmText: 'Sair',
+                    );
+                    if (confirmed == true) {
+                      context
+                          .read<AuthBloc>()
+                          .add(const AuthLogoutRequested());
+                      context.go('/login');
+                    }
+                  },
                 ),
               ),
 

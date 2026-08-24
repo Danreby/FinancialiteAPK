@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/icon_utils.dart';
-import '../../../widgets/category_icon_glyph.dart';
-import '../../../../core/theme/app_tokens.dart';
+import '../../../../core/utils/category_icons.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../widgets/ledger_row.dart';
 
 class FaturaItemTile extends StatelessWidget {
   final Map<String, dynamic> item;
@@ -12,7 +13,7 @@ class FaturaItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final appColors = Theme.of(context).appColors;
     final title = item['title'] as String? ?? '';
     final installmentAmount =
         (item['installment_amount'] as num?)?.toDouble() ?? 0.0;
@@ -27,109 +28,50 @@ class FaturaItemTile extends StatelessWidget {
     final categoryColor = item['category_color'] as String?;
     final bankName = item['bank_name'] as String?;
     final iconColor = colorFromHex(categoryColor);
+    final iconData =
+        iconDataForCategoryIcon(categoryIcon) ?? iconFromName(categoryIcon);
 
-    return InkWell(
+    // Fold the status/installment/recurring badges and bank name into a
+    // single subtitle line -- LedgerRow has no room for a badge Wrap.
+    final subtitleParts = <String>[
+      _statusLabel(status),
+      if (hasInstallments) '$displayInstallment/$totalInstallments',
+      if (isRecurring) 'Recorrente',
+      if (bankName != null) bankName,
+    ];
+
+    return LedgerRow(
+      title: title,
+      subtitle: subtitleParts.join(' • '),
+      subtitleColor: _statusColor(status, appColors),
+      leadingIcon: iconData,
+      leadingIconColor: iconColor,
+      amount: installmentAmount,
+      amountSign: '-',
+      amountColor: Theme.of(context).colorScheme.error,
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppRadius.xl),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppRadius.xl),
-              ),
-              child: CategoryIconGlyph(
-                  icon: categoryIcon, size: 22, color: iconColor),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.titleSmall
-                        ?.copyWith(fontWeight: FontWeight.w600),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 4,
-                    children: [
-                      if (hasInstallments)
-                        _badge('$displayInstallment/$totalInstallments',
-                            const Color(0xFF7C3AED)),
-                      if (isRecurring)
-                        _badge('Recorrente', const Color(0xFF3B82F6)),
-                      _statusBadge(status, theme),
-                      if (bankName != null)
-                        Text(
-                          bankName,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                            fontSize: 10,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              '- ${CurrencyFormatter.format(installmentAmount)}',
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: theme.colorScheme.error,
-                letterSpacing: -0.3,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
-  Widget _badge(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppRadius.sm),
-      ),
-      child: Text(
-        label,
-        style:
-            TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: color),
-      ),
-    );
-  }
-
-  Widget _statusBadge(String status, ThemeData theme) {
-    Color color;
-    String label;
+  String _statusLabel(String status) {
     switch (status) {
       case 'paid':
-        color = const Color(0xFF10B981);
-        label = 'Pago';
-        break;
+        return 'Pago';
       case 'overdue':
-        color = theme.colorScheme.error;
-        label = 'Vencido';
-        break;
+        return 'Vencido';
       default:
-        color = theme.colorScheme.onSurfaceVariant;
-        label = 'Em aberto';
+        return 'Em aberto';
     }
-    return _badge(label, color);
+  }
+
+  Color _statusColor(String status, ThemeColors appColors) {
+    switch (status) {
+      case 'paid':
+        return appColors.success;
+      case 'overdue':
+        return appColors.error;
+      default:
+        return appColors.onSurfaceVariant;
+    }
   }
 }

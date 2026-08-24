@@ -126,7 +126,7 @@ class _BillsPageState extends State<BillsPage> {
                     return RefreshIndicator(
                       onRefresh: () async => _loadData(),
                       child: ListView.builder(
-                        padding: const EdgeInsets.only(bottom: 90),
+                        padding: const EdgeInsets.fromLTRB(20, 4, 20, 130),
                         itemCount: state.bills.length + 1,
                         itemBuilder: (context, index) {
                           if (index == 0) {

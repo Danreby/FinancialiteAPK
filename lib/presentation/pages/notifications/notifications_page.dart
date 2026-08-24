@@ -4,11 +4,12 @@ import '../../blocs/notification/notification_cubit.dart';
 import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/empty_state_widget.dart';
+import '../../widgets/ledger_row.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/responsive_content.dart';
 import 'widgets/notification_type_style.dart';
-import '../../../core/theme/app_tokens.dart';
+import '../../../domain/entities/notification.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -22,6 +23,35 @@ class _NotificationsPageState extends State<NotificationsPage> {
   void initState() {
     super.initState();
     context.read<NotificationCubit>().loadNotifications();
+  }
+
+  /// Groups the already-loaded notifications by recency for rendering.
+  /// Purely a display-layer transform — does not affect data loading.
+  List<Object> _buildDisplayItems(List<AppNotification> notifications) {
+    final items = <Object>[];
+    String? lastGroup;
+    for (final n in notifications) {
+      final createdAt = n.createdAt;
+      if (createdAt != null) {
+        final group = _groupLabel(createdAt);
+        if (group != lastGroup) {
+          items.add(group);
+          lastGroup = group;
+        }
+      }
+      items.add(n);
+    }
+    return items;
+  }
+
+  String _groupLabel(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final day = DateTime(date.year, date.month, date.day);
+    final diff = today.difference(day).inDays;
+    if (diff <= 0) return 'Hoje';
+    if (diff < 7) return 'Esta semana';
+    return 'Anteriores';
   }
 
   @override
@@ -106,141 +136,84 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         subtitle: 'Você ainda não tem notificações',
                       );
                     }
+                    final displayItems =
+                        _buildDisplayItems(state.notifications);
                     return RefreshIndicator(
                       onRefresh: () async =>
                           context.read<NotificationCubit>().loadNotifications(),
                       child: ListView.builder(
-                        padding: const EdgeInsets.only(top: 8, bottom: 90),
-                        itemCount: state.notifications.length,
+                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 130),
+                        itemCount: displayItems.length,
                         itemBuilder: (context, index) {
-                          final n = state.notifications[index];
+                          final item = displayItems[index];
+                          if (item is String) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.fromLTRB(4, 16, 4, 4),
+                              child: Text(
+                                item,
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            );
+                          }
+                          final n = item as AppNotification;
                           final isUnread = !n.isRead;
                           final typeStyle =
                               NotificationTypeMapper.resolve(context, n.type);
                           final canMutate = n.id != null;
                           final keyValue = n.id?.toString() ??
                               '${n.title}_${n.createdAt?.millisecondsSinceEpoch ?? index}_$index';
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(AppRadius.xl),
-                              child: Dismissible(
-                                key: Key('notif_$keyValue'),
-                                direction: canMutate
-                                    ? DismissDirection.endToStart
-                                    : DismissDirection.none,
-                                background: Container(
-                                  alignment: Alignment.centerRight,
-                                  padding: const EdgeInsets.only(right: 20),
-                                  color: theme.colorScheme.error,
-                                  child: const Icon(Icons.delete,
-                                      color: Colors.white),
-                                ),
-                                onDismissed: (_) {
-                                  if (!canMutate) return;
-                                  context
-                                      .read<NotificationCubit>()
-                                      .deleteNotification(n.id!);
-                                },
-                                child: GestureDetector(
-                                  onTap: isUnread && canMutate
-                                      ? () => context
-                                          .read<NotificationCubit>()
-                                          .markAsRead(n.id!)
-                                      : null,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color: isUnread
-                                          ? Color.alphaBlend(
-                                              theme.colorScheme.primary
-                                                  .withValues(alpha: 0.03),
-                                              theme.colorScheme.surface,
-                                            )
-                                          : theme.colorScheme.surface,
-                                      borderRadius:
-                                          BorderRadius.circular(AppRadius.xl),
-                                      border: Border.all(
-                                        color: theme.colorScheme.outlineVariant
-                                            .withValues(alpha: 0.5),
+                          // Fold the message + relative time into a single
+                          // subtitle line -- LedgerRow shows one line below
+                          // the title, not a stacked message/timestamp block.
+                          final subtitleParts = <String>[
+                            if (n.message != null) n.message!,
+                            if (n.createdAt != null)
+                              DateFormatter.relativeTime(n.createdAt!),
+                          ];
+                          return Dismissible(
+                            key: Key('notif_$keyValue'),
+                            direction: canMutate
+                                ? DismissDirection.endToStart
+                                : DismissDirection.none,
+                            background: Container(
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              color: theme.colorScheme.error,
+                              child: const Icon(Icons.delete,
+                                  color: Colors.white),
+                            ),
+                            onDismissed: (_) {
+                              if (!canMutate) return;
+                              context
+                                  .read<NotificationCubit>()
+                                  .deleteNotification(n.id!);
+                            },
+                            child: LedgerRow(
+                              title: n.title,
+                              subtitle: subtitleParts.isEmpty
+                                  ? null
+                                  : subtitleParts.join(' • '),
+                              leadingIcon: typeStyle.icon,
+                              leadingIconColor: typeStyle.color,
+                              trailing: isUnread
+                                  ? Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        color: typeStyle.color,
+                                        shape: BoxShape.circle,
                                       ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: 44,
-                                          height: 44,
-                                          decoration: BoxDecoration(
-                                            color: typeStyle.color
-                                                .withValues(alpha: 0.08),
-                                            borderRadius: BorderRadius.circular(
-                                                AppRadius.sm),
-                                          ),
-                                          child: Icon(typeStyle.icon,
-                                              color: typeStyle.color, size: 22),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                n.title,
-                                                style: theme.textTheme.bodyLarge
-                                                    ?.copyWith(
-                                                  fontWeight: isUnread
-                                                      ? FontWeight.w600
-                                                      : FontWeight.w400,
-                                                ),
-                                              ),
-                                              if (n.message != null) ...[
-                                                const SizedBox(height: 2),
-                                                Text(
-                                                  n.message!,
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: theme
-                                                      .textTheme.bodyMedium
-                                                      ?.copyWith(
-                                                    color: theme.colorScheme
-                                                        .onSurfaceVariant,
-                                                  ),
-                                                ),
-                                              ],
-                                              if (n.createdAt != null) ...[
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  DateFormatter.relativeTime(
-                                                      n.createdAt!),
-                                                  style: theme
-                                                      .textTheme.bodySmall
-                                                      ?.copyWith(
-                                                    color: theme
-                                                        .colorScheme.outline,
-                                                  ),
-                                                ),
-                                              ],
-                                            ],
-                                          ),
-                                        ),
-                                        if (isUnread)
-                                          Container(
-                                            width: 8,
-                                            height: 8,
-                                            margin:
-                                                const EdgeInsets.only(left: 8),
-                                            decoration: BoxDecoration(
-                                              color: typeStyle.color,
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
+                                    )
+                                  : null,
+                              onTap: isUnread && canMutate
+                                  ? () => context
+                                      .read<NotificationCubit>()
+                                      .markAsRead(n.id!)
+                                  : null,
                             ),
                           );
                         },

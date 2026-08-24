@@ -101,7 +101,10 @@ class AppTheme {
           backgroundColor: colors.primary,
           foregroundColor: contrastColor,
           minimumSize: const Size(double.infinity, 48),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+          // Pill shape marks this as THE primary action on the screen --
+          // never applied to secondary/tertiary buttons, so it keeps its
+          // meaning as "the one main button here" (matches the auth CTAs).
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
           textStyle: const TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
@@ -113,7 +116,7 @@ class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size(double.infinity, 48),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
           textStyle: const TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
@@ -125,7 +128,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           minimumSize: const Size(double.infinity, 48),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
           side: BorderSide(color: colors.divider, width: 1.5),
           foregroundColor: colors.onSurface,
           textStyle: const TextStyle(
@@ -148,24 +151,28 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: colors.inputFill,
+        // Label always sits above the field instead of floating in from a
+        // placeholder position -- reads as "field name", not "example
+        // text", and lets hintText show real example content inside.
+        floatingLabelBehavior: FloatingLabelBehavior.always,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           borderSide: AppBorders.hairline(colors.cardBorder),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           borderSide: AppBorders.hairline(colors.cardBorder),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           borderSide: BorderSide(color: colors.accent, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           borderSide: BorderSide(color: colors.error, width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           borderSide: BorderSide(color: colors.error, width: 2),
         ),
         contentPadding:
@@ -177,8 +184,13 @@ class AppTheme {
         ),
         labelStyle: TextStyle(
           color: colors.onSurfaceVariant,
-          fontWeight: FontWeight.w500,
-          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
+        ),
+        floatingLabelStyle: TextStyle(
+          color: colors.onSurfaceVariant,
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
         ),
         prefixIconColor: colors.hint,
       ),

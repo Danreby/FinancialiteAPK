@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "targets": {
+    "auth-login": {
+      "targetKind": "new-in-existing-codebase",
+      "projectId": "eca769c5-6479-4551-af92-bea98e2f31a2",
+      "activeDraftId": "036a9fd5-75fc-4340-8937-b2bd0df493a5",
+      "designSystemPath": ".superdesign/design-system.md",
+      "contextFiles": [
+        ".superdesign/design-system.md"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "5ffa67c30fa8fc277fbdec618bc9b50973a1202aa87210baf90ea09148e2d8e5"
+      },
+      "drafts": {
+        "036a9fd5-75fc-4340-8937-b2bd0df493a5": {
+          "title": "Financialite Auth - Login",
+          "visualDirection": "dark neumorphic rose, adapted from Financialite web GuestLayout/NeumorphicCard",
+          "currentVersion": 2
+        }
+      },
+      "updatedAt": "2026-08-23T01:35:00Z"
+    },
+    "auth-register": {
+      "targetKind": "new-in-existing-codebase",
+      "projectId": "eca769c5-6479-4551-af92-bea98e2f31a2",
+      "activeDraftId": "92f2dc7f-2802-4170-a0cc-712b73d46e56",
+      "designSystemPath": ".superdesign/design-system.md",
+      "sourceTarget": "auth-login",
+      "sourceDraftId": "036a9fd5-75fc-4340-8937-b2bd0df493a5",
+      "contextFiles": [
+        ".superdesign/design-system.md"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "5ffa67c30fa8fc277fbdec618bc9b50973a1202aa87210baf90ea09148e2d8e5"
+      },
+      "drafts": {
+        "92f2dc7f-2802-4170-a0cc-712b73d46e56": {
+          "title": "Cadastro - Neumorphic Dark Rose",
+          "visualDirection": "same dark neumorphic rose family as Login, no Google/divider",
+          "parentDraftId": "036a9fd5-75fc-4340-8937-b2bd0df493a5",
+          "currentVersion": 2
+        }
+      },
+      "updatedAt": "2026-08-23T01:35:00Z"
+    },
+    "auth-design-system-sheet": {
+      "targetKind": "new-in-existing-codebase",
+      "projectId": "eca769c5-6479-4551-af92-bea98e2f31a2",
+      "activeDraftId": "7651c7c2-2c7b-4eb2-9802-73e5281135ee",
+      "designSystemPath": ".superdesign/design-system.md",
+      "sourceTarget": "auth-login",
+      "sourceDraftId": "036a9fd5-75fc-4340-8937-b2bd0df493a5",
+      "contextFiles": [
+        ".superdesign/design-system.md"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "5ffa67c30fa8fc277fbdec618bc9b50973a1202aa87210baf90ea09148e2d8e5"
+      },
+      "drafts": {
+        "7651c7c2-2c7b-4eb2-9802-73e5281135ee": {
+          "title": "Design System - Componentes",
+          "visualDirection": "reference sheet: palette, typography, buttons, inputs, shapes",
+          "parentDraftId": "036a9fd5-75fc-4340-8937-b2bd0df493a5",
+          "currentVersion": 3
+        }
+      },
+      "updatedAt": "2026-08-23T01:35:00Z"
+    }
+  }
+}

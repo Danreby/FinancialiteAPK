@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_money_style.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../../../../domain/entities/dashboard.dart';
-import '../../../../core/theme/app_tokens.dart';
+import '../../../../core/theme/app_theme.dart';
 
+/// Editorial-ledger month row: month label + income/expense mini-figures on
+/// the left, net balance on the right, separated by a hairline divider --
+/// no card box, no shadow, mirrors [LedgerRow] but needs two money figures
+/// on the left side so it's kept local to this file.
 class MonthlySummaryList extends StatelessWidget {
   final List<MonthlyChartData> chart;
 
@@ -11,77 +16,58 @@ class MonthlySummaryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final appColors = Theme.of(context).appColors;
     final items = chart.reversed.take(6).toList();
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
-      ),
-      child: Column(
-        children: items.asMap().entries.map((entry) {
-          final i = entry.key;
-          final d = entry.value;
-          final balance = d.income - d.expense;
-          final isPositive = balance >= 0;
-          return Column(
+    return Column(
+      children: items.asMap().entries.map((entry) {
+        final i = entry.key;
+        final d = entry.value;
+        final balance = d.income - d.expense;
+        final isPositive = balance >= 0;
+        final isLast = i == items.length - 1;
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            border: isLast
+                ? null
+                : Border(bottom: BorderSide(color: appColors.divider, width: 1)),
+          ),
+          child: Row(
             children: [
-              if (i > 0)
-                Divider(
-                    height: 1,
-                    indent: 16,
-                    color: theme.colorScheme.outlineVariant
-                        .withValues(alpha: 0.3)),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                child: Row(
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            DateFormatter.monthYearFromKey(d.month),
-                            style: theme.textTheme.titleSmall
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              _miniTag(
-                                  '+${CurrencyFormatter.formatCompact(d.income)}',
-                                  const Color(0xFF10B981),
-                                  theme),
-                              const SizedBox(width: 6),
-                              _miniTag(
-                                  '-${CurrencyFormatter.formatCompact(d.expense)}',
-                                  theme.colorScheme.error,
-                                  theme),
-                            ],
-                          ),
-                        ],
+                    Text(
+                      DateFormatter.monthYearFromKey(d.month),
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: appColors.onSurface,
                       ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    const SizedBox(height: 4),
+                    Row(
                       children: [
                         Text(
-                          '${isPositive ? '+' : ''}${CurrencyFormatter.format(balance)}',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: isPositive
-                                ? const Color(0xFF10B981)
-                                : theme.colorScheme.error,
+                          '+${CurrencyFormatter.formatCompact(d.income)}',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: appColors.income,
                           ),
                         ),
+                        const SizedBox(width: 8),
                         Text(
-                          'saldo do mês',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                          '-${CurrencyFormatter.formatCompact(d.expense)}',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: appColors.expense,
                           ),
                         ),
                       ],
@@ -89,23 +75,36 @@ class MonthlySummaryList extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text.rich(
+                    AppMoneyStyle.rich(
+                      amount: CurrencyFormatter.toInputFormat(balance.abs()),
+                      style: AppMoneyStyle.small,
+                      digitColor: isPositive ? appColors.income : appColors.expense,
+                      symbolColor:
+                          (isPositive ? appColors.income : appColors.expense)
+                              .withValues(alpha: 0.7),
+                      sign: isPositive ? '+' : '-',
+                    ),
+                  ),
+                  Text(
+                    'saldo do mês',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: appColors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
             ],
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _miniTag(String text, Color color, ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppRadius.sm),
-      ),
-      child: Text(text,
-          style: TextStyle(
-              fontSize: 11, color: color, fontWeight: FontWeight.w600)),
+          ),
+        );
+      }).toList(),
     );
   }
 }

@@ -128,14 +128,11 @@ class _FaturasPageState extends State<FaturasPage> {
             totalItems: _items.length,
           ),
           Expanded(
-            child: ListView.separated(
+            child: ListView.builder(
+              // LedgerRow already draws its own hairline divider -- a
+              // separatorBuilder here would double it up.
               controller: _scrollController,
-              padding: const EdgeInsets.only(bottom: 32),
-              separatorBuilder: (_, __) => Divider(
-                height: 1,
-                indent: 74,
-                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-              ),
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 130),
               itemCount: _items.length,
               itemBuilder: (_, i) {
                 final item = _items[i];

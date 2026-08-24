@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -25,9 +26,9 @@ class _AppShellState extends State<AppShell> {
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
     if (location.startsWith('/dashboard')) return 0;
-    if (location.startsWith('/transactions')) return 1;
+    if (location.startsWith('/faturas')) return 1;
     if (location.startsWith('/bills')) return 2;
-    if (location.startsWith('/faturas')) return 3;
+    if (location.startsWith('/transactions')) return 3;
     if (location.startsWith('/more')) return 4;
     return 0;
   }
@@ -38,13 +39,13 @@ class _AppShellState extends State<AppShell> {
         context.go('/dashboard');
         break;
       case 1:
-        context.go('/transactions');
+        context.go('/faturas');
         break;
       case 2:
         context.go('/bills');
         break;
       case 3:
-        context.go('/faturas');
+        context.go('/transactions');
         break;
       case 4:
         context.go('/more');
@@ -60,6 +61,11 @@ class _AppShellState extends State<AppShell> {
     final appColors = theme.appColors;
 
     return Scaffold(
+      // Content scrolls behind the floating nav so the glass panel has
+      // something real to blur -- without this the backdrop filter just
+      // blurs the flat page background and reads as a tinted rectangle,
+      // not glass.
+      extendBody: true,
       body: Column(
         children: [
           ConnectivityBanner(isOnline: isOnline),
@@ -70,22 +76,42 @@ class _AppShellState extends State<AppShell> {
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          child: Container(
-            height: 64,
-            decoration: BoxDecoration(
-              color: appColors.surface,
-              borderRadius: BorderRadius.circular(AppRadius.nav),
-              boxShadow: [
-                BoxShadow(
-                  color: appColors.primary.withValues(alpha: 0.18),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadius.nav),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+              child: Container(
+                height: 64,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppRadius.nav),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      appColors.surface.withValues(alpha: 0.58),
+                      appColors.surface.withValues(alpha: 0.38),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.14),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.35),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.05),
+                      blurRadius: 1,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
                 _NavItem(
                   icon: Icons.grid_view_rounded,
                   label: 'Início',
@@ -94,8 +120,8 @@ class _AppShellState extends State<AppShell> {
                   lift: true,
                 ),
                 _NavItem(
-                  icon: Icons.swap_horiz_rounded,
-                  label: 'Transações',
+                  icon: Icons.credit_card_rounded,
+                  label: 'Faturas',
                   isSelected: selectedIndex == 1,
                   onTap: () => _onItemTapped(1),
                 ),
@@ -106,8 +132,8 @@ class _AppShellState extends State<AppShell> {
                   onTap: () => _onItemTapped(2),
                 ),
                 _NavItem(
-                  icon: Icons.credit_card_rounded,
-                  label: 'Faturas',
+                  icon: Icons.swap_horiz_rounded,
+                  label: 'Transações',
                   isSelected: selectedIndex == 3,
                   onTap: () => _onItemTapped(3),
                 ),
@@ -123,7 +149,9 @@ class _AppShellState extends State<AppShell> {
                     );
                   },
                 ),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
         ),

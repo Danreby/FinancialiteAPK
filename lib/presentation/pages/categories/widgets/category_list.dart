@@ -5,9 +5,10 @@ import '../../../../domain/entities/category.dart';
 import '../../../widgets/empty_state_widget.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../../core/utils/icon_utils.dart';
-import '../../../widgets/category_icon_glyph.dart';
+import '../../../../core/utils/category_icons.dart';
+import '../../../widgets/ledger_row.dart';
+import '../../../../core/theme/app_theme.dart';
 import 'category_form_dialog.dart';
-import '../../../../core/theme/app_tokens.dart';
 
 class CategoryList extends StatelessWidget {
   final List<dynamic> categories;
@@ -17,6 +18,7 @@ class CategoryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final appColors = theme.appColors;
     if (categories.isEmpty) {
       return const EmptyStateWidget(
         icon: Icons.category,
@@ -27,93 +29,42 @@ class CategoryList extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: () async => context.read<CategoryCubit>().loadCategories(),
       child: ListView.builder(
-        padding: const EdgeInsets.only(top: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final cat = categories[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppRadius.xl),
-              child: Dismissible(
-                key: Key('cat_${cat.id}'),
-                direction: DismissDirection.endToStart,
-                background: Container(
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 20),
-                  color: theme.colorScheme.error,
-                  child: const Icon(Icons.delete, color: Colors.white),
-                ),
-                confirmDismiss: (_) => ConfirmDialog.show(
-                  context,
-                  title: 'Excluir categoria',
-                  message: 'Deseja excluir "${cat.name}"?',
-                  confirmText: 'Excluir',
-                  confirmColor: theme.colorScheme.error,
-                ),
-                onDismissed: (_) =>
-                    context.read<CategoryCubit>().deleteCategory(cat.id),
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(AppRadius.xl),
-                    border: Border.all(
-                      color: theme.colorScheme.outlineVariant
-                          .withValues(alpha: 0.5),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color:
-                              colorFromHex(cat.color).withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(AppRadius.xl),
-                        ),
-                        child: CategoryIconGlyph(
-                          icon: cat.icon,
-                          color: colorFromHex(cat.color),
-                          size: 22,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              cat.name,
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              _typeLabel(cat.type),
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.edit_outlined,
-                            size: 18,
-                            color: theme.colorScheme.onSurfaceVariant),
-                        onPressed: () => showCategoryDialog(context,
-                            editing: cat as Category),
-                        constraints:
-                            const BoxConstraints(maxWidth: 36, maxHeight: 36),
-                        padding: EdgeInsets.zero,
-                      ),
-                    ],
-                  ),
-                ),
+          return Dismissible(
+            key: Key('cat_${cat.id}'),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 4),
+              color: theme.colorScheme.error,
+              child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
+            ),
+            confirmDismiss: (_) => ConfirmDialog.show(
+              context,
+              title: 'Excluir categoria',
+              message: 'Deseja excluir "${cat.name}"?',
+              confirmText: 'Excluir',
+              confirmColor: theme.colorScheme.error,
+            ),
+            onDismissed: (_) =>
+                context.read<CategoryCubit>().deleteCategory(cat.id),
+            child: LedgerRow(
+              title: cat.name,
+              subtitle: _typeLabel(cat.type),
+              leadingIcon:
+                  iconDataForCategoryIcon(cat.icon) ?? iconFromName(cat.icon),
+              leadingIconColor: colorFromHex(cat.color),
+              trailing: IconButton(
+                icon: Icon(Icons.edit_outlined,
+                    size: 18, color: appColors.onSurfaceVariant),
+                onPressed: () =>
+                    showCategoryDialog(context, editing: cat as Category),
+                constraints:
+                    const BoxConstraints(maxWidth: 36, maxHeight: 36),
+                padding: EdgeInsets.zero,
               ),
             ),
           );

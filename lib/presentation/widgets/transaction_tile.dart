@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/theme/app_tokens.dart';
-import 'category_icon_glyph.dart';
+import '../../core/utils/currency_formatter.dart';
+import '../../core/utils/icon_utils.dart';
+import '../../core/utils/category_icons.dart';
+import 'ledger_row.dart';
 
 class TransactionTile extends StatelessWidget {
   final String title;
@@ -33,80 +35,22 @@ class TransactionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final appColors = theme.appColors;
+    final appColors = Theme.of(context).appColors;
     final amountColor = isExpense ? appColors.expense : appColors.income;
-    final iconBg = categoryColor ?? amountColor;
+    final iconColor = categoryColor ?? amountColor;
 
-    return InkWell(
+    return LedgerRow(
+      title: title,
+      subtitle: subtitle,
+      leadingIcon: categoryIconName != null
+          ? (iconDataForCategoryIcon(categoryIconName) ??
+              iconFromName(categoryIconName))
+          : categoryIcon,
+      leadingIconColor: iconColor,
+      amount: CurrencyFormatter.parse(amount),
+      amountSign: isExpense ? '-' : '+',
+      amountColor: amountColor,
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppRadius.md),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        child: Row(
-          children: [
-            Container(
-              width: 42,
-              height: 42,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: iconBg.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(AppRadius.sm),
-              ),
-              child: categoryIconName != null
-                  ? CategoryIconGlyph(
-                      icon: categoryIconName, size: 19, color: iconBg)
-                  : Icon(categoryIcon, size: 19, color: iconBg),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  '${isExpense ? '-' : '+'} $amount',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: amountColor,
-                    letterSpacing: -0.3,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

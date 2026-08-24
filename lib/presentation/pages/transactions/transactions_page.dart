@@ -16,9 +16,11 @@ import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/icon_utils.dart';
 import '../../../domain/entities/category.dart';
 import '../../../domain/entities/card_entity.dart';
+import '../../../domain/entities/transaction.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/shadowed_fab.dart';
 import '../../../core/theme/app_tokens.dart';
+import '../../../core/theme/app_theme.dart';
 
 class TransactionsPage extends StatefulWidget {
   const TransactionsPage({super.key});
@@ -86,6 +88,34 @@ class _TransactionsPageState extends State<TransactionsPage> {
         _scrollController.position.maxScrollExtent - 200) {
       context.read<TransactionBloc>().add(const TransactionsFetched());
     }
+  }
+
+  /// Groups the already-loaded transactions by calendar day for rendering.
+  /// Purely a display-layer transform — does not affect pagination/loading.
+  List<Object> _buildDisplayItems(List<Transaction> transactions) {
+    final items = <Object>[];
+    DateTime? lastDay;
+    for (final tx in transactions) {
+      final txDate = tx.date;
+      if (txDate != null) {
+        final day = DateTime(txDate.year, txDate.month, txDate.day);
+        if (lastDay == null || day != lastDay) {
+          items.add(day);
+          lastDay = day;
+        }
+      }
+      items.add(tx);
+    }
+    return items;
+  }
+
+  String _dayLabel(DateTime day) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    if (day == today) return 'Hoje';
+    if (day == yesterday) return 'Ontem';
+    return DateFormatter.formatDayMonth(day);
   }
 
   void _openFilterSheet() {
@@ -353,18 +383,20 @@ class _TransactionsPageState extends State<TransactionsPage> {
                       onAction: () => context.push('/transactions/new'),
                     );
                   }
+                  final displayItems =
+                      _buildDisplayItems(state.transactions);
                   return RefreshIndicator(
                     onRefresh: () async => _loadData(),
                     child: ResponsiveContent(
                       child: ListView.builder(
                         controller: _scrollController,
-                        padding: const EdgeInsets.only(top: 8, bottom: 100),
+                        padding: const EdgeInsets.only(top: 8, bottom: 130),
                         itemCount:
-                            state.transactions.length + (state.hasMore ? 1 : 0),
+                            displayItems.length + (state.hasMore ? 1 : 0),
                         itemBuilder: (context, index) {
-                          if (index >= state.transactions.length) {
-                            return const Padding(
-                              padding: EdgeInsets.all(20),
+                          if (index >= displayItems.length) {
+                            return Padding(
+                              padding: const EdgeInsets.all(20),
                               child: Center(
                                 child: SizedBox(
                                   width: 24,
@@ -372,12 +404,29 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2.5,
                                     strokeCap: StrokeCap.round,
+                                    color: theme.colorScheme.primary,
                                   ),
                                 ),
                               ),
                             );
                           }
-                          final tx = state.transactions[index];
+                          final item = displayItems[index];
+                          if (item is DateTime) {
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(4, 16, 4, 4),
+                              child: Text(
+                                _dayLabel(item).toUpperCase(),
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.8,
+                                  color: theme.appColors.onSurfaceVariant,
+                                ),
+                              ),
+                            );
+                          }
+                          final tx = item as Transaction;
                           final isCredit = tx.type == 'credit';
                           return Dismissible(
                             key: Key('tx_${tx.id}'),

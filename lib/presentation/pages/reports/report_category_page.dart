@@ -9,6 +9,8 @@ import '../../widgets/app_loading_indicator.dart';
 import '../../widgets/month_selector.dart';
 import '../../widgets/page_header.dart';
 import '../../../core/theme/app_tokens.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_money_style.dart';
 
 class ReportCategoryPage extends StatefulWidget {
   const ReportCategoryPage({super.key});
@@ -144,115 +146,100 @@ class _ReportCategoryPageState extends State<ReportCategoryPage> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        // Category list
-                        Container(
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(AppRadius.xl),
-                            border: Border.all(
-                                color: theme.colorScheme.outlineVariant
-                                    .withValues(alpha: 0.5)),
-                          ),
-                          child: Column(
-                            children: cats.asMap().entries.map((entry) {
-                              final i = entry.key;
-                              final cat = entry.value;
-                              final pct =
-                                  total > 0 ? (cat.amount / total * 100) : 0.0;
-                              return Column(
+                        // Category list -- editorial-ledger rows: hairline
+                        // divider, no card box, no tinted icon badge. Each
+                        // row shows the pie-chart's color as a small dot so
+                        // the list still cross-references the chart above.
+                        Column(
+                          children: cats.asMap().entries.map((entry) {
+                            final i = entry.key;
+                            final cat = entry.value;
+                            final pct =
+                                total > 0 ? (cat.amount / total * 100) : 0.0;
+                            final isLast = i == cats.length - 1;
+                            final color = colors[i % colors.length];
+                            return Container(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              decoration: BoxDecoration(
+                                border: isLast
+                                    ? null
+                                    : Border(
+                                        bottom: BorderSide(
+                                            color: theme.appColors.divider,
+                                            width: 1)),
+                              ),
+                              child: Row(
                                 children: [
-                                  if (i > 0)
-                                    Divider(
-                                        height: 1,
-                                        indent: 60,
-                                        color: theme.colorScheme.outlineVariant
-                                            .withValues(alpha: 0.3)),
-                                  Padding(
-                                    padding: const EdgeInsets.all(14),
-                                    child: Row(
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: color,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Container(
-                                          width: 40,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            color: colors[i % colors.length]
-                                                .withValues(alpha: 0.12),
-                                            borderRadius: BorderRadius.circular(
-                                                AppRadius.md),
-                                          ),
-                                          child: Center(
-                                            child: Container(
-                                              width: 12,
-                                              height: 12,
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    colors[i % colors.length],
-                                                shape: BoxShape.circle,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(cat.name,
-                                                  style: theme
-                                                      .textTheme.bodyMedium
-                                                      ?.copyWith(
-                                                          fontWeight:
-                                                              FontWeight.w600)),
-                                              const SizedBox(height: 4),
-                                              ClipRRect(
-                                                borderRadius: BorderRadius
-                                                    .circular(AppRadius.xs),
-                                                child: LinearProgressIndicator(
-                                                  value: pct / 100,
-                                                  minHeight: 4,
-                                                  color:
-                                                      colors[i % colors.length],
-                                                  backgroundColor:
-                                                      colors[i % colors.length]
-                                                          .withValues(
-                                                              alpha: 0.1),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
+                                        Row(
                                           children: [
-                                            Text(
-                                              CurrencyFormatter.format(
-                                                  cat.amount),
-                                              style: theme.textTheme.bodyMedium
-                                                  ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w700),
+                                            Expanded(
+                                              child: Text(
+                                                cat.name,
+                                                style: TextStyle(
+                                                  fontFamily: 'Inter',
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: theme.appColors.onSurface,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
                                             ),
                                             Text(
                                               '${pct.toStringAsFixed(1)}%',
-                                              style: theme.textTheme.bodySmall
-                                                  ?.copyWith(
-                                                color:
-                                                    colors[i % colors.length],
-                                                fontWeight: FontWeight.w600,
+                                              style: TextStyle(
+                                                fontFamily: 'Inter',
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w700,
+                                                color: color,
                                               ),
                                             ),
                                           ],
                                         ),
+                                        const SizedBox(height: 5),
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.zero,
+                                          child: LinearProgressIndicator(
+                                            value: pct / 100,
+                                            minHeight: 2,
+                                            backgroundColor:
+                                                theme.appColors.divider,
+                                            valueColor:
+                                                AlwaysStoppedAnimation(color),
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
+                                  const SizedBox(width: 12),
+                                  Text.rich(
+                                    AppMoneyStyle.rich(
+                                      amount: CurrencyFormatter.toInputFormat(
+                                          cat.amount),
+                                      style: AppMoneyStyle.small,
+                                      digitColor: theme.appColors.onSurface,
+                                      symbolColor:
+                                          theme.appColors.onSurfaceVariant,
+                                    ),
+                                  ),
                                 ],
-                              );
-                            }).toList(),
-                          ),
+                              ),
+                            );
+                          }).toList(),
                         ),
                         const SizedBox(height: 32),
                       ],

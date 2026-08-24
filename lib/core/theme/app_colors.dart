@@ -162,7 +162,7 @@ ThemeColors _buildLightTheme({
   Color onSurface = const Color(0xFF18181B),
   Color divider = const Color(0xFFE5E5E5),
   Color inputFill = const Color(0xFFFFFFFF),
-  Color cardBorder = const Color(0xFFE5E5E5),
+  Color cardBorder = const Color(0x14000000),
   Color shimmerBase = const Color(0xFFE5E7EB),
   Color shimmerHighlight = const Color(0xFFF9FAFB),
 }) {
@@ -291,14 +291,14 @@ ThemeColors _buildDarkTheme({
 
 List<BoxShadow> _defaultLightCardShadow() => [
       BoxShadow(
-        color: const Color(0xFF1A1D26).withValues(alpha: 0.05),
-        blurRadius: 16,
-        offset: const Offset(0, 4),
+        color: const Color(0xFF1A1D26).withValues(alpha: 0.10),
+        blurRadius: 28,
+        offset: const Offset(0, 12),
       ),
       BoxShadow(
-        color: const Color(0xFF1A1D26).withValues(alpha: 0.02),
-        blurRadius: 4,
-        offset: const Offset(0, 1),
+        color: const Color(0xFF1A1D26).withValues(alpha: 0.04),
+        blurRadius: 6,
+        offset: const Offset(0, 2),
       ),
     ];
 
@@ -428,7 +428,7 @@ extension AppColorSchemeExtension on AppColorScheme {
           surfaceVariant: const Color(0xFF1F0A0A),
           chipBackground: const Color(0x33F43F5E),
           divider: const Color(0x80450A0A),
-          cardBorder: const Color(0x80450A0A),
+          cardBorder: const Color(0x33450A0A),
           cardGradientColors: const [Color(0xFF1F0A0A), Color(0xFF150707)],
           heroGradientColors: const [Color(0xFFBE123C), Color(0xFF0A0404)],
           cardShadow: _cardShadow(Colors.black, 0.25),

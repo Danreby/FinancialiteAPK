@@ -78,7 +78,11 @@ class _TypeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final fg = selected ? Colors.white : theme.colorScheme.onSurfaceVariant;
+    // Selected state is a soft tint + colored border, never a solid fill
+    // with a glow -- a colored ambient shadow is reserved for the single
+    // primary brand button per screen (AppShadows' own documented rule),
+    // not for a semantic status color like income/expense.
+    final fg = selected ? color : theme.colorScheme.onSurfaceVariant;
     return PressableScale(
       child: GestureDetector(
         onTap: onTap,
@@ -87,9 +91,13 @@ class _TypeButton extends StatelessWidget {
           curve: Curves.easeOutCubic,
           height: 64,
           decoration: BoxDecoration(
-            color: selected ? color : theme.colorScheme.surfaceContainerHighest,
+            color: selected
+                ? color.withValues(alpha: 0.12)
+                : theme.colorScheme.surfaceContainerHighest,
             borderRadius: AppRadius.cardCut(open: 16, tight: 4),
-            boxShadow: selected ? AppShadows.buttonPrimary(color) : null,
+            border: selected
+                ? Border.all(color: color, width: 1.5)
+                : null,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

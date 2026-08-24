@@ -1,0 +1,81 @@
+- generic [ref=f2e2]:
+  - banner [ref=f2e3]:
+    - generic [ref=f2e4]:
+      - paragraph [ref=f2e5]: Financialite
+      - heading "Visão Geral" [level=1] [ref=f2e6]
+    - button [ref=f2e7] [cursor=pointer]
+  - main [ref=f2e12]:
+    - generic [ref=f2e13]:
+      - generic [ref=f2e14]:
+        - generic [ref=f2e15]: Saldo Total
+        - generic [ref=f2e16]: Positivo
+      - generic [ref=f2e17]:
+        - heading "R$ 4.285" [level=2] [ref=f2e18]
+        - paragraph [ref=f2e19]: ",50"
+      - generic [ref=f2e20]:
+        - button "Entrada" [ref=f2e21] [cursor=pointer]
+        - button "Saída" [ref=f2e22] [cursor=pointer]
+    - generic [ref=f2e23]:
+      - generic [ref=f2e28]:
+        - generic [ref=f2e29]: Receitas
+        - text: 8.4k
+      - generic [ref=f2e34]:
+        - generic [ref=f2e35]: Despesas
+        - text: 3.1k
+      - generic [ref=f2e37]:
+        - generic [ref=f2e38]: Metas / Savings
+        - text: R$ 12.000
+      - generic [ref=f2e45]:
+        - generic [ref=f2e46]: "03"
+        - generic [ref=f2e47]: Contas
+      - generic [ref=f2e48]:
+        - generic [ref=f2e49]: Crédito
+        - generic [ref=f2e50]: R$ 940
+      - generic [ref=f2e51]:
+        - generic [ref=f2e52]: Débito
+        - generic [ref=f2e53]: R$ 1.050
+    - generic [ref=f2e54]:
+      - heading "Performance" [level=3] [ref=f2e56]
+      - generic [ref=f2e65]:
+        - generic [ref=f2e66]: Jan
+        - generic [ref=f2e67]: Fev
+        - generic [ref=f2e68]: Mar
+        - generic [ref=f2e69]: Abr
+        - generic [ref=f2e70]: Mai
+        - generic [ref=f2e71]: Jun
+    - generic [ref=f2e72]:
+      - generic [ref=f2e73]:
+        - generic [ref=f2e74]:
+          - heading "Agenda" [level=4] [ref=f2e75]
+          - link "Tudo" [ref=f2e76] [cursor=pointer]:
+            - /url: "#"
+        - generic [ref=f2e77]:
+          - generic [ref=f2e80]:
+            - paragraph [ref=f2e81]: Google
+            - paragraph [ref=f2e82]: Hoje
+          - generic [ref=f2e85]:
+            - paragraph [ref=f2e86]: Net
+            - paragraph [ref=f2e87]: 22 Out
+      - generic [ref=f2e88]:
+        - heading "Gastos" [level=4] [ref=f2e89]
+        - generic [ref=f2e90]:
+          - generic [ref=f2e92]:
+            - generic [ref=f2e93]: Lazer
+            - generic [ref=f2e94]: 45%
+          - generic [ref=f2e98]:
+            - generic [ref=f2e99]: Casa
+            - generic [ref=f2e100]: 30%
+          - generic [ref=f2e104]:
+            - generic [ref=f2e105]: Outros
+            - generic [ref=f2e106]: 25%
+  - navigation [ref=f2e109]:
+    - link [ref=f2e110] [cursor=pointer]:
+      - /url: "#"
+    - link [ref=f2e118] [cursor=pointer]:
+      - /url: "#"
+    - link [ref=f2e122] [cursor=pointer]:
+      - /url: "#"
+    - link [ref=f2e126] [cursor=pointer]:
+      - /url: "#"
+    - link [ref=f2e131] [cursor=pointer]:
+      - /url: "#"

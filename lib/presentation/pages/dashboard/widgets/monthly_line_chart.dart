@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../domain/entities/dashboard.dart';
 
@@ -46,16 +47,15 @@ class MonthlyLineChart extends StatelessWidget {
           .add(FlSpot(i.toDouble(), chartData[i].expense.clamp(0, maxVal)));
     }
 
+    final appColors = theme.appColors;
     return Container(
-      height: 240,
+      height: 260,
+      padding: const EdgeInsets.fromLTRB(16, 22, 16, 14),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-        ),
+        color: appColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
+        boxShadow: AppNeumorphic.outsetLarge,
       ),
-      padding: const EdgeInsets.fromLTRB(8, 20, 16, 12),
       child: Column(
         children: [
           Row(

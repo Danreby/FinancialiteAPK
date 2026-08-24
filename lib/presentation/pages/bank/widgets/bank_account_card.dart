@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../../core/utils/currency_formatter.dart';
 import '../../../../domain/entities/bank_account.dart';
 import '../../../../core/theme/app_tokens.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../widgets/ledger_row.dart';
 
 class BankAccountCard extends StatelessWidget {
   final BankAccount account;
@@ -20,82 +21,48 @@ class BankAccountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Dismissible(
-        key: Key('bank_${account.id}'),
-        direction: DismissDirection.endToStart,
-        background: Container(
-          alignment: Alignment.centerRight,
-          padding: const EdgeInsets.only(right: 20),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.error,
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-          ),
-          child: const Icon(Icons.delete, color: Colors.white),
+    final appColors = theme.appColors;
+    return Dismissible(
+      key: Key('bank_${account.id}'),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.error,
+          borderRadius: BorderRadius.circular(AppRadius.xl),
         ),
-        confirmDismiss: (_) => onConfirmDismiss(),
-        onDismissed: (_) => onDismissed(),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-            border: Border.all(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      confirmDismiss: (_) => onConfirmDismiss(),
+      onDismissed: (_) => onDismissed(),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: appColors.divider, width: 1)),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: LedgerRow(
+                title: account.displayName,
+                subtitle: _typeLabel(account.accountType ?? 'corrente'),
+                leadingIcon: Icons.account_balance_rounded,
+                leadingIconColor: theme.colorScheme.primary,
+                amount: account.balance,
+                amountColor: account.balance >= 0
+                    ? appColors.income
+                    : theme.colorScheme.error,
+                showDivider: false,
+              ),
             ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppRadius.xl),
-                ),
-                child: Icon(Icons.account_balance,
-                    color: theme.colorScheme.primary, size: 22),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      account.displayName,
-                      style: theme.textTheme.titleSmall
-                          ?.copyWith(fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _typeLabel(account.accountType ?? 'corrente'),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                CurrencyFormatter.format(account.balance),
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: account.balance >= 0
-                      ? Colors.green
-                      : theme.colorScheme.error,
-                ),
-              ),
-              const SizedBox(width: 4),
-              IconButton(
-                icon: Icon(Icons.edit_outlined,
-                    size: 18, color: theme.colorScheme.onSurfaceVariant),
-                onPressed: onEdit,
-                constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
-                padding: EdgeInsets.zero,
-              ),
-            ],
-          ),
+            IconButton(
+              icon: Icon(Icons.edit_outlined,
+                  size: 18, color: appColors.onSurfaceVariant),
+              onPressed: onEdit,
+              constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
+              padding: EdgeInsets.zero,
+            ),
+          ],
         ),
       ),
     );

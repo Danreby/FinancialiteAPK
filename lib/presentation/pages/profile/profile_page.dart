@@ -10,7 +10,6 @@ import '../../widgets/page_header.dart';
 import 'widgets/profile_menu_item.dart';
 import 'widgets/profile_dialogs.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/theme/app_tokens.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -137,35 +136,22 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildActionsSection(ThemeData theme, String name, String email) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-          border: Border.all(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+      child: Column(
+        children: [
+          ProfileMenuItem(
+            icon: Icons.person_outline,
+            title: 'Editar perfil',
+            color: theme.colorScheme.primary,
+            onTap: () => showEditProfileDialog(context, name),
           ),
-        ),
-        child: Column(
-          children: [
-            ProfileMenuItem(
-              icon: Icons.person_outline,
-              title: 'Editar perfil',
-              color: theme.colorScheme.primary,
-              onTap: () => showEditProfileDialog(context, name),
-            ),
-            Divider(
-              height: 1,
-              indent: 74,
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-            ),
-            ProfileMenuItem(
-              icon: Icons.lock_outline,
-              title: 'Alterar senha',
-              color: theme.colorScheme.primary,
-              onTap: () => showChangePasswordDialog(context),
-            ),
-          ],
-        ),
+          ProfileMenuItem(
+            icon: Icons.lock_outline,
+            title: 'Alterar senha',
+            color: theme.colorScheme.primary,
+            onTap: () => showChangePasswordDialog(context),
+            showDivider: false,
+          ),
+        ],
       ),
     );
   }
@@ -173,46 +159,33 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildDangerSection(ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-          border: Border.all(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+      child: Column(
+        children: [
+          ProfileMenuItem(
+            icon: Icons.logout,
+            title: 'Sair',
+            color: Colors.orange,
+            onTap: () async {
+              final confirmed = await ConfirmDialog.show(
+                context,
+                title: 'Sair',
+                message: 'Deseja realmente sair da sua conta?',
+                confirmText: 'Sair',
+              );
+              if (confirmed == true) {
+                context.read<AuthBloc>().add(const AuthLogoutRequested());
+                context.go('/login');
+              }
+            },
           ),
-        ),
-        child: Column(
-          children: [
-            ProfileMenuItem(
-              icon: Icons.logout,
-              title: 'Sair',
-              color: Colors.orange,
-              onTap: () async {
-                final confirmed = await ConfirmDialog.show(
-                  context,
-                  title: 'Sair',
-                  message: 'Deseja realmente sair da sua conta?',
-                  confirmText: 'Sair',
-                );
-                if (confirmed == true) {
-                  context.read<AuthBloc>().add(const AuthLogoutRequested());
-                  context.go('/login');
-                }
-              },
-            ),
-            Divider(
-              height: 1,
-              indent: 74,
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-            ),
-            ProfileMenuItem(
-              icon: Icons.delete_forever,
-              title: 'Excluir conta',
-              color: theme.colorScheme.error,
-              onTap: () => showDeleteAccountDialog(context),
-            ),
-          ],
-        ),
+          ProfileMenuItem(
+            icon: Icons.delete_forever,
+            title: 'Excluir conta',
+            color: theme.colorScheme.error,
+            onTap: () => showDeleteAccountDialog(context),
+            showDivider: false,
+          ),
+        ],
       ),
     );
   }

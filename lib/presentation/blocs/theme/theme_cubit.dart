@@ -20,14 +20,18 @@ class ThemeCubit extends Cubit<ThemeState> {
     final schemeName = prefs.getString(_keyColorScheme) ?? 'rose';
     ThemeMode mode;
     switch (modeStr) {
-      case 'dark':
-        mode = ThemeMode.dark;
+      case 'light':
+        mode = ThemeMode.light;
         break;
       case 'system':
         mode = ThemeMode.system;
         break;
       default:
-        mode = ThemeMode.light;
+        // Dark is the app's designed default -- it's the mode the brand
+        // (rose neumorphic accents, deep near-black surfaces) is actually
+        // authored for, matching the auth flow. Light stays a real,
+        // fully-supported opt-in via Settings, not the first impression.
+        mode = ThemeMode.dark;
     }
     emit(ThemeState(themeMode: mode, colorSchemeName: schemeName));
   }

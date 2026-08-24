@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/dashboard/dashboard_cubit.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/app_loading_indicator.dart';
+import '../../widgets/empty_state_widget.dart';
 import '../../widgets/page_header.dart';
 import 'widgets/evolution_summary_card.dart';
 import 'widgets/evolution_line_chart.dart';
@@ -24,8 +25,6 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       body: Column(
         children: [
@@ -49,20 +48,9 @@ class _ReportEvolutionPageState extends State<ReportEvolutionPage> {
                 if (state is DashboardLoaded) {
                   final chart = state.data.monthlyChart;
                   if (chart.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.trending_up,
-                              size: 64,
-                              color: theme.colorScheme.onSurfaceVariant
-                                  .withValues(alpha: 0.3)),
-                          const SizedBox(height: 12),
-                          Text('Sem dados disponíveis',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant)),
-                        ],
-                      ),
+                    return const EmptyStateWidget(
+                      icon: Icons.trending_up,
+                      title: 'Sem dados disponíveis',
                     );
                   }
 

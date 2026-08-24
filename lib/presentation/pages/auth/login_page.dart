@@ -4,12 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../blocs/auth/auth_bloc.dart';
-import '../../widgets/app_text_field.dart';
 import '../../../core/utils/validators.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/theme/app_tokens.dart';
-import '../../widgets/app_logo_mark.dart';
-import '../../widgets/pressable_scale.dart';
+import 'widgets/auth_ui.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -23,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _rememberMe = false;
   bool _googleLoading = false;
 
   static const _googleClientId =
@@ -111,194 +108,206 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: theme.colorScheme.error,
+              backgroundColor: AuthColors.error,
               behavior: SnackBarBehavior.floating,
             ),
           );
         }
       },
       child: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Gradient hero -- signature asymmetric corner instead of a
-              // symmetric rounded-bottom banner.
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).padding.top + 40,
-                  bottom: 40,
-                ),
-                decoration: BoxDecoration(
-                  gradient: theme.appColors.heroGradient,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(32),
-                    bottomRight: Radius.circular(4),
-                  ),
-                ),
+        backgroundColor: AuthColors.bg,
+        body: Stack(
+          children: [
+            const AuthAmbientBackground(),
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
                 child: Column(
                   children: [
-                    const AppLogoMark(size: 72, barColor: Colors.white),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Financialite',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: -0.8,
+                    const AuthStagger(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Financialite',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: AuthColors.onSurface,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Entrar',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 30,
+                              fontWeight: FontWeight.w800,
+                              color: AuthColors.onSurface,
+                              letterSpacing: -0.8,
+                              height: 1.2,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Entre na sua conta',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: AuthColors.onSurfaceVar,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Entre na sua conta',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.85),
+                    const SizedBox(height: 32),
+                    AuthStagger(
+                      delay: const Duration(milliseconds: 70),
+                      child: AuthCard(
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Center(
+                                child: NeumorphicGoogleButton(
+                                  onPressed: _googleSignIn,
+                                  isLoading: _googleLoading,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              const AuthDivider(),
+                              const SizedBox(height: 24),
+                              NeumorphicField(
+                                controller: _emailController,
+                                label: 'E-mail',
+                                hint: 'Digite seu e-mail',
+                                keyboardType: TextInputType.emailAddress,
+                                textInputAction: TextInputAction.next,
+                                validator: Validators.email,
+                                autofillHints: const [AutofillHints.username],
+                              ),
+                              const SizedBox(height: 20),
+                              NeumorphicField(
+                                controller: _passwordController,
+                                label: 'Senha',
+                                hint: 'Sua senha',
+                                obscureText: _obscurePassword,
+                                textInputAction: TextInputAction.done,
+                                validator: Validators.required,
+                                onFieldSubmitted: (_) => _submit(),
+                                autofillHints: const [AutofillHints.password],
+                                suffix: FieldIconButton(
+                                  icon: _obscurePassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                  tooltip: _obscurePassword
+                                      ? 'Mostrar senha'
+                                      : 'Ocultar senha',
+                                  onPressed: () => setState(
+                                      () => _obscurePassword = !_obscurePassword),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  RememberMeCheckbox(
+                                    value: _rememberMe,
+                                    onChanged: (v) =>
+                                        setState(() => _rememberMe = v ?? false),
+                                  ),
+                                  BlocBuilder<AuthBloc, AuthState>(
+                                    builder: (context, state) {
+                                      final isLoading = state is AuthLoading;
+                                      return TextButton(
+                                        onPressed: isLoading
+                                            ? null
+                                            : () => ScaffoldMessenger.of(context)
+                                                .showSnackBar(const SnackBar(
+                                                  content: Text(
+                                                      'Recuperação de senha em breve.'),
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
+                                                )),
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: AuthColors.hint,
+                                          padding: EdgeInsets.zero,
+                                          minimumSize: const Size(0, 0),
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                        ),
+                                        child: const Text(
+                                          'Esqueceu a senha?',
+                                          style: TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 24),
+                              BlocBuilder<AuthBloc, AuthState>(
+                                builder: (context, state) {
+                                  final isLoading = state is AuthLoading;
+                                  return AuthPrimaryButton(
+                                    label: 'Entrar',
+                                    isLoading: isLoading,
+                                    onPressed: isLoading ? null : _submit,
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    AuthStagger(
+                      delay: const Duration(milliseconds: 140),
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        children: [
+                          const Text(
+                            'Não tem conta? ',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: AuthColors.onSurfaceVar,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => context.push('/register'),
+                            child: const Text(
+                              'Cadastre-se',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: AuthColors.primaryAlt,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-              // Form Section
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      AppTextField(
-                        controller: _emailController,
-                        label: 'E-mail',
-                        prefixIcon: Icons.email_outlined,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
-                        validator: Validators.email,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        controller: _passwordController,
-                        label: 'Senha',
-                        prefixIcon: Icons.lock_outline_rounded,
-                        obscureText: _obscurePassword,
-                        textInputAction: TextInputAction.done,
-                        validator: Validators.required,
-                        onSubmitted: (_) => _submit(),
-                        suffix: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                          ),
-                          onPressed: () => setState(
-                              () => _obscurePassword = !_obscurePassword),
-                        ),
-                      ),
-                      const SizedBox(height: 28),
-                      BlocBuilder<AuthBloc, AuthState>(
-                        builder: (context, state) {
-                          final isLoading = state is AuthLoading;
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.circular(AppRadius.md),
-                              boxShadow: isLoading
-                                  ? []
-                                  : AppShadows.buttonPrimary(
-                                      theme.colorScheme.primary),
-                            ),
-                            child: PressableScale(
-                              enabled: !isLoading,
-                              child: FilledButton(
-                                onPressed: isLoading ? null : _submit,
-                                child: isLoading
-                                    ? const SizedBox(
-                                        height: 22,
-                                        width: 22,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.5,
-                                          strokeCap: StrokeCap.round,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    : const Text('Entrar'),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: Divider(color: theme.colorScheme.outline)),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              'ou',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                              child: Divider(color: theme.colorScheme.outline)),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      OutlinedButton.icon(
-                        onPressed: _googleLoading ? null : _googleSignIn,
-                        icon: _googleLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Icon(Icons.g_mobiledata_rounded, size: 28),
-                        label: Text(_googleLoading
-                            ? 'Conectando...'
-                            : 'Entrar com Google'),
-                      ),
-                      const SizedBox(height: 32),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Não tem uma conta? ',
-                            style: theme.textTheme.bodyMedium,
-                          ),
-                          GestureDetector(
-                            onTap: () => context.push('/register'),
-                            child: Text(
-                              'Cadastre-se',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

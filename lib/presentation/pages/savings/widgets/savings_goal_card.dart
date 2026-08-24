@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../../../../core/theme/app_tokens.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_money_style.dart';
 import '../../../../domain/entities/savings_goal.dart';
+import '../../../widgets/ledger_row.dart';
 
 class SavingsGoalCard extends StatelessWidget {
   final SavingsGoal goal;
@@ -21,128 +24,102 @@ class SavingsGoalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final appColors = theme.appColors;
     final progress = goal.targetAmount > 0
         ? (goal.currentAmount / goal.targetAmount).clamp(0.0, 1.0)
         : 0.0;
     final progressColor =
-        progress >= 1.0 ? Colors.green : theme.colorScheme.primary;
+        progress >= 1.0 ? theme.appColors.success : theme.colorScheme.primary;
+    final hasEmoji = goal.icon != null && goal.icon!.isNotEmpty;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        onTap: onTap,
-        onLongPress: onLongPress,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-            border: Border.all(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+    // Tap/long-press handled by one outer InkWell wrapping the whole entry
+    // (header + progress bar + footer), since LedgerRow itself has no
+    // onLongPress hook.
+    return InkWell(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: Container(
+        padding: const EdgeInsets.only(bottom: 14),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: appColors.divider, width: 1)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            LedgerRow(
+              title: goal.title,
+              subtitle: goal.deadline != null
+                  ? 'Prazo: ${DateFormatter.shortDate(goal.deadline!)}'
+                  : null,
+              // Emoji goals have no IconData to hand LedgerRow -- omit the
+              // leading slot for those and keep the plain icon only for
+              // goals without a custom emoji.
+              leadingIcon: hasEmoji ? null : Icons.savings,
+              leadingIconColor: progressColor,
+              amount: goal.currentAmount,
+              amountColor: progressColor,
+              showDivider: false,
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: progressColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(AppRadius.xl),
-                    ),
-                    child: Center(
-                      child: goal.icon != null && goal.icon!.isNotEmpty
-                          ? Text(goal.icon!,
-                              style: const TextStyle(fontSize: 22))
-                          : Icon(Icons.savings, color: progressColor, size: 22),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          goal.title,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+            const SizedBox(height: 4),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 6,
+                backgroundColor:
+                    theme.colorScheme.primary.withValues(alpha: 0.1),
+                color: progressColor,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Meta: ',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
-                        if (goal.deadline != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: Text(
-                              'Prazo: ${DateFormatter.shortDate(goal.deadline!)}',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+                      ),
+                      AppMoneyStyle.rich(
+                        amount: CurrencyFormatter.format(goal.targetAmount)
+                            .replaceFirst(RegExp(r'R\$\s*'), ''),
+                        style: AppMoneyStyle.small,
+                        digitColor: theme.colorScheme.onSurfaceVariant,
+                        symbolColor: theme.colorScheme.onSurfaceVariant
+                            .withValues(alpha: 0.7),
+                      ),
+                    ],
                   ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: progressColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
-                    ),
-                    child: Text(
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
                       '${(progress * 100).toStringAsFixed(0)}%',
                       style: theme.textTheme.labelMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: progressColor,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 4),
-                  IconButton(
-                    icon: Icon(Icons.edit_outlined,
-                        size: 18, color: Colors.white54),
-                    onPressed: onEdit,
-                    constraints:
-                        const BoxConstraints(maxWidth: 32, maxHeight: 32),
-                    padding: EdgeInsets.zero,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadius.pill),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 10,
-                  backgroundColor:
-                      theme.colorScheme.primary.withValues(alpha: 0.1),
-                  color: progressColor,
+                    const SizedBox(width: 4),
+                    IconButton(
+                      icon: Icon(Icons.edit_outlined,
+                          size: 18, color: appColors.onSurfaceVariant),
+                      onPressed: onEdit,
+                      constraints:
+                          const BoxConstraints(maxWidth: 32, maxHeight: 32),
+                      padding: EdgeInsets.zero,
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    CurrencyFormatter.format(goal.currentAmount),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: progressColor,
-                    ),
-                  ),
-                  Text(
-                    CurrencyFormatter.format(goal.targetAmount),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ),
       ),
     );

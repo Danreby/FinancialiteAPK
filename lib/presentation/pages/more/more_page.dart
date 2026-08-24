@@ -1,9 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/page_header.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../widgets/ledger_row.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/theme/app_tokens.dart';
+
+/// Curated menu-icon colors, sourced from the hues already used across the
+/// app's color schemes (rose/forest/gold/lavender/midnight -- see
+/// app_colors.dart) instead of generic Material swatches, so the "one
+/// distinct color per menu item" pattern still reads as this app's palette.
+class _MenuColors {
+  _MenuColors._();
+
+  static const forestGreen = Color(0xFF059669); // forest scheme primary
+  static const amber = Color(0xFFD97706); // gold scheme primary
+  static const blue = Color(0xFF3B82F6); // midnight scheme secondary
+  static const purple = Color(0xFF7C3AED); // lavender scheme primary
+  static const teal = Color(0xFF2DD4BF); // forest scheme accent
+  static const rose = Color(0xFFE11D48); // rose scheme secondary
+  static const pink = Color(0xFFF43F5E); // rose scheme accent
+  static const slate = Color(0xFF4B5563); // black scheme accent
+}
 
 class MorePage extends StatelessWidget {
   const MorePage({super.key});
@@ -20,68 +36,66 @@ class MorePage extends StatelessWidget {
           PageHeader(title: 'Mais'),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.fromLTRB(0, 20, 0, 130),
               children: [
                 _SectionLabel('Financeiro'),
                 const SizedBox(height: 8),
-                _buildGroup(context, appColors, [
+                _buildGroup(context, [
                   _MenuItemData(Icons.trending_up_rounded, 'Receitas',
-                      const Color(0xFF4CAF50), () => context.push('/income')),
+                      _MenuColors.forestGreen, () => context.push('/income')),
                   _MenuItemData(Icons.receipt_long_rounded, 'Faturas',
-                      const Color(0xFF10B981), () => context.push('/faturas')),
+                      _MenuColors.amber, () => context.push('/faturas')),
                   _MenuItemData(Icons.account_balance_wallet_rounded, 'Extrato',
-                      const Color(0xFF2196F3), () => context.push('/extract')),
+                      _MenuColors.blue, () => context.push('/extract')),
                   _MenuItemData(
                       Icons.show_chart_rounded,
                       'Projeções',
-                      const Color(0xFF7C3AED),
+                      _MenuColors.purple,
                       () => context.push('/projections')),
                   _MenuItemData(Icons.savings_rounded, 'Metas de Economia',
-                      const Color(0xFF2196F3), () => context.push('/savings')),
+                      _MenuColors.teal, () => context.push('/savings')),
                   _MenuItemData(
                       Icons.account_balance_rounded,
                       'Contas Bancárias',
-                      const Color(0xFF9C27B0),
+                      _MenuColors.rose,
                       () => context.push('/bank-accounts')),
                   _MenuItemData(Icons.credit_card_rounded, 'Cartões',
-                      const Color(0xFFFF9800), () => context.push('/cards')),
+                      _MenuColors.pink, () => context.push('/cards')),
                 ]),
                 const SizedBox(height: 20),
                 _SectionLabel('Organização'),
                 const SizedBox(height: 8),
-                _buildGroup(context, appColors, [
+                _buildGroup(context, [
                   _MenuItemData(
                       Icons.category_rounded,
                       'Categorias',
-                      const Color(0xFFE91E63),
+                      _MenuColors.slate,
                       () => context.push('/categories')),
                   _MenuItemData(
                       Icons.notifications_rounded,
                       'Notificações',
-                      const Color(0xFFFF5722),
+                      _MenuColors.amber,
                       () => context.push('/notifications')),
                   _MenuItemData(Icons.bar_chart_rounded, 'Relatórios',
-                      const Color(0xFF607D8B), () => context.push('/reports')),
+                      _MenuColors.blue, () => context.push('/reports')),
                 ]),
                 const SizedBox(height: 20),
                 _SectionLabel('Conta'),
                 const SizedBox(height: 8),
-                _buildGroup(context, appColors, [
+                _buildGroup(context, [
                   _MenuItemData(
                       Icons.person_rounded,
                       'Perfil',
                       theme.colorScheme.primary,
                       () => context.push('/profile')),
                   _MenuItemData(Icons.settings_rounded, 'Configurações',
-                      const Color(0xFF78909C), () => context.push('/settings')),
+                      _MenuColors.slate, () => context.push('/settings')),
                 ]),
                 const SizedBox(height: 32),
                 Center(
                   child: Text(
                     'Financialite v1.2.0',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 12,
+                    style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant
                           .withValues(alpha: 0.5),
                     ),
@@ -96,85 +110,20 @@ class MorePage extends StatelessWidget {
     );
   }
 
-  Widget _buildGroup(
-      BuildContext context, ThemeColors appColors, List<_MenuItemData> items) {
-    final theme = Theme.of(context);
+  Widget _buildGroup(BuildContext context, List<_MenuItemData> items) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        decoration: BoxDecoration(
-          color: appColors.surface,
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-          border: Border.all(color: appColors.divider.withValues(alpha: 0.7)),
-        ),
-        child: Column(
-          children: List.generate(items.length, (i) {
-            final item = items[i];
-            return Column(
-              children: [
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.only(
-                      topLeft:
-                          i == 0 ? const Radius.circular(AppRadius.xl) : Radius.zero,
-                      topRight:
-                          i == 0 ? const Radius.circular(AppRadius.xl) : Radius.zero,
-                      bottomLeft: i == items.length - 1
-                          ? const Radius.circular(AppRadius.xl)
-                          : Radius.zero,
-                      bottomRight: i == items.length - 1
-                          ? const Radius.circular(AppRadius.xl)
-                          : Radius.zero,
-                    ),
-                    onTap: item.onTap,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 11),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: item.color.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(AppRadius.sm),
-                            ),
-                            child: Icon(item.icon, color: item.color, size: 20),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              item.label,
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
-                          ),
-                          Icon(
-                            Icons.chevron_right_rounded,
-                            size: 18,
-                            color: theme.colorScheme.onSurfaceVariant
-                                .withValues(alpha: 0.4),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                if (i < items.length - 1)
-                  Divider(
-                    height: 1,
-                    indent: 66,
-                    color: appColors.divider.withValues(alpha: 0.5),
-                  ),
-              ],
-            );
-          }),
-        ),
+      child: Column(
+        children: List.generate(items.length, (i) {
+          final item = items[i];
+          return LedgerRow(
+            leadingIcon: item.icon,
+            leadingIconColor: item.color,
+            title: item.label,
+            onTap: item.onTap,
+            showDivider: i < items.length - 1,
+          );
+        }),
       ),
     );
   }
@@ -199,10 +148,7 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Text(
         text,
-        style: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
+        style: theme.textTheme.labelMedium?.copyWith(
           color: theme.colorScheme.onSurfaceVariant,
           letterSpacing: 0.4,
         ),

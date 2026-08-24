@@ -44,7 +44,7 @@ class StatCard extends StatelessWidget {
             borderRadius: AppRadius.cardCut(),
             boxShadow: isGradient
                 ? AppShadows.buttonPrimary(effectiveColor)
-                : AppShadows.cardBold(appColors.primary),
+                : AppNeumorphic.outset,
           ),
           child: Padding(
             padding: const EdgeInsets.all(14),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/theme/app_tokens.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_money_style.dart';
 import '../../../../domain/entities/budget.dart';
+import '../../../widgets/ledger_row.dart';
 
 class BudgetListItem extends StatelessWidget {
   final Budget budget;
@@ -18,6 +21,7 @@ class BudgetListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final appColors = theme.appColors;
     final spent = budget.totalSpent ?? 0;
     final progress = budget.monthlyLimit > 0
         ? (spent / budget.monthlyLimit).clamp(0.0, 1.0)
@@ -26,148 +30,123 @@ class BudgetListItem extends StatelessWidget {
     final progressColor =
         isOver ? theme.colorScheme.error : theme.colorScheme.primary;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Dismissible(
-        key: Key('budget_${budget.id}'),
-        direction: DismissDirection.endToStart,
-        background: Container(
-          alignment: Alignment.centerRight,
-          padding: const EdgeInsets.only(right: 20),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.error,
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-          ),
-          child: const Icon(Icons.delete, color: Colors.white),
+    return Dismissible(
+      key: Key('budget_${budget.id}'),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.error,
+          borderRadius: BorderRadius.circular(AppRadius.xl),
         ),
-        confirmDismiss: (_) => onConfirmDismiss(),
-        onDismissed: (_) => onDismissed(),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-            border: Border.all(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      confirmDismiss: (_) => onConfirmDismiss(),
+      onDismissed: (_) => onDismissed(),
+      // Whole entry (header + progress bar + gasto/limite + chips) is wrapped
+      // in a single hairline-bottom-bordered block so it reads as one
+      // coherent ledger line, not a floating disconnected progress bar.
+      child: Container(
+        padding: const EdgeInsets.only(bottom: 14),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: appColors.divider, width: 1)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            LedgerRow(
+              title: 'Orçamento ${budget.monthYear}',
+              subtitle: isOver ? 'Limite excedido' : 'Dentro do limite',
+              subtitleColor: isOver ? theme.colorScheme.error : null,
+              trailingText: '${(progress * 100).toStringAsFixed(0)}%',
+              trailingTextColor: progressColor,
+              showDivider: false,
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: progressColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(AppRadius.xl),
-                    ),
-                    child: Icon(
-                      Icons.pie_chart_rounded,
-                      color: progressColor,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Orçamento ${budget.monthYear}',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+            const SizedBox(height: 4),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 6,
+                color: progressColor,
+                backgroundColor: progressColor.withValues(alpha: 0.12),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Gasto: ',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          isOver ? 'Limite excedido' : 'Dentro do limite',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: isOver
-                                ? theme.colorScheme.error
-                                : theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: progressColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(AppRadius.lg),
-                    ),
-                    child: Text(
-                      '${(progress * 100).toStringAsFixed(0)}%',
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: progressColor,
-                        fontWeight: FontWeight.w700,
                       ),
-                    ),
+                      AppMoneyStyle.rich(
+                        amount: CurrencyFormatter.format(spent)
+                            .replaceFirst(RegExp(r'R\$\s*'), ''),
+                        style: AppMoneyStyle.small,
+                        digitColor: theme.colorScheme.onSurfaceVariant,
+                        symbolColor: theme.colorScheme.onSurfaceVariant
+                            .withValues(alpha: 0.7),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadius.pill),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 8,
-                  color: progressColor,
-                  backgroundColor: progressColor.withValues(alpha: 0.12),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Gasto: ${CurrencyFormatter.format(spent)}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Limite: ',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      AppMoneyStyle.rich(
+                        amount: CurrencyFormatter.format(budget.monthlyLimit)
+                            .replaceFirst(RegExp(r'R\$\s*'), ''),
+                        style: AppMoneyStyle.small,
+                        digitColor: theme.colorScheme.onSurfaceVariant,
+                        symbolColor: theme.colorScheme.onSurfaceVariant
+                            .withValues(alpha: 0.7),
+                      ),
+                    ],
                   ),
-                  Text(
-                    'Limite: ${CurrencyFormatter.format(budget.monthlyLimit)}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-              if ((budget.categories ?? []).isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: (budget.categories ?? [])
-                      .map((c) => Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primaryContainer
-                                  .withValues(alpha: 0.5),
-                              borderRadius: BorderRadius.circular(AppRadius.md),
-                            ),
-                            child: Text(
-                              c.categoryName ?? '',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.onPrimaryContainer,
-                              ),
-                            ),
-                          ))
-                      .toList(),
                 ),
               ],
+            ),
+            if ((budget.categories ?? []).isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: (budget.categories ?? [])
+                    .map((c) => Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer
+                                .withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                          ),
+                          child: Text(
+                            c.categoryName ?? '',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                        ))
+                    .toList(),
+              ),
             ],
-          ),
+          ],
         ),
       ),
     );

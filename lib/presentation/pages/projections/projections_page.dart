@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/projections/projections_cubit.dart';
 import '../../widgets/app_error_widget.dart';
 import '../../widgets/app_loading_indicator.dart';
+import '../../widgets/empty_state_widget.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../widgets/page_header.dart';
 import 'widgets/summary_card.dart';
@@ -63,24 +64,10 @@ class _ProjectionsPageState extends State<ProjectionsPage> {
     final transactions = state.transactions;
 
     if (months.isEmpty && transactions.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.show_chart,
-                size: 64,
-                color:
-                    theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
-            const SizedBox(height: 12),
-            Text('Nenhuma projeção disponível',
-                style: theme.textTheme.bodyLarge
-                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-            const SizedBox(height: 6),
-            Text('Adicione transações com parcelas ou recorrentes',
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-          ],
-        ),
+      return const EmptyStateWidget(
+        icon: Icons.show_chart,
+        title: 'Nenhuma projeção disponível',
+        subtitle: 'Adicione transações com parcelas ou recorrentes',
       );
     }
 
